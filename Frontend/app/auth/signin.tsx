@@ -1,5 +1,13 @@
-import React, { useState } from "react";
-import { Text, View, TouchableOpacity, TextInput, ActivityIndicator, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -7,11 +15,18 @@ import { StatusBar } from "expo-status-bar";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { BookOpen, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
-import { AuthsignIn } from "@/api/apiCall";
-import { useDispatch } from 'react-redux';
-import { setUser } from '@/store/reducer';
-import * as SecureStore from 'expo-secure-store';
-//  import { showLoginNotification } from "../../utils/notifications";
+import { AuthsignIn, AuthGoogleSignIn } from "@/api/apiCall"; // <-- Make sure AuthGoogleSignIn is exported from apiCall
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/reducer";
+import * as SecureStore from "expo-secure-store";
+
+// --- Google Auth Imports ---
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
+
+// This is required for expo-auth-session on web/development
+WebBrowser.maybeCompleteAuthSession();
+
 // Validation schema
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -21,13 +36,69 @@ const SignInSchema = Yup.object().shape({
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
 });
-
+const AndroidClientID = process.env.AndroirdClientID
 export default function SignIn() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // For email/pass login
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // For Google login
   const [showPassword, setShowPassword] = useState(false);
 
+  // --- Google Auth Hook ---
+  // Replace with your actual client IDs from Google Cloud Console
+  // const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+  //   expoClientId: "YOUR_EXPO_CLIENT_ID.apps.googleusercontent.com",
+  //   iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
+  //   androidClientId: AndroidClientID,
+  //   webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+  // });
+
+  // --- Handle Google Sign-In Response ---
+  // useEffect(() => {
+  //   if (response?.type === "success") {
+  //     setIsGoogleLoading(true);
+  //     const { id_token } = response.params;
+  //     handleGoogleSignIn(id_token);
+  //   } else if (response?.type === "error") {
+  //     Alert.alert(
+  //       "Google Sign In Failed",
+  //       response.error?.message || "Something went wrong"
+  //     );
+  //     setIsGoogleLoading(false);
+  //   }
+  // }, [response]);
+
+  // --- Google Sign-In API Call Handler ---
+  // const handleGoogleSignIn = async (idToken: string) => {
+  //   try {
+  //     // This function must be created in your api/apiCall.js
+  //     const result = await AuthGoogleSignIn(idToken);
+  //     await SecureStore.setItemAsync("authToken", result.token);
+  //     dispatch(setUser({ user: result.user }));
+
+  //     // Check if user needs to complete their profile (based on backend logic)
+  //     if (!result.user.cohortNo || !result.user.semester || !result.user.term) {
+  //       Alert.alert(
+  //         "Profile Incomplete",
+  //         "Please complete your profile details."
+  //       );
+  //       router.replace("/user/profile"); // Redirect to profile page
+  //     } else if (result.user.role === "TEACHER") {
+  //       router.replace("/admin");
+  //     } else {
+  //       router.replace("/user");
+  //     }
+  //   } catch (e: any) {
+  //     const errorMsg =
+  //       e.response?.data?.message || e.message || "Something went wrong";
+  //     Alert.alert("Sign In Failed", errorMsg);
+  //     console.log("Google SignIn Error:", errorMsg);
+  //   } finally {
+  //     setIsGoogleLoading(false);
+  //   }
+  // };
+
+  // --- Email/Password Sign-In Handler ---
   const handleSignIn = async (
     values: { email: string; password: string },
     setErrors: (errors: { [key: string]: string }) => void
@@ -37,17 +108,18 @@ export default function SignIn() {
 
     try {
       const result = await AuthsignIn(values);
-      await SecureStore.setItemAsync('authToken', result.token);
-      dispatch(setUser({"user":result.user}));
-      // await showLoginNotification(result.user.name); 
+      await SecureStore.setItemAsync("authToken", result.token);
+      dispatch(setUser({ user: result.user }));
+      // await showLoginNotification(result.user.name);
       // Redirect based on user role
-      if (result.user.role === 'TEACHER') {
+      if (result.user.role === "TEACHER") {
         router.replace("/admin");
       } else {
         router.replace("/user");
       }
     } catch (e: any) {
-      const errorMsg = e.response?.data?.message || e.message || "Something went wrong";
+      const errorMsg =
+        e.response?.data?.message || e.message || "Something went wrong";
 
       // Show error as alert for better UX
       Alert.alert("Sign In Failed", errorMsg);
@@ -61,15 +133,11 @@ export default function SignIn() {
   return (
     <SafeAreaView className="flex-1 bg-[#0f172b]">
       <StatusBar style="light" />
-<LinearGradient
-  colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
-  locations={[0, 0.5, 1]}
-  style={{ flex: 1 }}
->
-
-
-
-
+      <LinearGradient
+        colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
+        locations={[0, 0.5, 1]}
+        style={{ flex: 1 }}
+      >
         <View className="flex-1 items-center justify-center px-8">
           {/* Header */}
           <View className="justify-center items-center mb-12">
@@ -78,7 +146,9 @@ export default function SignIn() {
                 <BookOpen size={24} color="white" strokeWidth={2} />
               </View>
             </View>
-            <Text className="text-4xl font-bold text-white mb-2">Welcome Back</Text>
+            <Text className="text-4xl font-bold text-white mb-2">
+              Welcome Back
+            </Text>
             <Text className="text-base text-white/80 text-center">
               Sign in to manage your assignments
             </Text>
@@ -87,16 +157,31 @@ export default function SignIn() {
           <Formik
             initialValues={{ email: "", password: "" }}
             validationSchema={SignInSchema}
-            onSubmit={(values, { setErrors }) => handleSignIn(values, setErrors)}
+            onSubmit={(values, { setErrors }) =>
+              handleSignIn(values, setErrors)
+            }
           >
-            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+            }) => (
               <View className="w-full max-w-sm">
                 {/* Email Input */}
                 <View className="mb-4">
-                  <Text className="text-white mb-2 text-base font-medium">Email</Text>
+                  <Text className="text-white mb-2 text-base font-medium">
+                    Email
+                  </Text>
                   <View className="relative">
                     <View className="absolute left-3 top-3 z-10">
-                      <Mail size={20} color="rgba(0,0,0,0.4)" strokeWidth={2} />
+                      <Mail
+                        size={20}
+                        color="rgba(0,0,0,0.4)"
+                        strokeWidth={2}
+                      />
                     </View>
                     <TextInput
                       onChangeText={handleChange("email")}
@@ -111,16 +196,24 @@ export default function SignIn() {
                     />
                   </View>
                   {errors.email && touched.email && (
-                    <Text className="text-red-300 text-sm mt-1 ml-1">{errors.email}</Text>
+                    <Text className="text-red-300 text-sm mt-1 ml-1">
+                      {errors.email}
+                    </Text>
                   )}
                 </View>
 
                 {/* Password Input */}
                 <View className="mb-6">
-                  <Text className="text-white mb-2 text-base font-medium">Password</Text>
+                  <Text className="text-white mb-2 text-base font-medium">
+                    Password
+                  </Text>
                   <View className="relative">
                     <View className="absolute left-3 top-3 z-10">
-                      <Lock size={20} color="rgba(0,0,0,0.4)" strokeWidth={2} />
+                      <Lock
+                        size={20}
+                        color="rgba(0,0,0,0.4)"
+                        strokeWidth={2}
+                      />
                     </View>
                     <TextInput
                       secureTextEntry={!showPassword}
@@ -138,19 +231,29 @@ export default function SignIn() {
                       activeOpacity={0.7}
                     >
                       {showPassword ? (
-                        <EyeOff size={20} color="rgba(0,0,0,0.4)" strokeWidth={2} />
+                        <EyeOff
+                          size={20}
+                          color="rgba(0,0,0,0.4)"
+                          strokeWidth={2}
+                        />
                       ) : (
-                        <Eye size={20} color="rgba(0,0,0,0.4)" strokeWidth={2} />
+                        <Eye
+                          size={20}
+                          color="rgba(0,0,0,0.4)"
+                          strokeWidth={2}
+                        />
                       )}
                     </TouchableOpacity>
                   </View>
                   {errors.password && touched.password && (
-                    <Text className="text-red-300 text-sm mt-1 ml-1">{errors.password}</Text>
+                    <Text className="text-red-300 text-sm mt-1 ml-1">
+                      {errors.password}
+                    </Text>
                   )}
                 </View>
 
                 {/* Forgot Password Link */}
-                <TouchableOpacity 
+                <TouchableOpacity
                   className="mb-6"
                   onPress={() => {
                     // TODO: Navigate to forgot password screen
@@ -166,12 +269,12 @@ export default function SignIn() {
                 {/* Sign In Button */}
                 <TouchableOpacity
                   onPress={() => handleSubmit()}
-                  disabled={isLoading}
+                  disabled={isLoading || isGoogleLoading}
                   className={`py-4 rounded-xl mb-6 ${
-                    isLoading ? 'bg-white/50' : 'bg-white'
+                    isLoading ? "bg-white/50" : "bg-white"
                   }`}
                   style={{
-                    shadowColor: '#000',
+                    shadowColor: "#000",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.3,
                     shadowRadius: 8,
@@ -182,16 +285,56 @@ export default function SignIn() {
                   {isLoading ? (
                     <View className="flex-row items-center justify-center">
                       <ActivityIndicator size="small" color="#3B82F6" />
-                      <Text className="text-blue-600 ml-2 font-bold text-lg">Signing In...</Text>
+                      <Text className="text-blue-600 ml-2 font-bold text-lg">
+                        Signing In...
+                      </Text>
                     </View>
                   ) : (
-                    <Text className="text-blue-600 text-center font-bold text-lg">Sign In</Text>
+                    <Text className="text-blue-600 text-center font-bold text-lg">
+                      Sign In
+                    </Text>
                   )}
                 </TouchableOpacity>
 
+                {/* --- Google Sign-In Button --- */}
+                <TouchableOpacity
+                  // onPress={() => {
+                  //   if (!isGoogleLoading) {
+                  //     promptAsync();
+                  //   }
+                  // }}
+                  disabled={isLoading || isGoogleLoading}
+                  className={`py-4 rounded-xl mb-6 ${
+                    isGoogleLoading ? "bg-gray-200/50" : "bg-gray-200"
+                  }`}
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 8,
+                  }}
+                  activeOpacity={0.8}
+                >
+                  {isGoogleLoading ? (
+                    <View className="flex-row items-center justify-center">
+                      <ActivityIndicator size="small" color="#3B82F6" />
+                      <Text className="text-blue-600 ml-2 font-bold text-lg">
+                        Signing In...
+                      </Text>
+                    </View>
+                  ) : (
+                    // You can add a Google logo here if you want
+                    <Text className="text-blue-600 text-center font-bold text-lg">
+                      Sign In with Google
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                {/* ----------------------------- */}
+
                 {/* Sign Up Link */}
-                <TouchableOpacity 
-                  onPress={() => router.push("/auth/signup")} 
+                <TouchableOpacity
+                  onPress={() => router.push("/auth/signup")}
                   activeOpacity={0.7}
                   className="items-center"
                 >

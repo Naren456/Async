@@ -22,6 +22,7 @@ model User {
   email          String           @unique
   name           String?
   password       String?
+  googleId       String?          @unique // <-- ADD THIS
   profilePic     String?
   role           Role             @default(STUDENT)
   cohortNo       Int? 

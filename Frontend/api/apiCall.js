@@ -165,5 +165,14 @@ export const UpdateProfile = async (token, payload) => {
   }
 };
 
+export const AuthGoogleSignIn = async (idToken) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/auth/google`, { idToken });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 
