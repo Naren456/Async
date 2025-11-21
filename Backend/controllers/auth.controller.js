@@ -245,3 +245,37 @@ export const googleSignin = async (req, res) => {
     res.status(500).json({ message: "Server error during Google sign-in" });
   }
 };
+
+export const getMe = async (req, res) => {
+  try {
+    // req.user is set by the authenticate middleware
+    const userId = req.user; 
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        cohortNo: true,
+        semester: true,
+        term: true,
+        // Exclude sensitive fields like 'password'
+      },
+    });
+
+    if (!user) {
+      // Should not happen if token is valid, but good for safety
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Success: Token is valid, return user data
+    res.json({ user });
+  } catch (error) {
+    console.error(error);
+    // If the token was invalid/expired, the 'authenticate' middleware 
+    // already handles the 401 response. This catch is for other server errors.
+    res.status(500).json({ message: "Server error fetching user profile" });
+  }
+};

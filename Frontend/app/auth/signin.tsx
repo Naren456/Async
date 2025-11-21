@@ -15,17 +15,11 @@ import { StatusBar } from "expo-status-bar";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { BookOpen, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
-import { AuthsignIn, AuthGoogleSignIn } from "@/api/apiCall"; // <-- Make sure AuthGoogleSignIn is exported from apiCall
+import { AuthsignIn } from "@/api/apiCall";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/store/reducer";
 import * as SecureStore from "expo-secure-store";
 
-// --- Google Auth Imports ---
-import * as Google from "expo-auth-session/providers/google";
-import * as WebBrowser from "expo-web-browser";
-
-// This is required for expo-auth-session on web/development
-WebBrowser.maybeCompleteAuthSession();
 
 // Validation schema
 const SignInSchema = Yup.object().shape({
@@ -36,67 +30,12 @@ const SignInSchema = Yup.object().shape({
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
 });
-const AndroidClientID = process.env.AndroirdClientID
+
 export default function SignIn() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false); // For email/pass login
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // For Google login
   const [showPassword, setShowPassword] = useState(false);
-
-  // --- Google Auth Hook ---
-  // Replace with your actual client IDs from Google Cloud Console
-  // const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-  //   expoClientId: "YOUR_EXPO_CLIENT_ID.apps.googleusercontent.com",
-  //   iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
-  //   androidClientId: AndroidClientID,
-  //   webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
-  // });
-
-  // --- Handle Google Sign-In Response ---
-  // useEffect(() => {
-  //   if (response?.type === "success") {
-  //     setIsGoogleLoading(true);
-  //     const { id_token } = response.params;
-  //     handleGoogleSignIn(id_token);
-  //   } else if (response?.type === "error") {
-  //     Alert.alert(
-  //       "Google Sign In Failed",
-  //       response.error?.message || "Something went wrong"
-  //     );
-  //     setIsGoogleLoading(false);
-  //   }
-  // }, [response]);
-
-  // --- Google Sign-In API Call Handler ---
-  // const handleGoogleSignIn = async (idToken: string) => {
-  //   try {
-  //     // This function must be created in your api/apiCall.js
-  //     const result = await AuthGoogleSignIn(idToken);
-  //     await SecureStore.setItemAsync("authToken", result.token);
-  //     dispatch(setUser({ user: result.user }));
-
-  //     // Check if user needs to complete their profile (based on backend logic)
-  //     if (!result.user.cohortNo || !result.user.semester || !result.user.term) {
-  //       Alert.alert(
-  //         "Profile Incomplete",
-  //         "Please complete your profile details."
-  //       );
-  //       router.replace("/user/profile"); // Redirect to profile page
-  //     } else if (result.user.role === "TEACHER") {
-  //       router.replace("/admin");
-  //     } else {
-  //       router.replace("/user");
-  //     }
-  //   } catch (e: any) {
-  //     const errorMsg =
-  //       e.response?.data?.message || e.message || "Something went wrong";
-  //     Alert.alert("Sign In Failed", errorMsg);
-  //     console.log("Google SignIn Error:", errorMsg);
-  //   } finally {
-  //     setIsGoogleLoading(false);
-  //   }
-  // };
 
   // --- Email/Password Sign-In Handler ---
   const handleSignIn = async (
@@ -269,7 +208,7 @@ export default function SignIn() {
                 {/* Sign In Button */}
                 <TouchableOpacity
                   onPress={() => handleSubmit()}
-                  disabled={isLoading || isGoogleLoading}
+                  disabled={isLoading}
                   className={`py-4 rounded-xl mb-6 ${
                     isLoading ? "bg-white/50" : "bg-white"
                   }`}
@@ -295,42 +234,6 @@ export default function SignIn() {
                     </Text>
                   )}
                 </TouchableOpacity>
-
-                {/* --- Google Sign-In Button --- */}
-                <TouchableOpacity
-                  // onPress={() => {
-                  //   if (!isGoogleLoading) {
-                  //     promptAsync();
-                  //   }
-                  // }}
-                  disabled={isLoading || isGoogleLoading}
-                  className={`py-4 rounded-xl mb-6 ${
-                    isGoogleLoading ? "bg-gray-200/50" : "bg-gray-200"
-                  }`}
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 8,
-                  }}
-                  activeOpacity={0.8}
-                >
-                  {isGoogleLoading ? (
-                    <View className="flex-row items-center justify-center">
-                      <ActivityIndicator size="small" color="#3B82F6" />
-                      <Text className="text-blue-600 ml-2 font-bold text-lg">
-                        Signing In...
-                      </Text>
-                    </View>
-                  ) : (
-                    // You can add a Google logo here if you want
-                    <Text className="text-blue-600 text-center font-bold text-lg">
-                      Sign In with Google
-                    </Text>
-                  )}
-                </TouchableOpacity>
-                {/* ----------------------------- */}
 
                 {/* Sign Up Link */}
                 <TouchableOpacity

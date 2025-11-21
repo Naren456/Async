@@ -30,6 +30,16 @@ export const AuthsignIn = async (userData) => {
   }
 }
 
+export const GetMe = async () => {
+  try {
+    const response = await api.get("/api/auth/me");
+    return response.data; // Expected: { user: { id, name, email, role, ... } }
+  } catch (error) {
+    // 401 Unauthorized is expected here if token is expired/invalid
+    console.error("GetMe API Error:", error.response?.status, error.message);
+    throw error.response?.data || { message: "Token validation failed" };
+  }
+}
 
 // Fetch Assignment //
 export const GetAssignments = async (cohort) => {
