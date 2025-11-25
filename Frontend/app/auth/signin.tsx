@@ -48,7 +48,8 @@ export default function SignIn() {
     try {
       const result = await AuthsignIn(values);
       await SecureStore.setItemAsync("authToken", result.token);
-      dispatch(setUser({ user: result.user }));
+      // 🔥 MODIFICATION: Pass the token to the setUser action
+      dispatch(setUser({ user: result.user, token: result.token }));
       // await showLoginNotification(result.user.name);
       // Redirect based on user role
       if (result.user.role === "TEACHER") {
