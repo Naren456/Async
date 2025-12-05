@@ -17,7 +17,7 @@ const AdminUsers = () => {
     setLoading(true);
     setError('');
     try {
-      const data = await GetAllUsers(user?.token);
+      const data = await GetAllUsers();
       setUsers(data);
     } catch (err: any) {
       console.error('Error loading users:', err?.response || err);

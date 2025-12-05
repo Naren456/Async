@@ -68,10 +68,10 @@ const SubjectForm: React.FC<SubjectFormProps> = ({
     setLoading(true);
     try {
       if (editMode) {
-        await UpdateSubject(user?.token, form.code, form);
+        await UpdateSubject(form.code, form);
         Alert.alert("Success", "Subject updated successfully!");
       } else {
-        await CreateSubject(user?.token, form);
+        await CreateSubject(form);
         Alert.alert("Success", "Subject created successfully!");
       }
       onSuccess && onSuccess();

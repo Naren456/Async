@@ -5,6 +5,7 @@ export const ENDPOINTS = {
     GOOGLE: '/api/auth/google',
     ME: '/api/auth/me',
     PUSH_TOKEN: '/api/auth/push-token',
+    TEST_NOTIFICATION: '/api/auth/test-notification',
   },
   ASSIGNMENTS: {
     BASE: '/api/assignments',
@@ -20,6 +21,7 @@ export const ENDPOINTS = {
   ADMIN: {
     STATS: '/api/admin/stats',
     USERS: '/api/admin/Users',
+    NOTIFICATIONS: '/api/admin/notifications',
   },
   NOTES: {
     UPLOAD: '/api/notes/upload',

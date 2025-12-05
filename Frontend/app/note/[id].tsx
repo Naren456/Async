@@ -26,7 +26,7 @@ export default function SubjectNotes() {
     setLoading(true);
     setError(null);
     try {
-      const data = await GetSubjectById(user?.token,id);
+      const data = await GetSubjectById(id);
       setSubject(data.subject);
     } catch (e: any) {
       setError(e?.message || "Failed to load subject");

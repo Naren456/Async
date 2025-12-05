@@ -94,7 +94,7 @@ const UserProfile = () => {
         term: data.term ? Number(data.term) : null,
         cgr: data.cgr && data.cgr.trim() ? Number(data.cgr.trim()) : null,
       };
-      const response = await UpdateProfile(user.token, updatedData);
+      const response = await UpdateProfile(updatedData);
       dispatch(setUser({ user: response.user, token: user.token }));
       setEditModalVisible(false);
       Alert.alert("Success", "Profile updated successfully");
@@ -105,6 +105,8 @@ const UserProfile = () => {
       setIsLoading(false);
     }
   };
+
+
 
   return (
     <SafeAreaView className="flex-1 bg-[#0f172b]">
@@ -165,6 +167,8 @@ const UserProfile = () => {
             </View>
           </View>
         </ProfileSection>
+
+
 
 
 

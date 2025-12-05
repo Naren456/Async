@@ -60,12 +60,12 @@ const AssignmentForm = () => {
     setLoading(true);
     try {
       if (isEdit) {
-        await UpdateAssignment(user.token, id, { ...form });
+        await UpdateAssignment(id, { ...form });
         Alert.alert("Success", "Assignment updated successfully", [
           { text: "OK", onPress: () => router.back() },
         ]);
       } else {
-        await CreateAssignment(user.token, { ...form });
+        await CreateAssignment({ ...form });
         Alert.alert("Success", "Assignment created successfully", [
           { text: "OK", onPress: () => router.back() },
         ]);

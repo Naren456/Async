@@ -25,3 +25,21 @@ export const getAllUsers = async () => {
   const users = await prisma.user.findMany({});
   return users;
 };
+
+export const sendNotificationToCohort = async (cohort, title, body) => {
+  let whereClause = {};
+  if (cohort !== 'ALL') {
+    whereClause = { cohortNo: Number(cohort) };
+  }
+
+  const users = await prisma.user.findMany({
+    where: {
+      ...whereClause,
+      pushToken: { not: null }
+    },
+    select: { pushToken: true }
+  });
+
+  const tokens = users.map(u => u.pushToken);
+  return tokens;
+};

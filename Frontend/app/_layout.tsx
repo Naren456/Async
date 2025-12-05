@@ -3,8 +3,8 @@ import { Provider } from 'react-redux';
 import { store } from '../store/store';
 import * as SecureStore from "expo-secure-store"
 import { useDispatch } from "react-redux";
-import AnimatedSplashScreen from "@/components/AnimatedSplashScreen";
-import { useState } from "react";
+
+
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useSelector } from "react-redux";
 import { UpdatePushToken } from "@/api/apiCall";
@@ -14,16 +14,17 @@ import { useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 // Prevent auto hide
-SplashScreen.preventAutoHideAsync();
+// Hide splash screen immediately
+SplashScreen.hideAsync();
 
 function AppLayout() {
-  const [appIsReady, setAppIsReady] = useState(false);
+
   const { expoPushToken } = usePushNotifications();
   const user = useSelector((state: any) => state.user);
 
   useEffect(() => {
     if (user && user.token && expoPushToken) {
-      UpdatePushToken(user.token, expoPushToken).catch(err => console.error("Failed to sync push token", err));
+      UpdatePushToken(expoPushToken).catch(err => console.error("Failed to sync push token", err));
     }
   }, [user, expoPushToken]);
 
@@ -34,14 +35,7 @@ function AppLayout() {
     });
   }, []);
 
-  const onAnimationFinish = async () => {
-    setAppIsReady(true);
-    await SplashScreen.hideAsync();
-  };
 
-  if (!appIsReady) {
-    return <AnimatedSplashScreen onAnimationFinish={onAnimationFinish} />;
-  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

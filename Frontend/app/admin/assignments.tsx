@@ -13,9 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { ArrowLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { GetAssignmentsByCohort} from "../../api/apiCall";
+import { GetAssignmentsByCohort, DeleteAssignment } from "../../api/apiCall";
 import AssignmentCard from "../../components/AssignmentCard";
-import { DeleteAssignment } from "@/api/admin";
 
 export type Assignment = {
   id: string;
@@ -124,7 +123,7 @@ const AdminAssignments = () => {
         onPress: async () => {
           try {
             setLoading(true);
-            await DeleteAssignment(user.token, id);
+            await DeleteAssignment(id);
             Alert.alert("Deleted", "Assignment deleted successfully");
             loadAssignments();
           } catch (e: any) {

@@ -40,7 +40,7 @@ const AdminSubjects = () => {
   const loadSubjects = async () => {
     setLoading(true);
     try {
-      const data = await GetSubjects(user.token);
+      const data = await GetSubjects();
       setSubjects(data.subjects || []);
     } catch {
       setSubjects([]);
@@ -58,7 +58,7 @@ const AdminSubjects = () => {
         onPress: async () => {
           setLoading(true);
           try {
-            await DeleteSubject(user.token, code);
+            await DeleteSubject(code);
             Alert.alert('Deleted', 'Subject deleted successfully');
             loadSubjects();
           } catch (e: any) {

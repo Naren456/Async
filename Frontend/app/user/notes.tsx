@@ -49,7 +49,7 @@ const UserNotes = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await GetUserSubjectsWithNotes(user?.token,
+        const data = await GetUserSubjectsWithNotes(
           user?.id,
           selectedSemester !== undefined && selectedTerm !== undefined
             ? { semester: selectedSemester, term: selectedTerm }

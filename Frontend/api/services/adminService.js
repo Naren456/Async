@@ -16,7 +16,17 @@ export const GetAllUsers = async () => {
     const response = await client.get(ENDPOINTS.ADMIN.USERS);
     return response.data;
   } catch (error) {
-    console.error('GetAllUsers Error:', error);
-    throw error.response?.data || { message: 'Something went wrong' };
+    console.error("GetAllUsers API Error:", error);
+    throw error.response?.data || { message: "Something went wrong" };
+  }
+};
+
+export const SendNotification = async (cohort, title, body) => {
+  try {
+    const response = await client.post(ENDPOINTS.ADMIN.NOTIFICATIONS, { cohort, title, body });
+    return response.data;
+  } catch (error) {
+    console.error("SendNotification API Error:", error);
+    throw error.response?.data || { message: "Something went wrong" };
   }
 };
