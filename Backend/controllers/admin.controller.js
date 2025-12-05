@@ -1,39 +1,21 @@
-import prisma from "../config/db.js";
+import * as adminService from "../services/admin.service.js";
 
-// ---------------- GET ADMIN STATS ----------------
 export const getAdminStats = async (req, res) => {
   try {
-    const [
-      totalUsers,
-      totalSubjects,
-      totalAssignments,
-      activeCohorts
-    ] = await Promise.all([
-      prisma.user.count(),
-      prisma.subject.count(),
-      prisma.assignment.count(),
-      prisma.cohort.count()
-    ]);
-
-    res.json({
-      totalUsers,
-      totalSubjects,
-      totalAssignments,
-      activeCohorts
-    });
+    const stats = await adminService.getStats();
+    res.json(stats);
   } catch (error) {
     console.error("Error fetching admin stats:", error);
     res.status(500).json({ message: "Server error fetching admin stats" });
   }
 };
 
-export const getAllUsers=  async(req,res) =>{
- try {
-   const users  = await prisma.user.findMany({});
-   res.status(200).json(users)
- }
- catch(error){
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await adminService.getAllUsers();
+    res.status(200).json(users);
+  } catch (error) {
     console.error("Error fetching admin stats:", error);
     res.status(500).json({ message: "Server error fetching all users" });
- }
-}
+  }
+};

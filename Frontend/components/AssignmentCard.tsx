@@ -1,6 +1,7 @@
 import { CalendarDays, ChevronRight, Pen, Trash2 } from "lucide-react-native";
 import React from "react";
-import { Alert, Pressable, Text, View, Linking } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 
 interface AssignmentCardProps {
   title: string;
@@ -23,14 +24,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
 }) => {
   const openAssignment = async () => {
     try {
-      console.log(`Checking support for URL: ${link}`);
-      const supported = await Linking.canOpenURL(link);
-      console.log(`URL supported: ${supported}`);
-      if (supported) {
-        await Linking.openURL(link);
-      } else {
-        Alert.alert("Error", "Cannot open this link.");
-      }
+      await WebBrowser.openBrowserAsync(link);
     } catch (error) {
       console.error("Failed to open link:", error);
       Alert.alert("Error", "Failed to open the assignment link.");

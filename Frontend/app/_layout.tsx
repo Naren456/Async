@@ -1,23 +1,64 @@
-import { Stack } from "expo-router";
+import { Stack, SplashScreen } from "expo-router";
 import { Provider } from 'react-redux';
 import { store } from '../store/store';
 import * as SecureStore from "expo-secure-store"
-import { UseDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
+import AnimatedSplashScreen from "@/components/AnimatedSplashScreen";
+import { useState } from "react";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useSelector } from "react-redux";
+import { UpdatePushToken } from "@/api/apiCall";
 
+
+import { useEffect } from "react";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+
+// Prevent auto hide
+SplashScreen.preventAutoHideAsync();
+
+function AppLayout() {
+  const [appIsReady, setAppIsReady] = useState(false);
+  const { expoPushToken } = usePushNotifications();
+  const user = useSelector((state: any) => state.user);
+
+  useEffect(() => {
+    if (user && user.token && expoPushToken) {
+      UpdatePushToken(user.token, expoPushToken).catch(err => console.error("Failed to sync push token", err));
+    }
+  }, [user, expoPushToken]);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      offlineAccess: true,
+    });
+  }, []);
+
+  const onAnimationFinish = async () => {
+    setAppIsReady(true);
+    await SplashScreen.hideAsync();
+  };
+
+  if (!appIsReady) {
+    return <AnimatedSplashScreen onAnimationFinish={onAnimationFinish} />;
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="welcome" />
+      <Stack.Screen name="user" />
+      <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="note/[id]" />
+      <Stack.Screen name="pdf/[id]" />
+    </Stack>
+  )
+}
 
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <Stack screenOptions={{headerShown:false}}>
-        <Stack.Screen name="index"/>
-        <Stack.Screen name="welcome"/> 
-        <Stack.Screen name="auth/signin"/> 
-        <Stack.Screen name="auth/signup"/> 
-        <Stack.Screen name="user"/>
-        <Stack.Screen name="admin" options={{ presentation: 'modal' }}/> 
-        <Stack.Screen name="note/[id]"/>
-        <Stack.Screen name="pdf/[id]"/>
-      </Stack>
+      <AppLayout />
     </Provider>
   )
 }

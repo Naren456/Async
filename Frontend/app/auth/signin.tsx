@@ -5,8 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
-  Alert,
-  Platform,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -15,11 +14,15 @@ import { StatusBar } from "expo-status-bar";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { BookOpen, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
-import { AuthsignIn } from "@/api/apiCall";
+import { AuthsignIn, AuthGoogleSignIn } from "@/api/apiCall";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/store/reducer";
 import * as SecureStore from "expo-secure-store";
-
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
+import { Toast } from "@/components/Toast";
 
 // Validation schema
 const SignInSchema = Yup.object().shape({
@@ -35,7 +38,21 @@ export default function SignIn() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false); // For email/pass login
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: "", type: "info" as "success" | "error" | "info" });
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+    setToast({ visible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, visible: false }));
+  };
+
+  useEffect(() => {
+    // Configuration moved to _layout.tsx
+  }, []);
 
   // --- Email/Password Sign-In Handler ---
   const handleSignIn = async (
@@ -55,18 +72,60 @@ export default function SignIn() {
       if (result.user.role === "TEACHER") {
         router.replace("/admin");
       } else {
-        router.replace("/user");
+        router.replace("/user/home");
       }
     } catch (e: any) {
       const errorMsg =
         e.response?.data?.message || e.message || "Something went wrong";
 
-      // Show error as alert for better UX
-      Alert.alert("Sign In Failed", errorMsg);
+      // Show error as toast for better UX
+      showToast(errorMsg, "error");
       setErrors({ general: errorMsg });
       console.log("SignIn Error:", errorMsg);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // --- Google Sign-In Handler ---
+  // --- Google Sign-In Handler ---
+  // --- Google Sign-In Handler ---
+  const onGoogleButtonPress = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+
+      if (userInfo.data?.idToken) {
+        const result = await AuthGoogleSignIn(userInfo.data.idToken);
+        await SecureStore.setItemAsync("authToken", result.token);
+        dispatch(setUser({ user: result.user, token: result.token }));
+
+        if (result.user.role === "TEACHER") {
+          router.replace("/admin");
+        } else {
+          router.replace("/user/home");
+        }
+      } else {
+        throw new Error("No ID token present!");
+      }
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        console.log("Google Sign-In cancelled");
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+        console.log("Google Sign-In in progress");
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+        showToast("Google Play Services not available", "error");
+      } else {
+        // some other error happened
+        console.error("Google Sign-In Error:", error);
+        showToast(error.message || "Something went wrong", "error");
+      }
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -197,7 +256,7 @@ export default function SignIn() {
                   className="mb-6"
                   onPress={() => {
                     // TODO: Navigate to forgot password screen
-                    Alert.alert("Forgot Password", "Feature coming soon!");
+                    router.push("/auth/forgot-password");
                   }}
                   activeOpacity={0.7}
                 >
@@ -209,10 +268,9 @@ export default function SignIn() {
                 {/* Sign In Button */}
                 <TouchableOpacity
                   onPress={() => handleSubmit()}
-                  disabled={isLoading}
-                  className={`py-4 rounded-xl mb-6 ${
-                    isLoading ? "bg-white/50" : "bg-white"
-                  }`}
+                  disabled={isLoading || isGoogleLoading}
+                  className={`py-4 rounded-xl mb-4 ${isLoading ? "bg-white/50" : "bg-white"
+                    }`}
                   style={{
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 4 },
@@ -236,6 +294,46 @@ export default function SignIn() {
                   )}
                 </TouchableOpacity>
 
+                {/* Google Sign In Button */}
+                <View className="mb-6">
+                  <TouchableOpacity
+                    onPress={onGoogleButtonPress}
+                    disabled={isGoogleLoading || isLoading}
+                    activeOpacity={0.8}
+                    style={{
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.2,
+                      shadowRadius: 4,
+                      elevation: 4,
+                    }}
+                  >
+                    <LinearGradient
+                      colors={["#3b82f6", "#2563eb", "#1d4ed8"]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      className="flex-row items-center justify-center rounded-xl py-4 px-6"
+                    >
+                      {isGoogleLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                      ) : (
+                        <>
+                          <View className="bg-white p-1 rounded-full mr-3">
+                            <Image
+                              source={require("../../assets/images/google-logo.png")}
+                              style={{ width: 18, height: 18 }}
+                              resizeMode="contain"
+                            />
+                          </View>
+                          <Text className="text-white font-bold text-lg">
+                            Sign in with Google
+                          </Text>
+                        </>
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+
                 {/* Sign Up Link */}
                 <TouchableOpacity
                   onPress={() => router.push("/auth/signup")}
@@ -256,6 +354,12 @@ export default function SignIn() {
         <View className="absolute top-20 right-10 w-16 h-16 rounded-full bg-white/5" />
         <View className="absolute top-40 left-8 w-10 h-10 rounded-full bg-white/5" />
         <View className="absolute bottom-32 right-6 w-12 h-12 rounded-full bg-white/5" />
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onHide={hideToast}
+        />
       </LinearGradient>
     </SafeAreaView>
   );

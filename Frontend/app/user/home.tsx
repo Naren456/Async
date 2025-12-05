@@ -14,11 +14,10 @@ import {
   ClipboardList,
   GraduationCap,
   Clock,
-  ArrowUp,
-  ArrowDown,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import AssignmentCard from "../../components/AssignmentCard";
+import StatCard from "../../components/StatCard";
 import { GetAssignmentsByCohort } from "../../api/apiCall";
 
 // --- Types ---
@@ -105,7 +104,7 @@ const UserDashboard = () => {
     try {
       // Dummy stats (replace with actual API data if needed)
       setStats({
-        totalSubjects: 5,
+        totalSubjects: 3,
         totalAssignments: 12,
         upcomingDeadlines: 3,
         cpg: 8.5, // Example value
@@ -137,28 +136,6 @@ const UserDashboard = () => {
     await loadDashboard();
     setRefreshing(false);
   }, [user?.cohortNo]);
-
-  const StatCard = ({ title, value, icon, color, trend }: any) => (
-    <View className="bg-[#1e293b]/60 rounded-xl p-4 mb-4 w-full border border-white/10">
-      <View className="flex-row items-center justify-between">
-        <View>
-          <Text className="text-gray-400 text-sm mb-1">{title}</Text>
-          <Text className="text-white text-2xl font-bold">{value}</Text>
-          {trend !== undefined && (
-            <View className="flex-row items-center mt-1">
-              {trend > 0 ? <ArrowUp size={14} color="#10B981" /> : trend < 0 ? <ArrowDown size={14} color="#EF4444" /> : null}
-              <Text className="text-gray-400 text-xs ml-1">
-                {trend > 0 ? `+${trend} this week` : trend < 0 ? `${trend} this week` : `No change`}
-              </Text>
-            </View>
-          )}
-        </View>
-        <View className={`w-12 h-12 rounded-xl items-center justify-center`} style={{ backgroundColor: color + "22" }}>
-          {icon}
-        </View>
-      </View>
-    </View>
-  );
 
   if (loading) {
     return (
@@ -197,7 +174,6 @@ const UserDashboard = () => {
                 value={stats.totalSubjects}
                 icon={<BookOpen size={26} color="#10B981" />}
                 color="#10B981"
-              
               />
             </View>
             <View className="w-[48%]">
@@ -206,7 +182,6 @@ const UserDashboard = () => {
                 value={assgin}
                 icon={<ClipboardList size={26} color="#F59E0B" />}
                 color="#F59E0B"
-             
               />
             </View>
             <View className="w-[48%]">
@@ -215,16 +190,14 @@ const UserDashboard = () => {
                 value={nextAssignments.length}
                 icon={<Calendar size={26} color="#3B82F6" />}
                 color="#3B82F6"
-            
               />
             </View>
             <View className="w-[48%]">
               <StatCard
-                title="CGPA"
-                value={stats.cpg}
+                title="CGR"
+                value={user?.cgr || 'N/A'}
                 icon={<GraduationCap size={26} color="#F472B6" />}
                 color="#F472B6"
-             
               />
             </View>
           </View>

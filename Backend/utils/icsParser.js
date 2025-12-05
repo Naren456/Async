@@ -27,7 +27,7 @@ export function getICSUrl(cohort) {
     4: "https://www.coursera.org/api/rest/v1/learnercalendars/160556499/47ab0fcb-d665-4c61-b120-9362820ca5ba",
     6: "https://www.coursera.org/api/rest/v1/learnercalendars/188822892/bbc0b1b4-9a1f-4e0b-b6c0-bdd688246cf7",
   };
-  console.log(urls[cohort]);
+
   return urls[cohort] ?? null;
 }
 

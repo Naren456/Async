@@ -1,91 +1,141 @@
 import React from "react";
-import { Text, View, TouchableOpacity, Dimensions } from "react-native";
+import { Text, View, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { BookOpen } from "lucide-react-native";
-import './global.css'
+import { MotiView } from "moti";
 
+import "./global.css";
 
-const { width, height } = Dimensions.get("window");
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 
-export default function Welcome() { // Renamed from Index
+import { AuthGoogleSignIn } from "@/api/apiCall";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/reducer";
+import * as SecureStore from "expo-secure-store";
+import { Alert } from "react-native";
+
+export default function Welcome() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
- 
+  const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signOut();
+      const userInfo = await GoogleSignin.signIn();
+
+      if (userInfo.data?.idToken) {
+        const result = await AuthGoogleSignIn(userInfo.data.idToken);
+
+        await SecureStore.setItemAsync("authToken", result.token);
+        dispatch(setUser({ user: result.user, token: result.token }));
+
+        if (result.user.role === "TEACHER") {
+          router.replace("/admin");
+        } else {
+          router.replace("/user/home");
+        }
+      }
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) return;
+      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert("Error", "Google Play Services are unavailable");
+        return;
+      }
+      Alert.alert("Google Sign-In Failed", error.message || "Something went wrong");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-blue-900">
       <StatusBar style="light" />
+
       <LinearGradient
-        colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
-        locations={[0, 0.5, 1]}
-        style={{ flex: 1 }}
+        colors={["#1e3a8a", "#1d4ed8", "#3b82f6"]}
+        className="flex-1"
       >
+        {/* Main Container */}
         <View className="flex-1 items-center justify-center px-8">
-          {/* Header Section */}
-          <View className="justify-center items-center mb-16">
-            {/* Logo Container */}
-            <View className="mb-6 p-5 rounded-full bg-white/15 backdrop-blur-sm">
-              <View className="w-16 h-16 rounded-full bg-white/25 items-center justify-center">
-                <BookOpen size={32} color="white" strokeWidth={2} />
+
+          {/* Animated Icon */}
+          <MotiView
+            from={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "timing", duration: 900 }}
+            className="mb-10"
+          >
+            <View className="p-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-xl">
+              <View className="w-20 h-20 rounded-2xl bg-white/25 items-center justify-center">
+                <BookOpen size={40} strokeWidth={2} color="white" />
               </View>
             </View>
+          </MotiView>
 
-            <Text className="text-5xl font-bold text-white mb-4 tracking-wide">
+          {/* Header Text */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 800, delay: 300 }}
+            className="items-center"
+          >
+            <Text className="text-6xl font-extrabold text-white tracking-wide">
               ASync
             </Text>
-            <Text className="text-xl text-white/90 text-center leading-7 px-6 font-medium">
+
+            <Text className="text-xl text-white/90 text-center mt-4 font-medium leading-7">
               Never miss an assignment again
             </Text>
-            <Text className="text-base text-white/70 text-center leading-6 px-4 mt-2">
-              Smart reminders for academic success
+
+            <Text className="text-base text-white/60 text-center mt-2 max-w-xs leading-6">
+              Smart reminders that keep you ahead in your academic journey
             </Text>
-          </View>
+          </MotiView>
 
           {/* Buttons */}
-          <View className="w-full max-w-sm">
-            {/* Get Started */}
+          <View className="w-full max-w-sm mt-14">
+
+            {/* Google Button */}
             <TouchableOpacity
-              className="w-full py-4 rounded-2xl shadow-lg mb-4 bg-white"
-              onPress={() => router.push("/auth/signup")}
-              activeOpacity={0.8}
-              style={{
+              onPress={onGoogleButtonPress}
+              activeOpacity={0.9}
+              className="bg-white flex-row items-center justify-center rounded-2xl py-4 shadow-lg"
+              style={{ 
+                elevation: 8,
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
+                shadowRadius: 4.65,
               }}
             >
-              <Text className="text-lg font-bold text-blue-600 text-center">
-                Get Started
+              <View className="mr-3">
+                <Image
+                  source={require("../assets/images/google-logo.png")}
+                  style={{ width: 20, height: 20 }}
+                  resizeMode="contain"
+                />
+              </View>
+
+              <Text className="text-blue-600 font-bold text-lg">
+                Sign in with Google
               </Text>
             </TouchableOpacity>
 
-            {/* Sign In */}
-            <TouchableOpacity
-              className="w-full py-4 rounded-2xl border-2 border-white/30 mb-6"
-              onPress={() => router.push("/auth/signin")}
-              activeOpacity={0.8}
-            >
-              <Text className="text-lg font-semibold text-white text-center">
-                I Already Have an Account
-              </Text>
-            </TouchableOpacity>
-
-            <View className="items-center">
-              <Text className="text-sm text-white/70 text-center leading-5">
-                Join thousands of students staying organized
-              </Text>
-            </View>
+            <Text className="text-sm text-center text-white/70 mt-6">
+              Join thousands of students staying organized
+            </Text>
           </View>
         </View>
 
-        {/* Decorative Elements */}
-        <View className="absolute top-24 right-12 w-16 h-16 rounded-full bg-white/5" />
-        <View className="absolute top-44 left-10 w-10 h-10 rounded-full bg-white/5" />
-        <View className="absolute bottom-36 right-8 w-14 h-14 rounded-full bg-white/5" />
+        {/* Soft decorative circles */}
+        <View className="absolute top-20 right-12 w-20 h-20 rounded-full bg-white/10 blur-xl" />
+        <View className="absolute bottom-32 left-10 w-16 h-16 rounded-full bg-white/10 blur-lg" />
+        <View className="absolute top-1/2 right-5 w-10 h-10 rounded-full bg-white/10 blur-md" />
       </LinearGradient>
     </SafeAreaView>
   );

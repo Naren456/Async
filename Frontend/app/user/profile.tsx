@@ -1,48 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Text, 
-  View, 
-  ScrollView, 
-  TouchableOpacity, 
-  Alert, 
+import {
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
   ActivityIndicator,
   Modal,
   TextInput
 } from 'react-native';
+import { Image } from 'expo-image';
+import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearUser, updateUser, setUser } from '@/store/reducer';
-import { UpdateProfile } from '@/api/apiCall';
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Settings, 
-  LogOut, 
-  Bell, 
-  Shield, 
-  HelpCircle,
-  ChevronRight,
-  Edit3
-} from 'lucide-react-native';
+import { Edit3, LogOut, User, ChevronRight } from "lucide-react-native";
+import { UpdateProfile } from "../../api/apiCall";
+import { setUser, clearUser } from "../../store/reducer";
+import ProfileSection from "../../components/ProfileSection";
+import ProfileItem from "../../components/ProfileItem";
+import EditProfileModal from "../../components/EditProfileModal";
 
 const UserProfile = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.user);
-  
+
   const [isLoading, setIsLoading] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editName, setEditName] = useState( '');
-  const [editEmail, setEditEmail] = useState( '');
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editCohortNo, setEditCohortNo] = useState('');
+  const [editSemester, setEditSemester] = useState('');
+  const [editTerm, setEditTerm] = useState('');
+  const [editCgr, setEditCgr] = useState('');
 
   useEffect(() => {
     if (user) {
       setEditName(user.name || '');
       setEditEmail(user.email || '');
+      setEditCohortNo(user.cohortNo !== null && user.cohortNo !== undefined ? String(user.cohortNo) : '');
+      setEditSemester(user.semester !== null && user.semester !== undefined ? String(user.semester) : '');
+      setEditTerm(user.term !== null && user.term !== undefined ? String(user.term) : '');
+      setEditCgr(user.cgr !== null && user.cgr !== undefined ? String(user.cgr) : '');
     }
   }, [user]);
 
@@ -58,6 +58,7 @@ const UserProfile = () => {
           onPress: async () => {
             setIsLoading(true);
             try {
+              await SecureStore.deleteItemAsync("authToken");
               dispatch(clearUser());
               router.replace('/');
             } catch (error) {
@@ -75,23 +76,26 @@ const UserProfile = () => {
   const handleEditProfile = () => {
     setEditName(user?.name || '');
     setEditEmail(user?.email || '');
+    setEditCohortNo(user?.cohortNo !== null && user?.cohortNo !== undefined ? String(user?.cohortNo) : '');
+    setEditSemester(user?.semester !== null && user?.semester !== undefined ? String(user?.semester) : '');
+    setEditTerm(user?.term !== null && user?.term !== undefined ? String(user?.term) : '');
+    setEditCgr(user?.cgr !== null && user?.cgr !== undefined ? String(user?.cgr) : '');
     setEditModalVisible(true);
   };
 
-  const handleSaveProfile = async () => {
-    if (!editName.trim() || !editEmail.trim()) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
+  const handleSaveProfile = async (data: any) => {
     setIsLoading(true);
     try {
       const updatedData = {
-        name: editName.trim(),
-        email: editEmail.trim(),
+        name: data.name,
+        email: data.email,
+        cohortNo: data.cohortNo ? Number(data.cohortNo) : null,
+        semester: data.semester ? Number(data.semester) : null,
+        term: data.term ? Number(data.term) : null,
+        cgr: data.cgr && data.cgr.trim() ? Number(data.cgr.trim()) : null,
       };
       const response = await UpdateProfile(user.token, updatedData);
-      dispatch(setUser(response.user));
+      dispatch(setUser({ user: response.user, token: user.token }));
       setEditModalVisible(false);
       Alert.alert("Success", "Profile updated successfully");
     } catch (e: any) {
@@ -101,32 +105,6 @@ const UserProfile = () => {
       setIsLoading(false);
     }
   };
-
-  const ProfileSection = ({ title, children }: any) => (
-    <View className="mb-6">
-      <Text className="text-gray-400 text-sm font-medium mb-3 uppercase tracking-wider">
-        {title}
-      </Text>
-      {children}
-    </View>
-  );
-
-  const ProfileItem = ({ icon, label, value, onPress }: any) => (
-    <TouchableOpacity
-      className="flex-row items-center py-4 border-b border-white/5"
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View className="w-8 h-8 rounded-full bg-blue-600/20 items-center justify-center mr-4">
-        {icon}
-      </View>
-      <View className="flex-1">
-        <Text className="text-gray-400 text-sm">{label}</Text>
-        <Text className="text-white text-base mt-1">{value}</Text>
-      </View>
-      {onPress && <ChevronRight size={20} color="#6B7280" />}
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView className="flex-1 bg-[#0f172b]">
@@ -141,8 +119,12 @@ const UserProfile = () => {
         <ProfileSection title="ACCOUNT">
           <View className="p-4">
             <View className="flex-row items-center mb-4">
-              <View className="w-16 h-16 rounded-full bg-blue-600/20 items-center justify-center mr-4">
-                <User size={32} color="#3B82F6" />
+              <View className="w-16 h-16 rounded-full bg-blue-600/20 items-center justify-center mr-4 overflow-hidden">
+                {user?.profilePic ? (
+                  <Image source={{ uri: user.profilePic }} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+                ) : (
+                  <User size={32} color="#3B82F6" />
+                )}
               </View>
               <View className="flex-1">
                 <Text className="text-white text-xl font-semibold">
@@ -161,43 +143,30 @@ const UserProfile = () => {
               </TouchableOpacity>
             </View>
 
-            <View className="flex-row justify-between items-center py-3 border-t border-white/10">
-              <View className="flex-row items-center">
-                <Calendar size={16} color="#6B7280" />
-                <Text className="text-gray-400 text-sm ml-2">
-                  Cohort {user?.cohortNo || 'N/A'}
-                </Text>
+
+
+            <View className="flex-row flex-wrap justify-between mt-6 border-t border-white/10 pt-6">
+              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl mb-4 border border-white/5">
+                <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Cohort</Text>
+                <Text className="text-white text-xl font-bold">{user?.cohortNo || 'N/A'}</Text>
               </View>
-              <View className="bg-green-600/20 px-3 py-1 rounded-full">
-                <Text className="text-green-400 text-xs font-medium">Active</Text>
+              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl mb-4 border border-white/5">
+                <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Semester</Text>
+                <Text className="text-white text-xl font-bold">{user?.semester || 'N/A'}</Text>
+              </View>
+              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl border border-white/5">
+                <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Term</Text>
+                <Text className="text-white text-xl font-bold">{user?.term || 'N/A'}</Text>
+              </View>
+              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl border border-white/5">
+                <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">CGR</Text>
+                <Text className="text-white text-xl font-bold">{user?.cgr || 'N/A'}</Text>
               </View>
             </View>
           </View>
         </ProfileSection>
 
-        {/* Settings Section */}
-        <ProfileSection title="SETTINGS">
-          <View className="bg-[#1e293b] rounded-xl">
-            <ProfileItem
-              icon={<Bell size={16} color="#3B82F6" />}
-              label="Notifications"
-              value={notificationsEnabled ? "Enabled" : "Disabled"}
-              onPress={() => setNotificationsEnabled(!notificationsEnabled)}
-            />
-            <ProfileItem
-              icon={<Settings size={16} color="#3B82F6" />}
-              label="Dark Mode"
-              value={darkModeEnabled ? "Enabled" : "Disabled"}
-              onPress={() => setDarkModeEnabled(!darkModeEnabled)}
-            />
-            <ProfileItem
-              icon={<Shield size={16} color="#3B82F6" />}
-              label="Privacy"
-              value="Manage your privacy settings"
-              onPress={() => Alert.alert('Coming Soon', 'Privacy settings will be available soon')}
-            />
-          </View>
-        </ProfileSection>
+
 
 
         {/* Logout Button */}
@@ -216,51 +185,20 @@ const UserProfile = () => {
       </ScrollView>
 
       {/* Edit Profile Modal */}
-      <Modal
+      <EditProfileModal
         visible={editModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-      >
-        <SafeAreaView className="flex-1 bg-[#0f172b]">
-          <View className="flex-row items-center justify-between p-4 border-b border-white/10">
-            <TouchableOpacity onPress={() => setEditModalVisible(false)}>
-              <Text className="text-blue-400 text-base">Cancel</Text>
-            </TouchableOpacity>
-            <Text className="text-white text-lg font-semibold">Edit Profile</Text>
-            <TouchableOpacity onPress={handleSaveProfile} disabled={isLoading}>
-              <Text className="text-blue-400 text-base font-semibold">
-                {isLoading ? 'Saving...' : 'Save'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView className="flex-1 p-4">
-            <View className="mb-6">
-              <Text className="text-white text-base font-medium mb-2">Name</Text>
-              <TextInput
-                value={editName}
-                onChangeText={setEditName}
-                className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
-                placeholder="Enter your name"
-                placeholderTextColor="#6B7280"
-              />
-            </View>
-
-            <View className="mb-6">
-              <Text className="text-white text-base font-medium mb-2">Email</Text>
-              <TextInput
-                value={editEmail}
-                onChangeText={setEditEmail}
-                className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
-                placeholder="Enter your email"
-                placeholderTextColor="#6B7280"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+        onClose={() => setEditModalVisible(false)}
+        onSave={handleSaveProfile}
+        isLoading={isLoading}
+        initialValues={{
+          name: editName,
+          email: editEmail,
+          cohortNo: editCohortNo,
+          semester: editSemester,
+          term: editTerm,
+          cgr: editCgr,
+        }}
+      />
     </SafeAreaView>
   );
 };

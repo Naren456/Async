@@ -1,7 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { TouchableOpacity, Text, View, useColorScheme } from 'react-native';
+
 import { FileUp, Pencil, Trash2 } from 'lucide-react-native';
 
 type Subject = {
@@ -29,7 +28,6 @@ const SubjectCard: React.FC<Props> = ({
   onAddNote,
   handlePress,
 }) => {
-  const router = useRouter();
   const isDarkMode = useColorScheme() === 'dark';
 
   // Theme classes
@@ -37,8 +35,6 @@ const SubjectCard: React.FC<Props> = ({
   const borderClass = isDarkMode ? 'border-gray-700' : 'border-gray-200';
   const textClass = isDarkMode ? 'text-white' : 'text-gray-900';
   const subText = isDarkMode ? 'text-gray-400' : 'text-gray-500';
-  const badgeBg = isDarkMode ? 'bg-blue-900' : 'bg-blue-50';
-  const badgeText = isDarkMode ? 'text-blue-400' : 'text-blue-600';
 
   // const handlePress = () => {
   //   if (mode === 'user') {

@@ -1,4 +1,3 @@
-// Prisma Schema for College Resources App
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -9,54 +8,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ENUMS
-enum Role {
-  STUDENT
-  TEACHER
-}
-
-// MODELS
-
 model User {
-  id             String           @id @default(cuid())
-  email          String           @unique
-  name           String?
-  password       String?
-  googleId       String?          @unique // <-- ADD THIS
-  profilePic     String?
-  role           Role             @default(STUDENT)
-  cohortNo       Int? 
-  cohort         Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
-  semester       Int?             @default(1)
-  term           Int?             @default(1)
-  assignments    UserAssignment[] // Track assignments + completion
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id          String           @id @default(cuid())
+  email       String           @unique
+  name        String?
+  password    String?
+  profilePic  String?
+  googleId    String?          @unique
+  pushToken   String?
+  cohortNo    Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  role        Role             @default(STUDENT)
+  semester    Int?             @default(1)
+  term        Int?             @default(1)
+  cgr         Float?
+  cohort      Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
+  assignments UserAssignment[]
 }
 
 model Subject {
-  code        String       @id
   name        String
+  code        String       @id
+  createdAt   DateTime     @default(now())
   semester    Int
   term        Int
-  assignments Assignment[] // back-relation, no onDelete here
-  notes       Note[]       // back-relation, no onDelete here
-  createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  assignments Assignment[]
+  notes       Note[]
 }
 
 model Assignment {
-  id          String    @id @default(cuid())
+  id          String           @id @default(cuid())
   title       String
   dueDate     DateTime?
   cohortNo    Int
-  link        String
-  cohort      Cohort    @relation(fields: [cohortNo], references: [cohortNo])
   subjectCode String
-  subject     Subject   @relation(fields: [subjectCode], references: [code], onDelete: Cascade)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  link        String
+  cohort      Cohort           @relation(fields: [cohortNo], references: [cohortNo])
+  subject     Subject          @relation(fields: [subjectCode], references: [code])
   users       UserAssignment[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  notificationSentAt DateTime?
 
   @@unique([title, cohortNo, subjectCode])
 }
@@ -64,34 +58,38 @@ model Assignment {
 model Note {
   id          String   @id @default(cuid())
   title       String
+  createdAt   DateTime @default(now())
   pdfUrl      String
+  updatedAt   DateTime @updatedAt
   subjectCode String
   publicId    String
-  subject     Subject  @relation(fields: [subjectCode], references: [code], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  subject     Subject  @relation(fields: [subjectCode], references: [code])
 }
 
 model Cohort {
-  cohortNo    Int          @id @default(autoincrement()) // primary key
+  cohortNo    Int          @id @default(autoincrement())
   semester    Int
   term        Int
-  users       User[]       // Users in this cohort
-  assignments Assignment[] // Assignments for this cohort
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  assignments Assignment[]
+  users       User[]
 }
 
 model UserAssignment {
-  id           String      @id @default(cuid())
+  id           String     @id @default(cuid())
   userId       String
   assignmentId String
-  completed    Boolean     @default(false) // completion status
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  completed    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
 
-  user        User        @relation(fields: [userId], references: [id])
-  assignment  Assignment  @relation(fields: [assignmentId], references: [id])
+  @@unique([userId, assignmentId])
+}
 
-  @@unique([userId, assignmentId]) // only one entry per user-assignment
+enum Role {
+  STUDENT
+  TEACHER
 }

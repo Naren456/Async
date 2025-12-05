@@ -8,6 +8,7 @@ import {
   Alert,
   RefreshControl,
 } from "react-native";
+import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
@@ -80,7 +81,8 @@ const AdminApp = () => {
       {
         text: "Logout",
         style: "destructive",
-        onPress: () => {
+        onPress: async () => {
+          await SecureStore.deleteItemAsync("authToken");
           dispatch(clearUser());
           router.replace("/");
         },
@@ -237,7 +239,7 @@ const AdminApp = () => {
                 value={stats.totalAssignments}
                 icon={<Calendar size={26} color="#F59E0B" />}
                 color="#F59E0B"
-            
+
               />
             </View>
             <View className="w-[48%]">

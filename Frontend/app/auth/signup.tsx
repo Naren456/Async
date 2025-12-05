@@ -9,6 +9,9 @@ import * as Yup from "yup";
 import { BookOpen, User, Mail, Lock, Users, Eye, EyeOff } from "lucide-react-native";
 import { AuthsignUp } from "../../api/apiCall";
 import * as SecureStore from 'expo-secure-store';
+import { useDispatch } from "react-redux";
+import { setUser } from "@/store/reducer";
+import { Toast } from "@/components/Toast";
 // Validation Schema
 const SignUpSchema = Yup.object().shape({
   name: Yup.string()
@@ -34,8 +37,18 @@ const SignUpSchema = Yup.object().shape({
 
 export default function SignUp() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: "", type: "info" as "success" | "error" | "info" });
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+    setToast({ visible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, visible: false }));
+  };
 
   const handleSignUp = async (values: any, setErrors: any) => {
     setIsLoading(true);
@@ -51,16 +64,21 @@ export default function SignUp() {
       const result = await AuthsignUp(payload);
       console.log("SignUp Success:", result);
 
-      Alert.alert(
-        "Account Created!",
-        "Welcome to ASync! You can now start managing your assignments.",
-        [{ text: "Get Started", onPress: () => router.push("/(tabs)/home") }]
-      );
+      // Save token and update Redux state
+      if (result.token) {
+        await SecureStore.setItemAsync("authToken", result.token);
+        dispatch(setUser({ user: result.user, token: result.token }));
+      }
+
+      showToast("Account Created! Welcome to ASync!", "success");
+      setTimeout(() => {
+        router.replace("/user/home");
+      }, 1500);
 
     } catch (e: any) {
       console.log("SignUp Error:", e);
       const errorMsg = e.response?.data?.message || e.message || "Failed to create account";
-      Alert.alert("Sign Up Failed", errorMsg);
+      showToast(errorMsg, "error");
       setErrors({ general: errorMsg });
     } finally {
       setIsLoading(false);
@@ -151,52 +169,82 @@ export default function SignUp() {
                     )}
                   </View>
 
-                  {/* Cohort Number */}
+                  {/* Cohort Selection */}
                   <View className="mb-4">
                     <Text className="text-white mb-2 text-base font-medium">Cohort Number</Text>
-                    <TextInput
-                      onChangeText={handleChange("cohortNo")}
-                      onBlur={handleBlur("cohortNo")}
-                      value={values.cohortNo}
-                      placeholder="Enter your cohort number"
-                      placeholderTextColor="rgba(0,0,0,0.4)"
-                      className="bg-white rounded-xl px-4 py-4 text-gray-800 text-base"
-                      keyboardType="numeric"
-                    />
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+                      {[1, 2, 4, 5, 6].map((num) => (
+                        <TouchableOpacity
+                          key={num}
+                          onPress={() => handleChange("cohortNo")(num.toString())}
+                          className={`mr-3 px-6 py-3 rounded-xl border ${values.cohortNo === num.toString()
+                            ? "bg-blue-500 border-blue-500"
+                            : "bg-white/10 border-white/20"
+                            }`}
+                        >
+                          <Text
+                            className={`font-bold ${values.cohortNo === num.toString() ? "text-white" : "text-white/70"
+                              }`}
+                          >
+                            Cohort {num}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
                     {errors.cohortNo && touched.cohortNo && (
                       <Text className="text-red-300 text-sm mt-1 ml-1">{errors.cohortNo}</Text>
                     )}
                   </View>
 
-                  {/* Semester */}
+                  {/* Semester Selection */}
                   <View className="mb-4">
                     <Text className="text-white mb-2 text-base font-medium">Semester</Text>
-                    <TextInput
-                      onChangeText={handleChange("semester")}
-                      onBlur={handleBlur("semester")}
-                      value={values.semester}
-                      placeholder="Enter your semester"
-                      placeholderTextColor="rgba(0,0,0,0.4)"
-                      className="bg-white rounded-xl px-4 py-4 text-gray-800 text-base"
-                      keyboardType="numeric"
-                    />
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                        <TouchableOpacity
+                          key={num}
+                          onPress={() => handleChange("semester")(num.toString())}
+                          className={`mr-3 px-5 py-3 rounded-xl border ${values.semester === num.toString()
+                            ? "bg-blue-500 border-blue-500"
+                            : "bg-white/10 border-white/20"
+                            }`}
+                        >
+                          <Text
+                            className={`font-bold ${values.semester === num.toString() ? "text-white" : "text-white/70"
+                              }`}
+                          >
+                            Sem {num}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
                     {errors.semester && touched.semester && (
                       <Text className="text-red-300 text-sm mt-1 ml-1">{errors.semester}</Text>
                     )}
                   </View>
 
-                  {/* Term */}
+                  {/* Term Selection */}
                   <View className="mb-6">
                     <Text className="text-white mb-2 text-base font-medium">Term</Text>
-                    <TextInput
-                      onChangeText={handleChange("term")}
-                      onBlur={handleBlur("term")}
-                      value={values.term}
-                      placeholder="Enter your term"
-                      placeholderTextColor="rgba(0,0,0,0.4)"
-                      className="bg-white rounded-xl px-4 py-4 text-gray-800 text-base"
-                      keyboardType="numeric"
-                    />
+                    <View className="flex-row">
+                      {[1, 2, 3].map((num) => (
+                        <TouchableOpacity
+                          key={num}
+                          onPress={() => handleChange("term")(num.toString())}
+                          className={`mr-3 px-6 py-3 rounded-xl border ${values.term === num.toString()
+                            ? "bg-blue-500 border-blue-500"
+                            : "bg-white/10 border-white/20"
+                            }`}
+                        >
+                          <Text
+                            className={`font-bold ${values.term === num.toString() ? "text-white" : "text-white/70"
+                              }`}
+                          >
+                            Term {num}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                     {errors.term && touched.term && (
                       <Text className="text-red-300 text-sm mt-1 ml-1">{errors.term}</Text>
                     )}
@@ -226,6 +274,12 @@ export default function SignUp() {
             </Formik>
           </View>
         </ScrollView>
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onHide={hideToast}
+        />
       </LinearGradient>
     </SafeAreaView>
   );

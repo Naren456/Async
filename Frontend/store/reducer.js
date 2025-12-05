@@ -9,6 +9,7 @@ const userInitialState = {
   cohortNo: null,
   semester: null,
   term: null,
+  cgr: null,
   token: null,
 };
 
@@ -26,6 +27,7 @@ const userSlice = createSlice({
       state.cohortNo = user.cohortNo ?? null;
       state.semester = user.semester ?? null;
       state.term = user.term ?? null;
+      state.cgr = user.cgr ?? null;
       state.token = token || null;
     },
     clearUser(state) {

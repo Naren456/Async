@@ -10,11 +10,14 @@ import adminRouter from './routes/admin.route.js';
 import notesRouter from './routes/note.route.js';
 import './jobs/assignmentCleanUp.js'; 
 import './jobs/syncAssignment.js'
+import scheduleDeadlineNotifications from './cron/scheduler.js';
+
+scheduleDeadlineNotifications();
 dotenv.config();
 
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 app.use(cors({
   origin: "*", // replace with your frontend URL
@@ -38,6 +41,6 @@ app.get('/', (req, res) => {
 });
 
 
-app.listen(8000, "0.0.0.0", () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port 8000");
 });
