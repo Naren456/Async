@@ -2,15 +2,39 @@ import cron from 'node-cron';
 import prisma from '../config/db.js';
 import { sendPushNotification } from '../utils/notification.js';
 
-// Run every hour
+// Run every 30 minutes
 const scheduleDeadlineNotifications = () => {
-  cron.schedule('0 * * * *', async () => {
+  cron.schedule('*/30 * * * *', async () => {
     console.log('Running deadline notification check...');
     try {
       const now = new Date();
+
+      // --- 0. Critical 30-Minute Reminder ---
+      // Priority: HIGHEST. Due in less than 45 mins.
+      const fortyFiveMinutesFromNow = new Date(now.getTime() + 45 * 60 * 1000);
+
+      const criticalAssignments = await prisma.assignment.findMany({
+        where: {
+          dueDate: {
+            gte: now,
+            lt: fortyFiveMinutesFromNow
+          }
+        },
+        include: { cohort: true, subject: true }
+      });
+
+      for (const assignment of criticalAssignments) {
+          const lastSent = assignment.notificationSentAt ? new Date(assignment.notificationSentAt).getTime() : 0;
+          const minsSinceLast = (now.getTime() - lastSent) / (1000 * 60);
+
+          // If we haven't sent a notification in the last 20 mins, send one now.
+          if (minsSinceLast > 20) {
+             await sendReminder(assignment, `CRITICAL: Assignment "${assignment.title}" for ${assignment.subject.name} is due in less than 45 minutes! Submit NOW!`);
+          }
+      }
       
       // --- 1. Urgent 5-Hour Reminder ---
-      // Priority: Check this first.
+      // Priority: Check this second.
       // Logic: Due between 5 and 6 hours from now.
       const fiveHoursFromNow = new Date(now.getTime() + 5 * 60 * 60 * 1000);
       const sixHoursFromNow = new Date(now.getTime() + 6 * 60 * 60 * 1000);
@@ -77,9 +101,9 @@ const scheduleDeadlineNotifications = () => {
         }
       });
 
-      for (const user of users) {
+       for (const user of users) {
         if (user.pushToken) {
-          await sendPushNotification(user.pushToken, message);
+          await sendPushNotification(user.pushToken, "Assignment Deadline", message, { url: assignment.link });
         }
       }
 

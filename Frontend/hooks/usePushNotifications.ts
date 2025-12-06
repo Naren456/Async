@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { Platform, Linking } from 'react-native';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -79,6 +79,10 @@ export const usePushNotifications = () => {
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
             console.log(response);
+            const data = response.notification.request.content.data as { url?: string };
+            if (data?.url) {
+                Linking.openURL(data.url).catch((err: any) => console.error("Failed to open URL:", err));
+            }
         });
 
         return () => {
