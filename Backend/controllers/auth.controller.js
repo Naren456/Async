@@ -96,6 +96,19 @@ export const getMe = async (req, res) => {
   try {
     const userId = req.user;
     const user = await authService.getUserProfile(userId);
+    
+    // Track activity
+    try {
+      await prisma.userActivity.create({
+        data: {
+          userId,
+          action: "APP_OPEN"
+        }
+      });
+    } catch (e) {
+      console.error("Failed to log activity", e);
+    }
+
     res.json({ user });
   } catch (error) {
     console.error(error);

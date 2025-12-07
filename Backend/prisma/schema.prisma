@@ -25,6 +25,7 @@ model User {
   cgr         Float?
   cohort      Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
   assignments UserAssignment[]
+  activities  UserActivity[]
 }
 
 model Subject {
@@ -92,4 +93,15 @@ model UserAssignment {
 enum Role {
   STUDENT
   TEACHER
+}
+
+model UserActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   @default("APP_OPEN")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
 }

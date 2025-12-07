@@ -45,3 +45,8 @@ app-example
 my-app-release-key.keystore
 credentials.json
 google-services.json
+
+# Security
+*.keystore
+google-services.json
+credentials.json

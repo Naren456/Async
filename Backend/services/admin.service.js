@@ -1,23 +1,39 @@
 import prisma from "../config/db.js";
 
 export const getStats = async () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const [
     totalUsers,
     totalSubjects,
     totalAssignments,
-    activeCohorts
+    activeCohorts,
+    dauCount,
+    totalActivities
   ] = await Promise.all([
     prisma.user.count(),
     prisma.subject.count(),
     prisma.assignment.count(),
-    prisma.cohort.count()
+    prisma.cohort.count(),
+    prisma.userActivity.groupBy({
+      by: ['userId'],
+      where: {
+        createdAt: {
+          gte: today
+        }
+      }
+    }),
+    prisma.userActivity.count()
   ]);
 
   return {
     totalUsers,
     totalSubjects,
     totalAssignments,
-    activeCohorts
+    activeCohorts,
+    dailyActiveUsers: dauCount.length,
+    totalActivities
   };
 };
 

@@ -120,7 +120,7 @@ const ManageNotifications = () => {
           ) : (
             <>
               <Send size={20} color="white" className="mr-2" />
-              <Text className="text-white font-bold text-lg">Send Notification</Text>
+              <Text className="text-white font-bold text-lg">  Send Notification</Text>
             </>
           )}
         </TouchableOpacity>
