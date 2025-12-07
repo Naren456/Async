@@ -41,3 +41,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+my-app-release-key.keystore
+credentials.json
+google-services.json

@@ -14,13 +14,18 @@ import { useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 // Prevent auto hide
-// Hide splash screen immediately
-SplashScreen.hideAsync();
+// Prevent auto hide
+SplashScreen.preventAutoHideAsync();
 
 function AppLayout() {
 
   const { expoPushToken } = usePushNotifications();
   const user = useSelector((state: any) => state.user);
+
+  useEffect(() => {
+    // Hide the splash screen once the layout is mounted
+    SplashScreen.hideAsync();
+  }, []);
 
   useEffect(() => {
     if (user && user.token && expoPushToken) {
