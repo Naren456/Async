@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
-import { GetUserSubjectsWithNotes } from '@/api/apiCall';
+import { GetUserSubjectsWithNotes } from '../../api/apiCall';
 import { BookOpen } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 

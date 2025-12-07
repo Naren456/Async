@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { ArrowLeft } from 'lucide-react-native';
-import { GetSubjects, DeleteSubject } from '@/api/apiCall';
+import { GetSubjects, DeleteSubject } from '../../api/apiCall';
 import FilterBar from '../../components/FilterBar';
 import SubjectCard from '../../components/SubjectCard';
 import SemesterModal from '../../components/SemesterModel';

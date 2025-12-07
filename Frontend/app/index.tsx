@@ -3,8 +3,8 @@ import { ActivityIndicator, View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useDispatch } from 'react-redux';
-import { GetMe } from '@/api/apiCall';
-import { setUser } from '@/store/reducer';
+import { GetMe } from '../api/apiCall';
+import { setUser } from '../store/reducer';
 import { StatusBar } from 'expo-status-bar';
 
 

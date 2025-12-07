@@ -24,13 +24,16 @@ export const usePushNotifications = () => {
         let token;
 
         if (Platform.OS === 'android') {
-            await Notifications.setNotificationChannelAsync('default', {
-                name: 'default',
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: '#FF231F7C',
-                sound: 'notification_sound.wav', // Ensure this matches the file in res/raw
-            });
+            try {
+                await Notifications.setNotificationChannelAsync('default', {
+                    name: 'default',
+                    importance: Notifications.AndroidImportance.MAX,
+                    vibrationPattern: [0, 250, 250, 250],
+                    lightColor: '#FF231F7C',
+                });
+            } catch (error) {
+                console.log('Error creating notification channel:', error);
+            }
         }
 
         if (Device.isDevice) {

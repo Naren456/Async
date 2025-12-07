@@ -14,9 +14,9 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 
-import { AuthGoogleSignIn } from "@/api/apiCall";
+import { AuthGoogleSignIn } from "../api/apiCall";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/reducer";
+import { setUser } from "../store/reducer";
 import * as SecureStore from "expo-secure-store";
 import { Alert } from "react-native";
 

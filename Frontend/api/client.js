@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 
-const Local = "http://192.168.1.68:8000";
+const Local = "http://10.51.6.234:8000";
 // const Local1 ="http://10.185.142.169:8000" // Unused
 
 export const API_BASE_URL = Local;

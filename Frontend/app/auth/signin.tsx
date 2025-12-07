@@ -14,15 +14,15 @@ import { StatusBar } from "expo-status-bar";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { BookOpen, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
-import { AuthsignIn, AuthGoogleSignIn } from "@/api/apiCall";
+import { AuthsignIn, AuthGoogleSignIn } from "../../api/apiCall";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/reducer";
+import { setUser } from "../../store/reducer";
 import * as SecureStore from "expo-secure-store";
 import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { Toast } from "@/components/Toast";
+import { Toast } from "../../components/Toast";
 
 // Validation schema
 const SignInSchema = Yup.object().shape({

@@ -10,7 +10,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FileText, ArrowLeft } from "lucide-react-native";
-import { GetSubjectById } from "@/api/apiCall";
+import { GetSubjectById } from "../../api/apiCall";
 import { useSelector } from "react-redux";
 export default function SubjectNotes() {
   const { id } = useLocalSearchParams<{ id: string }>();

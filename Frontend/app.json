@@ -13,24 +13,12 @@
       "bundleIdentifier": "com.android.async",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      },
-      "plugins": [
-        [
-          "expo-secure-store",
-          "expo-notifications",
-          {
-            "configureAndroidBackup": true,
-            "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
-          }
-        ]
-      ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,

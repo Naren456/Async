@@ -12,7 +12,7 @@ import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
-import { clearUser } from "@/store/reducer";
+import { clearUser } from "../../store/reducer";
 import {
   Settings,
   Users,

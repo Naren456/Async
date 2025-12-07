@@ -5,9 +5,9 @@ import * as SecureStore from "expo-secure-store"
 import { useDispatch } from "react-redux";
 
 
-import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useSelector } from "react-redux";
-import { UpdatePushToken } from "@/api/apiCall";
+import { UpdatePushToken } from "../api/apiCall";
 
 
 import { useEffect } from "react";
@@ -29,6 +29,7 @@ function AppLayout() {
   }, [user, expoPushToken]);
 
   useEffect(() => {
+    console.log("Configuring Google Sign-In with Web Client ID:", process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID);
     GoogleSignin.configure({
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       offlineAccess: true,
