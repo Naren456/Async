@@ -56,3 +56,14 @@ export const sendNotification = async (req, res) => {
     res.status(500).json({ message: "Server error sending notification" });
   }
 };
+
+export const triggerDeadlineCheck = async (req, res) => {
+  try {
+    const { checkDeadlines } = await import("../cron/scheduler.js");
+    await checkDeadlines();
+    res.status(200).json({ message: "Deadline check triggered successfully" });
+  } catch (error) {
+    console.error("Error triggering deadline check:", error);
+    res.status(500).json({ message: "Server error triggering deadline check" });
+  }
+};

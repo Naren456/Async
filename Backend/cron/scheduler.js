@@ -2,9 +2,8 @@ import cron from 'node-cron';
 import prisma from '../config/db.js';
 import { sendPushNotification } from '../utils/notification.js';
 
-// Run every 30 minutes
-const scheduleDeadlineNotifications = () => {
-  cron.schedule('*/30 * * * *', async () => {
+// Logic to check deadlines - Exported for manual triggering
+export const checkDeadlines = async () => {
     console.log('Running deadline notification check...');
     try {
       const now = new Date();
@@ -29,7 +28,7 @@ const scheduleDeadlineNotifications = () => {
 
           // If we haven't sent a notification in the last 20 mins, send one now.
           if (minsSinceLast > 20) {
-             await sendReminder(assignment, `CRITICAL: Assignment "${assignment.title}" for ${assignment.subject.name} is due in less than 45 minutes! Submit NOW!`);
+             await sendReminder(assignment, `🚨🔥 CRITICAL: Assignment "${assignment.title}" for ${assignment.subject.name} is due in less than 45 minutes! Submit NOW!`);
           }
       }
       
@@ -55,7 +54,7 @@ const scheduleDeadlineNotifications = () => {
         const hoursSinceLast = (now.getTime() - lastSent) / (1000 * 60 * 60);
 
         if (hoursSinceLast > 4) {
-           await sendReminder(assignment, `Urgent: Assignment "${assignment.title}" for ${assignment.subject.name} is due in 5 hours!`);
+           await sendReminder(assignment, `⏳⚠️ Urgent: Assignment "${assignment.title}" for ${assignment.subject.name} is due in 5 hours!`);
         }
       }
 
@@ -78,10 +77,10 @@ const scheduleDeadlineNotifications = () => {
         const timeDiff = new Date(assignment.dueDate).getTime() - now.getTime();
         const hoursRemaining = timeDiff / (1000 * 60 * 60);
         
-        let message = `Reminder: Assignment "${assignment.title}" for ${assignment.subject.name} is due tomorrow!`;
+        let message = `📅 Reminder: Assignment "${assignment.title}" for ${assignment.subject.name} is due tomorrow!`;
         
         if (hoursRemaining < 12) {
-             message = `Reminder: Assignment "${assignment.title}" for ${assignment.subject.name} is due today!`;
+             message = `⏰ Reminder: Assignment "${assignment.title}" for ${assignment.subject.name} is due today!`;
         }
         
         await sendReminder(assignment, message);
@@ -90,31 +89,40 @@ const scheduleDeadlineNotifications = () => {
     } catch (error) {
       console.error('Error in deadline notification cron:', error);
     }
-  });
+};
 
-  // Helper function to send notifications
-  const sendReminder = async (assignment, message) => {
-      const users = await prisma.user.findMany({
-        where: {
-          cohortNo: assignment.cohortNo,
-          pushToken: { not: null }
-        }
-      });
-
-       for (const user of users) {
-        if (user.pushToken) {
-          await sendPushNotification(user.pushToken, "Assignment Deadline", message, { url: assignment.link });
-        }
+// Helper function to send notifications
+const sendReminder = async (assignment, message) => {
+    const users = await prisma.user.findMany({
+      where: {
+        cohortNo: assignment.cohortNo,
+        pushToken: { not: null }
       }
+    });
 
-      // Mark assignment as notified
-      await prisma.assignment.update({
-        where: { id: assignment.id },
-        data: { notificationSentAt: new Date() }
-      });
-      
-      console.log(`Sent notifications for assignment: ${assignment.title}`);
-  };
+     for (const user of users) {
+      if (user.pushToken) {
+        await sendPushNotification(user.pushToken, "Assignment Deadline", message, { url: assignment.link });
+      }
+    }
+
+    // Mark assignment as notified
+    await prisma.assignment.update({
+      where: { id: assignment.id },
+      data: { notificationSentAt: new Date() }
+    });
+    
+    console.log(`Sent notifications for assignment: ${assignment.title}`);
+};
+
+// Run every 30 minutes
+const scheduleDeadlineNotifications = () => {
+  // Run once immediately on server startup
+  checkDeadlines();
+  
+  cron.schedule('*/30 * * * *', async () => {
+    await checkDeadlines();
+  });
 };
 
 export default scheduleDeadlineNotifications;

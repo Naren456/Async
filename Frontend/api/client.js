@@ -1,10 +1,10 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 
+const Production = "https://async-vr1z.onrender.com";
 const Local = "http://10.51.6.234:8000";
-// const Local1 ="http://10.185.142.169:8000" // Unused
 
-export const API_BASE_URL = Local;
+export const API_BASE_URL = Production;
 
 const client = axios.create({
   baseURL: API_BASE_URL,

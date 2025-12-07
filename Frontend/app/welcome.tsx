@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, TouchableOpacity, Image } from "react-native";
+import { Text, View, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,8 +23,10 @@ import { Alert } from "react-native";
 export default function Welcome() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
   const onGoogleButtonPress = async () => {
+    setIsGoogleLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signOut();
@@ -49,6 +51,8 @@ export default function Welcome() {
         return;
       }
       Alert.alert("Google Sign-In Failed", error.message || "Something went wrong");
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -103,6 +107,7 @@ export default function Welcome() {
             {/* Google Button */}
             <TouchableOpacity
               onPress={onGoogleButtonPress}
+              disabled={isGoogleLoading}
               activeOpacity={0.9}
               className="bg-white flex-row items-center justify-center rounded-2xl py-4 shadow-lg"
               style={{ 
@@ -113,17 +118,28 @@ export default function Welcome() {
                 shadowRadius: 4.65,
               }}
             >
-              <View className="mr-3">
-                <Image
-                  source={require("../assets/images/google-logo.png")}
-                  style={{ width: 20, height: 20 }}
-                  resizeMode="contain"
-                />
-              </View>
+              {isGoogleLoading ? (
+                <View className="flex-row items-center justify-center">
+                  <ActivityIndicator size="small" color="#2563eb" />
+                  <Text className="text-blue-600 font-bold text-lg ml-3">
+                    Signing in...
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <View className="mr-3">
+                    <Image
+                      source={require("../assets/images/google-logo.png")}
+                      style={{ width: 20, height: 20 }}
+                      resizeMode="contain"
+                    />
+                  </View>
 
-              <Text className="text-blue-600 font-bold text-lg">
-                Sign in with Google
-              </Text>
+                  <Text className="text-blue-600 font-bold text-lg">
+                    Sign in with Google
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
 
             <Text className="text-sm text-center text-white/70 mt-6">

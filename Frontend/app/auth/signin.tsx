@@ -315,7 +315,12 @@ export default function SignIn() {
                       className="flex-row items-center justify-center rounded-xl py-4 px-6"
                     >
                       {isGoogleLoading ? (
-                        <ActivityIndicator size="small" color="#fff" />
+                        <View className="flex-row items-center justify-center">
+                          <ActivityIndicator size="small" color="#fff" />
+                          <Text className="text-white font-bold text-lg ml-3">
+                            Signing in...
+                          </Text>
+                        </View>
                       ) : (
                         <>
                           <View className="bg-white p-1 rounded-full mr-3">
