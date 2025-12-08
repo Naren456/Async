@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 
-import dotenv from 'dotenv';
 import AuthRouter from './routes/auth.route.js';
 import CourseraRouter from './routes/coursera.route.js';
 import subjectRouter from './routes/subject.route.js';
@@ -14,7 +14,7 @@ import './jobs/syncAssignment.js'
 import scheduleDeadlineNotifications from './cron/scheduler.js';
 
 scheduleDeadlineNotifications();
-dotenv.config();
+// dotenv.config() - loaded at top
 
 const app = express();
 
