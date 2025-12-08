@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 
 import dotenv from 'dotenv';
 import AuthRouter from './routes/auth.route.js';
@@ -38,6 +39,19 @@ app.use('/api/notes', notesRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello from the backend!');
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("❌ Global Error Handler:", err);
+  
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ message: `Upload Error: ${err.message}` });
+  }
+
+  const status = err.status || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(status).json({ message });
 });
 
 
