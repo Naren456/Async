@@ -7,6 +7,20 @@ export const checkDeadlines = async () => {
     console.log('Running deadline notification check...');
     try {
       const now = new Date();
+      const cohortUsersCache = {};
+
+      // Helper to fetch users with caching within this execution cycle
+      const getUsersForCohort = async (cohortNo) => {
+          if (!cohortUsersCache[cohortNo]) {
+              cohortUsersCache[cohortNo] = await prisma.user.findMany({
+                  where: {
+                      cohortNo,
+                      pushToken: { not: null }
+                  }
+              });
+          }
+          return cohortUsersCache[cohortNo];
+      };
 
       // --- 0. Critical 30-Minute Reminder ---
       // Priority: HIGHEST. Due in less than 45 mins.
@@ -28,7 +42,8 @@ export const checkDeadlines = async () => {
 
           // If we haven't sent a notification in the last 20 mins, send one now.
           if (minsSinceLast > 20) {
-             await sendReminder(assignment, `🚨🔥 CRITICAL: Assignment "${assignment.title}" for ${assignment.subject.name} is due in less than 45 minutes! Submit NOW!`);
+             const users = await getUsersForCohort(assignment.cohortNo);
+             await sendReminder(assignment, `🚨🔥 CRITICAL: Assignment "${assignment.title}" for ${assignment.subject.name} is due in less than 45 minutes! Submit NOW!`, users);
           }
       }
       
@@ -54,7 +69,8 @@ export const checkDeadlines = async () => {
         const hoursSinceLast = (now.getTime() - lastSent) / (1000 * 60 * 60);
 
         if (hoursSinceLast > 4) {
-           await sendReminder(assignment, `⏳⚠️ Urgent: Assignment "${assignment.title}" for ${assignment.subject.name} is due in 5 hours!`);
+           const users = await getUsersForCohort(assignment.cohortNo);
+           await sendReminder(assignment, `⏳⚠️ Urgent: Assignment "${assignment.title}" for ${assignment.subject.name} is due in 5 hours!`, users);
         }
       }
 
@@ -83,7 +99,8 @@ export const checkDeadlines = async () => {
              message = `⏰ Reminder: Assignment "${assignment.title}" for ${assignment.subject.name} is due today!`;
         }
         
-        await sendReminder(assignment, message);
+        const users = await getUsersForCohort(assignment.cohortNo);
+        await sendReminder(assignment, message, users);
       }
 
     } catch (error) {
@@ -92,14 +109,7 @@ export const checkDeadlines = async () => {
 };
 
 // Helper function to send notifications
-const sendReminder = async (assignment, message) => {
-    const users = await prisma.user.findMany({
-      where: {
-        cohortNo: assignment.cohortNo,
-        pushToken: { not: null }
-      }
-    });
-
+const sendReminder = async (assignment, message, users) => {
      for (const user of users) {
       if (user.pushToken) {
         await sendPushNotification(user.pushToken, "Assignment Deadline", message, { url: assignment.link });

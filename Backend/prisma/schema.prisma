@@ -26,6 +26,8 @@ model User {
   cohort      Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
   assignments UserAssignment[]
   activities  UserActivity[]
+
+  @@index([cohortNo])
 }
 
 model Subject {
@@ -53,6 +55,7 @@ model Assignment {
   users       UserAssignment[]
   notificationSentAt DateTime?
 
+  @@index([dueDate])
   @@unique([title, cohortNo, subjectCode])
 }
 
