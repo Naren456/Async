@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { BookOpen } from "lucide-react-native";
-import { MotiView } from "moti";
+
 
 import "./global.css";
 
@@ -68,26 +68,16 @@ export default function Welcome() {
         <View className="flex-1 items-center justify-center px-8">
 
           {/* Animated Icon */}
-          <MotiView
-            from={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "timing", duration: 900 }}
-            className="mb-10"
-          >
+          <View className="mb-10">
             <View className="p-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-xl">
               <View className="w-20 h-20 rounded-2xl bg-white/25 items-center justify-center">
                 <BookOpen size={40} strokeWidth={2} color="white" />
               </View>
             </View>
-          </MotiView>
+          </View>
 
           {/* Header Text */}
-          <MotiView
-            from={{ opacity: 0, translateY: 20 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 800, delay: 300 }}
-            className="items-center"
-          >
+          <View className="items-center">
             <Text className="text-6xl font-extrabold text-white tracking-wide">
               ASync
             </Text>
@@ -99,7 +89,7 @@ export default function Welcome() {
             <Text className="text-base text-white/60 text-center mt-2 max-w-xs leading-6">
               Smart reminders that keep you ahead in your academic journey
             </Text>
-          </MotiView>
+          </View>
 
           {/* Buttons */}
           <View className="w-full max-w-sm mt-14">

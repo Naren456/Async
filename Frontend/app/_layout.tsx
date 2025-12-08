@@ -35,10 +35,16 @@ function AppLayout() {
 
   useEffect(() => {
     console.log("Configuring Google Sign-In with Web Client ID:", process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID);
-    GoogleSignin.configure({
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-      offlineAccess: true,
-    });
+    try {
+      console.log("Configuring Google Sign-In...");
+      GoogleSignin.configure({
+        webClientId: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com",
+        offlineAccess: true,
+      });
+      console.log("Google Sign-In configured successfully");
+    } catch (error) {
+      console.error("Google Sign-In configuration failed:", error);
+    }
   }, []);
 
 
