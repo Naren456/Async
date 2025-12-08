@@ -70,7 +70,7 @@ export const checkDeadlines = async () => {
 
         if (hoursSinceLast > 4) {
            const users = await getUsersForCohort(assignment.cohortNo);
-           await sendReminder(assignment, `⏳⚠️ Urgent: Assignment "${assignment.title}" for ${assignment.subject.name} is due in 5 hours!`, users);
+           await sendReminder(assignment, `📅 Urgent: Assignment "${assignment.title}" for ${assignment.subject.name} is due in 5 hours!`, users);
         }
       }
 
