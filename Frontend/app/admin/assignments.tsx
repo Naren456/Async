@@ -21,9 +21,11 @@ export type Assignment = {
   title: string;
   subject: string;
   isoDate: string;
+  openingDate: string;
   displayDate: string;
   link: string;
 };
+
 
 type GroupedAssignments = Record<string, Assignment[]>;
 
@@ -58,8 +60,10 @@ const AdminAssignments = () => {
           subject: a.subject?.name || a.subject?.code || "Subject",
           link: a.link || "",
           isoDate: iso,
+          openingDate: a.openingDate ? new Date(a.openingDate).toISOString() : "",
           displayDate: display,
         } as Assignment;
+
       });
     });
     return result;
@@ -103,11 +107,13 @@ const AdminAssignments = () => {
     router.push({
       pathname: "/admin/assignmentForm",
       params: {
-        id: a.id,
+         id: a.id,
         title: a.title,
         dueDate: a.isoDate,
+        openingDate: a.openingDate,
         cohortNo: cohortFilter,
         subjectCode: a.subject,
+
         link: a.link,
       },
     });
