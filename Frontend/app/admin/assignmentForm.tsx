@@ -19,7 +19,9 @@ const AssignmentForm = () => {
     id: params.id as string || "",
     title: params.title as string || "",
     dueDate: params.dueDate as string || new Date().toISOString(),
+    openingDate: params.openingDate as string || new Date().toISOString(),
     cohortNo: params.cohortNo as string || "",
+
     subjectCode: params.subjectCode as string || "",
     link: params.link as string || "",
   });
@@ -27,6 +29,8 @@ const AssignmentForm = () => {
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showOpeningDatePicker, setShowOpeningDatePicker] = useState(false);
+  const [showOpeningTimePicker, setShowOpeningTimePicker] = useState(false);
   const [tempDate, setTempDate] = useState(new Date(form.dueDate || Date.now()));
 
   const onDateChange = (event: any, selectedDate?: Date) => {
@@ -50,9 +54,30 @@ const AssignmentForm = () => {
     }
   };
 
+  const onOpeningDateChange = (event: any, selectedDate?: Date) => {
+    setShowOpeningDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      const current = new Date(form.openingDate);
+      current.setFullYear(selectedDate.getFullYear());
+      current.setMonth(selectedDate.getMonth());
+      current.setDate(selectedDate.getDate());
+      setForm(f => ({ ...f, openingDate: current.toISOString() }));
+    }
+  };
+
+  const onOpeningTimeChange = (event: any, selectedDate?: Date) => {
+    setShowOpeningTimePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      const current = new Date(form.openingDate);
+      current.setHours(selectedDate.getHours());
+      current.setMinutes(selectedDate.getMinutes());
+      setForm(f => ({ ...f, openingDate: current.toISOString() }));
+    }
+  };
+
   const handleSubmit = async () => {
-    const { id, title, dueDate, cohortNo, subjectCode, link } = form;
-    if (!title || !dueDate || !cohortNo || !subjectCode || !link) {
+    const { id, title, dueDate, openingDate, cohortNo, subjectCode, link } = form;
+    if (!title || !dueDate || !openingDate || !cohortNo || !subjectCode || !link) {
       Alert.alert("Missing Fields", "Please fill all fields");
       return;
     }
@@ -163,6 +188,62 @@ const AssignmentForm = () => {
             />
           )}
         </View>
+
+        <View className="mb-3 flex-row justify-between">
+          <View className="flex-1 mr-2">
+            <Text className="text-gray-300 mb-1">Opening Date</Text>
+            <TouchableOpacity
+              onPress={() => setShowOpeningDatePicker(true)}
+              className="bg-[#1e293b] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+            >
+              <Text className="text-white">
+                {new Date(form.openingDate).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "2-digit",
+                })}
+              </Text>
+              <Calendar size={20} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+
+          <View className="flex-1 ml-2">
+            <Text className="text-gray-300 mb-1">Opening Time</Text>
+            <TouchableOpacity
+              onPress={() => setShowOpeningTimePicker(true)}
+              className="bg-[#1e293b] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+            >
+              <Text className="text-white">
+                {new Date(form.openingDate).toLocaleTimeString(undefined, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+              <Clock size={20} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+          
+          {showOpeningDatePicker && (
+            <DateTimePicker
+              value={new Date(form.openingDate)}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onOpeningDateChange}
+              themeVariant="dark"
+            />
+          )}
+          
+          {showOpeningTimePicker && (
+            <DateTimePicker
+              value={new Date(form.openingDate)}
+              mode="time"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onOpeningTimeChange}
+              themeVariant="dark"
+            />
+          )}
+        </View>
+
 
         <View className="mb-3">
           <Text className="text-gray-300 mb-1">Cohort Number</Text>
