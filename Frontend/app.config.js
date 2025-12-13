@@ -70,6 +70,14 @@ export default {"expo": {
           "webClientId": process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
           "iosUrlScheme": process.env.EXPO_PUBLIC_IOS_URL_SCHEME
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "ndkVersion": "27.1.12297006"
+          }
+        }
       ]
     ],
 
