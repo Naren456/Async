@@ -73,10 +73,16 @@ export const scheduleAssignmentNotifications = async (assignments: Assignment[])
         { hours: 0.5, label: "Due Soon", emoji: "🚨" }, // 30 minutes
     ];
 
+    const tenDaysFromNow = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
+
     for (const assignment of assignments) {
         if (!assignment.isoDate) continue;
 
         const dueDate = new Date(assignment.isoDate);
+        
+        // Optimization: Skip assignments due more than 10 days in the future
+        if (dueDate > tenDaysFromNow) continue;
+
         const subjectName = typeof assignment.subject === 'string' ? assignment.subject : (assignment.subject as any).name || 'Subject';
 
         for (const interval of intervals) {
