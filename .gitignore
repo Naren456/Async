@@ -18,3 +18,7 @@ LandingPage/public/video.mp4
 Frontend/api.json
 Frontend/ios
 .idea
+
+# Global ignores for large binaries
+*.apk
+*.tar.gz
