@@ -66,3 +66,13 @@ export const UpdatePushToken = async (pushToken) => {
     throw error;
   }
 };
+
+export const SendTestNotification = async () => {
+  try {
+    const response = await client.post(ENDPOINTS.AUTH.TEST_NOTIFICATION);
+    return response.data;
+  } catch (error) {
+    console.error('SendTestNotification Error:', error);
+    throw error.response?.data || { message: 'Something went wrong' };
+  }
+};

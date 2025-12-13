@@ -5,7 +5,10 @@ export const UploadNote = async (formData) => {
   try {
     const response = await client.post(ENDPOINTS.NOTES.UPLOAD, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': undefined,
+      },
+      transformRequest: (data, headers) => {
+        return data;
       },
     });
     return response.data;

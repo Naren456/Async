@@ -2,11 +2,9 @@
 
 # dependencies
 node_modules/
-
 # Expo
-.expo/
-dist/
-web-build/
+dist
+web-build
 expo-env.d.ts
 
 # Native
@@ -39,5 +37,23 @@ yarn-error.*
 app-example
 
 # generated native folders
-/ios
-/android
+ios
+android
+
+my-app-release-key.keystore
+credentials.json
+google-services.json
+
+# Security
+*.keystore
+google-services.json
+credentials.json
+
+.easignore
+GoogleService-Info.plist
+google-services.json.env
+
+.idea
+.expo
+.vscode
+

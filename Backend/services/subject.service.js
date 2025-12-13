@@ -18,10 +18,11 @@ export const getUserSubjects = async (userId, filters = {}) => {
     throw { status: 404, message: "User not found" };
   }
 
-  const { semester: qpSemester, term: qpTerm } = filters;
+  const qpSemester = filters.semester !== undefined ? Number(filters.semester) : undefined;
+  const qpTerm = filters.term !== undefined ? Number(filters.term) : undefined;
   
-  const effectiveSemester = Number.isFinite(qpSemester) ? qpSemester : (user.semester || 1);
-  const effectiveTerm = Number.isFinite(qpTerm) ? qpTerm : (user.term || 1);
+  const effectiveSemester = (qpSemester !== undefined && !isNaN(qpSemester)) ? qpSemester : (user.semester || 1);
+  const effectiveTerm = (qpTerm !== undefined && !isNaN(qpTerm)) ? qpTerm : (user.term || 1);
 
   const whereClause = (qpSemester !== undefined && qpTerm !== undefined)
     ? {

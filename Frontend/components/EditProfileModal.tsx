@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, SafeAreaView, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface EditProfileModalProps {
   visible: boolean;
@@ -51,6 +52,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      onRequestClose={onClose}
     >
       <SafeAreaView className="flex-1 bg-[#0f172b]">
         <View className="flex-row items-center justify-between p-4 border-b border-white/10">

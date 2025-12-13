@@ -96,6 +96,19 @@ export const getMe = async (req, res) => {
   try {
     const userId = req.user;
     const user = await authService.getUserProfile(userId);
+    
+    // Track activity
+    try {
+      await prisma.userActivity.create({
+        data: {
+          userId,
+          action: "APP_OPEN"
+        }
+      });
+    } catch (e) {
+      console.error("Failed to log activity", e);
+    }
+
     res.json({ user });
   } catch (error) {
     console.error(error);
@@ -132,7 +145,7 @@ export const sendTestNotification = async (req, res) => {
       return res.status(404).json({ message: "User or push token not found" });
     }
 
-    await sendPushNotification(user.pushToken, "This is a test notification from ASync!");
+    await sendPushNotification(user.pushToken, "ASync Test", "This is a test notification from ASync!");
     res.status(200).json({ message: "Test notification sent" });
   } catch (error) {
     console.error("Error sending test notification:", error);

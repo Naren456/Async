@@ -10,8 +10,8 @@ import { BookOpen, User, Mail, Lock, Users, Eye, EyeOff } from "lucide-react-nat
 import { AuthsignUp } from "../../api/apiCall";
 import * as SecureStore from 'expo-secure-store';
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/reducer";
-import { Toast } from "@/components/Toast";
+import { setUser } from "../../store/reducer";
+import { Toast } from "../../components/Toast";
 // Validation Schema
 const SignUpSchema = Yup.object().shape({
   name: Yup.string()

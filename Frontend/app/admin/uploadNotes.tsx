@@ -13,7 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { ArrowLeft, FileUp, XCircle } from 'lucide-react-native';
 import * as DocumentPicker from 'expo-document-picker';
-import { UploadNote } from '../../api/admin'; // Make sure this import is correct
+import { UploadNote }  from '../../api/apiCall';
 
 const UploadNoteScreen = () => {
   const router = useRouter();
@@ -38,7 +38,7 @@ const UploadNoteScreen = () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: 'application/pdf',
-        copyToCacheDirectory: false,
+        copyToCacheDirectory: true,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -72,7 +72,7 @@ const UploadNoteScreen = () => {
     formData.append('subjectCode', subjectCode);
 
     try {
-      await UploadNote(user.token, formData);
+      await UploadNote(formData);
       Alert.alert('Success', 'Note uploaded successfully!', [
         { text: 'OK', onPress: () => router.back() },
       ]);
@@ -103,7 +103,7 @@ const UploadNoteScreen = () => {
           Upload Note
         </Text>
 
-        <View style={{ width: 24 }} /> {/* Spacer to balance header */}
+        <View style={{ width: 24 }} />
       </View>
 
       <ScrollView className="flex-1 p-4">

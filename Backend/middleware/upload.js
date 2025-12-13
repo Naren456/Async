@@ -10,7 +10,8 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf') {
     cb(null, true);
   } else {
-    cb(new Error('Only PDF files are allowed!'), false);
+    console.warn(`[Upload Middleware] Rejected file with mimetype: ${file.mimetype}`);
+    cb(new Error(`Only PDF files are allowed! Received: ${file.mimetype}`), false);
   }
 };
 
@@ -18,7 +19,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 1024 * 1024 * 10 // Limit file size to 10MB
+    fileSize: 1024 * 1024 * 50 // Limit file size to 50MB
   }
 });
 

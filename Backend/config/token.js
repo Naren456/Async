@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "portsyncsecret";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Jwt token generation (accepts user object or id string)
 export const generateToken = (userOrId) => {

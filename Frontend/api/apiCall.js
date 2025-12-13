@@ -4,7 +4,8 @@ export {
   GetMe,
   UpdateProfile,
   AuthGoogleSignIn,
-  UpdatePushToken
+  UpdatePushToken,
+  SendTestNotification
 } from './services/authService';
 
 export {

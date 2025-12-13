@@ -2,7 +2,7 @@ import { Expo } from 'expo-server-sdk';
 
 let expo = new Expo();
 
-export const sendPushNotification = async (pushToken, message) => {
+export const sendPushNotification = async (pushToken, title, body, data = {}) => {
   if (!Expo.isExpoPushToken(pushToken)) {
     console.error(`Push token ${pushToken} is not a valid Expo push token`);
     return;
@@ -12,8 +12,9 @@ export const sendPushNotification = async (pushToken, message) => {
   messages.push({
     to: pushToken,
     sound: 'default',
-    body: message,
-    data: { withSome: 'data' },
+    title: title,
+    body: body,
+    data: data,
   });
 
   let chunks = expo.chunkPushNotifications(messages);
