@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
 import { ArrowLeft } from 'lucide-react-native';
-import { GetSubjects, DeleteSubject } from '@/api/apiCall';
+import { GetSubjects, DeleteSubject } from '../../api/apiCall';
 import FilterBar from '../../components/FilterBar';
 import SubjectCard from '../../components/SubjectCard';
 import SemesterModal from '../../components/SemesterModel';
@@ -40,7 +40,7 @@ const AdminSubjects = () => {
   const loadSubjects = async () => {
     setLoading(true);
     try {
-      const data = await GetSubjects(user.token);
+      const data = await GetSubjects();
       setSubjects(data.subjects || []);
     } catch {
       setSubjects([]);
@@ -58,7 +58,7 @@ const AdminSubjects = () => {
         onPress: async () => {
           setLoading(true);
           try {
-            await DeleteSubject(user.token, code);
+            await DeleteSubject(code);
             Alert.alert('Deleted', 'Subject deleted successfully');
             loadSubjects();
           } catch (e: any) {

@@ -25,6 +25,9 @@ model User {
   cgr         Float?
   cohort      Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
   assignments UserAssignment[]
+  activities  UserActivity[]
+
+  @@index([cohortNo])
 }
 
 model Subject {
@@ -42,6 +45,7 @@ model Assignment {
   id          String           @id @default(cuid())
   title       String
   dueDate     DateTime?
+  openingDate DateTime?
   cohortNo    Int
   subjectCode String
   createdAt   DateTime         @default(now())
@@ -52,6 +56,7 @@ model Assignment {
   users       UserAssignment[]
   notificationSentAt DateTime?
 
+  @@index([dueDate])
   @@unique([title, cohortNo, subjectCode])
 }
 
@@ -92,4 +97,15 @@ model UserAssignment {
 enum Role {
   STUDENT
   TEACHER
+}
+
+model UserActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   @default("APP_OPEN")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
 }

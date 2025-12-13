@@ -1,50 +1,73 @@
-# Welcome to your Expo app 👋
+# ASync - Student Assignment Companion
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+ASync is a comprehensive mobile application designed to help students track assignments, deadlines, and academic schedules. Built with React Native and Expo, it simplifies academic management for students.
 
-## Get started
+## 🚀 Features
 
-1. Install dependencies
+- **Assignment Tracking**: View upcoming assignments and deadlines in a unified dashboard.
+- **Push Notifications**: Get timely reminders for due dates.
+- **Google Sign-In**: Secure and easy authentication using your institutional email.
+- **Admin Panel**: Teachers can upload assignments and notes directly.
+- **Offline Support**: View cached data even without internet.
 
-   ```bash
-   npm install
-   ```
+## 🛠️ Tech Stack
 
-2. Start the app
+- **Framework**: [Expo](https://expo.dev/) (React Native)
+- **Styling**: [NativeWind](https://www.nativewind.dev/) (Tailwind CSS)
+- **State Management**: Redux Toolkit
+- **Navigation**: Expo Router (File-based routing)
+- **Backend / Database**: Node.js, Prisma, PostgreSQL (NeonDB)
 
-   ```bash
-   npx expo start
-   ```
+## 🏁 Getting Started
 
-In the output, you'll find options to open the app in a
+### Prerequisites
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Node.js & npm/yarn
+- Expo Go app on your mobile device (or Android Studio/Xcode for emulators)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Installation
 
-## Get a fresh project
+1.  **Clone the repository**:
+    ```bash
+    git clone <repository-url>
+    cd Async/Frontend
+    ```
 
-When you're ready, run:
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-```bash
-npm run reset-project
-```
+3.  **Environment Setup**:
+    Create a `.env` file in the `Frontend` directory with the following keys:
+    ```env
+    EXPO_PUBLIC_GOOGLE_CLIENT_ID=your_web_client_id
+    EXPO_PUBLIC_IOS_URL_SCHEME=your_ios_url_scheme
+    EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_web_client_id_for_web
+    ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+4.  **Start the application**:
+    ```bash
+    npx expo start
+    ```
 
-## Learn more
+5.  **Run on Device/Emulator**:
+    - Scan the QR code with Expo Go (Android) or Camera (iOS).
+    - Press `a` to open in Android Emulator.
+    - Press `i` to open in iOS Simulator.
 
-To learn more about developing your project with Expo, look at the following resources:
+## 📂 Project Structure
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- `app/`: Expo Router pages (Screens).
+- `components/`: Reusable UI components.
+- `api/`: Axios client and service functions.
+- `store/`: Redux slices and store configuration.
+- `assets/`: Images and static resources.
 
-## Join the community
+## 🤝 Contributing
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1.  Fork the repo
+2.  Create your feature branch (`git checkout -b feature/amazing-feature`)
+3.  Commit your changes (`git commit -m 'Add some amazing feature'`)
+4.  Push to the branch (`git push origin feature/amazing-feature`)
+5.  Open a Pull Request

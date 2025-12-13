@@ -19,6 +19,7 @@ import { useRouter } from "expo-router";
 import AssignmentCard from "../../components/AssignmentCard";
 import StatCard from "../../components/StatCard";
 import { GetAssignmentsByCohort } from "../../api/apiCall";
+import { scheduleAssignmentNotifications } from "../../utils/notificationScheduler";
 
 // --- Types ---
 export type Assignment = {
@@ -120,6 +121,9 @@ const UserDashboard = () => {
 
       const next = nextDeadlineAssignments(grouped);
       setNextAssignments(next);
+
+      // Schedule local notifications for these assignments
+      await scheduleAssignmentNotifications(Object.values(grouped).flat());
     } catch (err) {
       console.error("Error loading dashboard:", err);
     } finally {

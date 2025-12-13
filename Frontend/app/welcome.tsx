@@ -1,11 +1,11 @@
 import React from "react";
-import { Text, View, TouchableOpacity, Image } from "react-native";
+import { Text, View, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { BookOpen } from "lucide-react-native";
-import { MotiView } from "moti";
+
 
 import "./global.css";
 
@@ -14,17 +14,19 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 
-import { AuthGoogleSignIn } from "@/api/apiCall";
+import { AuthGoogleSignIn } from "../api/apiCall";
 import { useDispatch } from "react-redux";
-import { setUser } from "@/store/reducer";
+import { setUser } from "../store/reducer";
 import * as SecureStore from "expo-secure-store";
 import { Alert } from "react-native";
 
 export default function Welcome() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
   const onGoogleButtonPress = async () => {
+    setIsGoogleLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signOut();
@@ -49,6 +51,8 @@ export default function Welcome() {
         return;
       }
       Alert.alert("Google Sign-In Failed", error.message || "Something went wrong");
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -64,26 +68,16 @@ export default function Welcome() {
         <View className="flex-1 items-center justify-center px-8">
 
           {/* Animated Icon */}
-          <MotiView
-            from={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "timing", duration: 900 }}
-            className="mb-10"
-          >
+          <View className="mb-10">
             <View className="p-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-xl">
               <View className="w-20 h-20 rounded-2xl bg-white/25 items-center justify-center">
                 <BookOpen size={40} strokeWidth={2} color="white" />
               </View>
             </View>
-          </MotiView>
+          </View>
 
           {/* Header Text */}
-          <MotiView
-            from={{ opacity: 0, translateY: 20 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 800, delay: 300 }}
-            className="items-center"
-          >
+          <View className="items-center">
             <Text className="text-6xl font-extrabold text-white tracking-wide">
               ASync
             </Text>
@@ -95,7 +89,7 @@ export default function Welcome() {
             <Text className="text-base text-white/60 text-center mt-2 max-w-xs leading-6">
               Smart reminders that keep you ahead in your academic journey
             </Text>
-          </MotiView>
+          </View>
 
           {/* Buttons */}
           <View className="w-full max-w-sm mt-14">
@@ -103,6 +97,7 @@ export default function Welcome() {
             {/* Google Button */}
             <TouchableOpacity
               onPress={onGoogleButtonPress}
+              disabled={isGoogleLoading}
               activeOpacity={0.9}
               className="bg-white flex-row items-center justify-center rounded-2xl py-4 shadow-lg"
               style={{ 
@@ -113,17 +108,28 @@ export default function Welcome() {
                 shadowRadius: 4.65,
               }}
             >
-              <View className="mr-3">
-                <Image
-                  source={require("../assets/images/google-logo.png")}
-                  style={{ width: 20, height: 20 }}
-                  resizeMode="contain"
-                />
-              </View>
+              {isGoogleLoading ? (
+                <View className="flex-row items-center justify-center">
+                  <ActivityIndicator size="small" color="#2563eb" />
+                  <Text className="text-blue-600 font-bold text-lg ml-3">
+                    Signing in...
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <View className="mr-3">
+                    <Image
+                      source={require("../assets/images/google-logo.png")}
+                      style={{ width: 20, height: 20 }}
+                      resizeMode="contain"
+                    />
+                  </View>
 
-              <Text className="text-blue-600 font-bold text-lg">
-                Sign in with Google
-              </Text>
+                  <Text className="text-blue-600 font-bold text-lg">
+                    Sign in with Google
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
 
             <Text className="text-sm text-center text-white/70 mt-6">

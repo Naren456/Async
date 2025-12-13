@@ -18,6 +18,7 @@ export const createAssignment = async (data) => {
     data: {
       title,
       dueDate: dueDate ? new Date(dueDate) : null,
+      openingDate: data.openingDate ? new Date(data.openingDate) : null,
       cohortNo: Number(cohortNo),
       subjectCode,
       link,
@@ -49,6 +50,7 @@ export const getAssignmentsByCohort = async (cohortNo) => {
       title: a.title,
       subject: a.subject,
       dueDate: a.dueDate,
+      openingDate: a.openingDate,
       link: a.link,
       displayDate: a.dueDate
         ? new Date(a.dueDate).toLocaleString(undefined, {

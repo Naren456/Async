@@ -1,6 +1,7 @@
 export {
   GetAdminStats,
-  GetAllUsers
+  GetAllUsers,
+  SendNotification
 } from './services/adminService';
 
 export {

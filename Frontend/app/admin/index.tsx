@@ -12,7 +12,7 @@ import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
-import { clearUser } from "@/store/reducer";
+import { clearUser } from "../../store/reducer";
 import {
   Settings,
   Users,
@@ -25,6 +25,7 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
+  Send,
 } from "lucide-react-native";
 
 const AdminApp = () => {
@@ -59,7 +60,7 @@ const AdminApp = () => {
     setLoading(true);
     try {
       const { GetAdminStats } = await import("@/api/apiCall");
-      const data = await GetAdminStats(user?.token);
+      const data = await GetAdminStats();
       setStats(data);
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -292,6 +293,13 @@ const AdminApp = () => {
             icon={<BarChart3 size={22} color="#8B5CF6" />}
             onPress={() => router.push("/admin/analytics")}
             color="#8B5CF6"
+          />
+          <ActionButton
+            title="Manage Notifications"
+            description="Send push notifications to cohorts"
+            icon={<Send size={22} color="#EC4899" />}
+            onPress={() => router.push("/admin/notifications")}
+            color="#EC4899"
           />
         </View>
       </ScrollView>

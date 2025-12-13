@@ -13,18 +13,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import { ArrowLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { GetAssignmentsByCohort} from "../../api/apiCall";
+import { GetAssignmentsByCohort, DeleteAssignment } from "../../api/apiCall";
 import AssignmentCard from "../../components/AssignmentCard";
-import { DeleteAssignment } from "@/api/admin";
 
 export type Assignment = {
   id: string;
   title: string;
   subject: string;
   isoDate: string;
+  openingDate: string;
   displayDate: string;
   link: string;
 };
+
 
 type GroupedAssignments = Record<string, Assignment[]>;
 
@@ -59,8 +60,10 @@ const AdminAssignments = () => {
           subject: a.subject?.name || a.subject?.code || "Subject",
           link: a.link || "",
           isoDate: iso,
+          openingDate: a.openingDate ? new Date(a.openingDate).toISOString() : "",
           displayDate: display,
         } as Assignment;
+
       });
     });
     return result;
@@ -104,11 +107,13 @@ const AdminAssignments = () => {
     router.push({
       pathname: "/admin/assignmentForm",
       params: {
-        id: a.id,
+         id: a.id,
         title: a.title,
         dueDate: a.isoDate,
+        openingDate: a.openingDate,
         cohortNo: cohortFilter,
         subjectCode: a.subject,
+
         link: a.link,
       },
     });
@@ -124,7 +129,7 @@ const AdminAssignments = () => {
         onPress: async () => {
           try {
             setLoading(true);
-            await DeleteAssignment(user.token, id);
+            await DeleteAssignment(id);
             Alert.alert("Deleted", "Assignment deleted successfully");
             loadAssignments();
           } catch (e: any) {

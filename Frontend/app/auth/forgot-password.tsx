@@ -14,7 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { KeyRound, Mail, ArrowLeft } from "lucide-react-native";
-import { Toast } from "@/components/Toast";
+import { Toast } from "../../components/Toast";
 
 const ForgotPasswordSchema = Yup.object().shape({
     email: Yup.string()

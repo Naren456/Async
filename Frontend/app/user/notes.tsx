@@ -6,11 +6,12 @@ import {
   ActivityIndicator,
   Modal,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useSelector } from 'react-redux';
-import { GetUserSubjectsWithNotes } from '@/api/apiCall';
+import { GetUserSubjectsWithNotes } from '../../api/apiCall';
 import { BookOpen } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -34,6 +35,27 @@ const UserNotes = () => {
   const [semModalVisible, setSemModalVisible] = useState(false);
   const [termModalVisible, setTermModalVisible] = useState(false);
 
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    if (!user?.id) return;
+    setRefreshing(true);
+    setError(null);
+    try {
+      const data = await GetUserSubjectsWithNotes(
+        user?.id,
+        selectedSemester !== undefined && selectedTerm !== undefined
+          ? { semester: selectedSemester, term: selectedTerm }
+          : {}
+      );
+      setSubjects(data.subjects || []);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load notes');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [user?.id, selectedSemester, selectedTerm]);
+
   // Initialize filters from user
   useEffect(() => {
     if (user?.id) {
@@ -49,7 +71,7 @@ const UserNotes = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await GetUserSubjectsWithNotes(user?.token,
+        const data = await GetUserSubjectsWithNotes(
           user?.id,
           selectedSemester !== undefined && selectedTerm !== undefined
             ? { semester: selectedSemester, term: selectedTerm }
@@ -101,6 +123,8 @@ const UserNotes = () => {
     );
   }
 
+
+
   return (
     <SafeAreaView className="flex-1 bg-[#0f172b] px-4">
       <View className="flex-row items-center mt-4 mb-6">
@@ -136,6 +160,14 @@ const UserNotes = () => {
       <FlatList
         data={filteredSubjects}
         keyExtractor={(item) => item.code}
+        refreshControl={
+            <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={['#3B82F6']}
+                tintColor="#3B82F6"
+            />
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             className="p-4 mb-3 bg-[#1e293b] rounded-2xl border border-white/10"

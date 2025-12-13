@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FileText, ArrowLeft } from "lucide-react-native";
-import { GetSubjectById } from "@/api/apiCall";
+import { FileText, ArrowLeft, Trash2 } from "lucide-react-native";
+import { GetSubjectById, DeleteNote } from "../../api/apiCall";
 import { useSelector } from "react-redux";
+
 export default function SubjectNotes() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -26,7 +28,7 @@ export default function SubjectNotes() {
     setLoading(true);
     setError(null);
     try {
-      const data = await GetSubjectById(user?.token,id);
+      const data = await GetSubjectById(id);
       setSubject(data.subject);
     } catch (e: any) {
       setError(e?.message || "Failed to load subject");
@@ -43,6 +45,25 @@ export default function SubjectNotes() {
     setRefreshing(true);
     await loadSubject();
     setRefreshing(false);
+  };
+
+  const handleDelete = async (noteId: string) => {
+    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await DeleteNote(noteId);
+            Alert.alert("Success", "Note deleted successfully");
+            loadSubject(); // Refresh list
+          } catch (e: any) {
+            Alert.alert("Error", e?.message || "Failed to delete note");
+          }
+        },
+      },
+    ]);
   };
 
   if (loading) {
@@ -123,6 +144,16 @@ export default function SubjectNotes() {
                 Tap to open PDF
               </Text>
             </View>
+
+            {/* Delete Button for Teachers */}
+            {user?.role === "TEACHER" && (
+              <TouchableOpacity
+                onPress={() => handleDelete(item.id)}
+                className="p-2 ml-2 bg-red-500/20 rounded-lg"
+              >
+                <Trash2 size={20} color="#EF4444" />
+              </TouchableOpacity>
+            )}
           </TouchableOpacity>
         )}
         ListEmptyComponent={
