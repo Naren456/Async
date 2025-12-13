@@ -2,7 +2,6 @@
 
 # dependencies
 node_modules/
-
 # Expo
 .expo/
 dist/
@@ -52,3 +51,5 @@ google-services.json
 credentials.json
 
 .easignore
+GoogleService-Info.plist
+google-services.json.env
