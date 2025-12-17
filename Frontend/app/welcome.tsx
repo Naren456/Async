@@ -15,6 +15,7 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 import { AuthGoogleSignIn } from "../api/apiCall";
+import { DataManager } from "../utils/DataManager";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/reducer";
 import * as SecureStore from "expo-secure-store";
@@ -37,6 +38,9 @@ export default function Welcome() {
 
         await SecureStore.setItemAsync("authToken", result.token);
         dispatch(setUser({ user: result.user, token: result.token }));
+
+        // Pre-fetch data
+        await DataManager.prefetchUserData(result.user);
 
         if (result.user.role === "TEACHER") {
           router.replace("/admin");

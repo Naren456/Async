@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import AssignmentCard from "../../components/AssignmentCard";
-import { GetAssignmentsByCohort } from "../../api/apiCall";
+import { DataManager } from "../../utils/DataManager";
 
 // --- Local Types ---
 export type Assignment = {
@@ -62,14 +62,34 @@ const Assignment = () => {
   useEffect(() => {
     const loadAssignments = async () => {
       if (!cohortNo) return;
-      setLoading(true);
-      setError(null);
+      
+      // 1. Try to load from cache first for instant UI
       try {
-        const data = await GetAssignmentsByCohort(cohortNo);
-        setGroupedAssignments(transformGrouped(data.grouped));
+        const cached = await DataManager.getAssignments(cohortNo);
+        if (cached) {
+          setGroupedAssignments(transformGrouped(cached));
+          setLoading(false); 
+        }
+      } catch (cacheErr) {
+        console.log("Cache load error:", cacheErr);
+      }
+
+      // 2. Fetch fresh data from API
+      try {
+        const freshData = await DataManager.syncAssignments(cohortNo);
+        if (freshData) {
+          setGroupedAssignments(transformGrouped(freshData));
+        }
+        setError(null);
       } catch (err) {
         console.error("Error loading assignments:", err);
-        setError("Failed to load assignments. Please try again.");
+        // Only show error if we have NO data to show (i.e. no cache)
+        setGroupedAssignments(prev => {
+           if (Object.keys(prev).length === 0) {
+              setError("Failed to load assignments. Please try again.");
+           }
+           return prev;
+        });
       } finally {
         setLoading(false);
       }
@@ -85,9 +105,10 @@ const Assignment = () => {
     setRefreshing(true);
     setError(null);
     try {
-      const data = await GetAssignmentsByCohort(cohortNo);
-      
-      setGroupedAssignments(transformGrouped(data.grouped));
+      const freshData = await DataManager.syncAssignments(cohortNo);
+      if (freshData) {
+        setGroupedAssignments(transformGrouped(freshData));
+      }
     } catch (err) {
       console.error("Error refreshing assignments:", err);
       setError("Failed to refresh assignments. Please try again.");
@@ -108,7 +129,7 @@ const Assignment = () => {
       
       <ScrollView 
         showsVerticalScrollIndicator={false} 
-        className="px-4"
+        className="px-4 mb-20"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -120,12 +141,12 @@ const Assignment = () => {
       >
         {/* Loading State */}
         {loading ? (
-          <View className="flex-1 justify-center items-center py-20">
+          <View className="mx-2 mt-10 flex-1 justify-center items-center py-20">
             <ActivityIndicator size="large" color="#3B82F6" />
             <Text className="text-gray-400 mt-4 text-base">Loading assignments...</Text>
           </View>
         ) : error ? (
-          <View className="flex-1 justify-center items-center py-20">
+          <View className="mx-2 mt-10 flex-1 justify-center items-center py-20">
             <Text className="text-red-400 text-base text-center mb-4">{error}</Text>
             <Text className="text-gray-400 text-sm text-center">Pull down to refresh</Text>
           </View>

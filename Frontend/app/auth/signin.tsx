@@ -23,6 +23,7 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import { Toast } from "../../components/Toast";
+import { DataManager } from "../../utils/DataManager";
 
 // Validation schema
 const SignInSchema = Yup.object().shape({
@@ -67,6 +68,10 @@ export default function SignIn() {
       await SecureStore.setItemAsync("authToken", result.token);
       // 🔥 MODIFICATION: Pass the token to the setUser action
       dispatch(setUser({ user: result.user, token: result.token }));
+      
+      // Pre-fetch data for instant load on next screens
+      await DataManager.prefetchUserData(result.user);
+
       // await showLoginNotification(result.user.name);
       // Redirect based on user role
       if (result.user.role === "TEACHER") {
@@ -100,6 +105,9 @@ export default function SignIn() {
         const result = await AuthGoogleSignIn(userInfo.data.idToken);
         await SecureStore.setItemAsync("authToken", result.token);
         dispatch(setUser({ user: result.user, token: result.token }));
+
+        // Pre-fetch data for instant load on next screens
+        await DataManager.prefetchUserData(result.user);
 
         if (result.user.role === "TEACHER") {
           router.replace("/admin");

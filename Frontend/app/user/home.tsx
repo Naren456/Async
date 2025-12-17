@@ -18,8 +18,9 @@ import {
 import { useRouter } from "expo-router";
 import AssignmentCard from "../../components/AssignmentCard";
 import StatCard from "../../components/StatCard";
-import { GetAssignmentsByCohort } from "../../api/apiCall";
+import { DataManager } from "../../utils/DataManager";
 import { scheduleAssignmentNotifications } from "../../utils/notificationScheduler";
+
 
 // --- Types ---
 export type Assignment = {
@@ -99,9 +100,44 @@ const UserDashboard = () => {
   });
   const [groupedAssignments, setGroupedAssignments] = useState<GroupedAssignments>({});
   const [nextAssignments, setNextAssignments] = useState<Assignment[]>([]);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const loadDashboard = async () => {
-    setLoading(true);
+    if (!user?.cohortNo) return;
+    
+    // 1. Try to load from cache first
+    let hasLoadedFromCache = false;
+    try {
+      const cached = await DataManager.getAssignments(user.cohortNo);
+      if (cached) {
+        // Calculate count from cached grouped data
+        const totalCount = Object.values(cached).reduce((acc: number, list: any) => acc + list.length, 0);
+        
+        Setassign(totalCount);
+        const grouped = transformGrouped(cached);
+        setGroupedAssignments(grouped);
+
+        const next = nextDeadlineAssignments(grouped);
+        setNextAssignments(next);
+        
+        hasLoadedFromCache = true;
+      }
+    } catch (cacheErr) {
+      console.log("Home cache load error:", cacheErr);
+    }
+
+    // Show loading if cache missed AND we are past the initial load timer
+    if (!hasLoadedFromCache && !isInitialLoading) {
+      setLoading(true);
+    }
+
     try {
       // Dummy stats (replace with actual API data if needed)
       setStats({
@@ -112,18 +148,21 @@ const UserDashboard = () => {
         trends: { subjects: 1, assignments: -2, deadlines: 0, cpg: 1 },
       });
 
-      if (!user?.cohortNo) return;
+      const freshData = await DataManager.syncAssignments(user.cohortNo);
+      if (freshData) {
+        // Calculate count from fresh data (which is grouped from DataManager)
+        const totalCount = Object.values(freshData).reduce((acc: number, list: any) => acc + list.length, 0);
+        Setassign(totalCount);
+        
+        const grouped = transformGrouped(freshData);
+        setGroupedAssignments(grouped);
 
-      const data = await GetAssignmentsByCohort(user.cohortNo);
-      Setassign(data.count)
-      const grouped = transformGrouped(data.grouped);
-      setGroupedAssignments(grouped);
+        const next = nextDeadlineAssignments(grouped);
+        setNextAssignments(next);
 
-      const next = nextDeadlineAssignments(grouped);
-      setNextAssignments(next);
-
-      // Schedule local notifications for these assignments
-      await scheduleAssignmentNotifications(Object.values(grouped).flat());
+        // Schedule local notifications for these assignments
+        await scheduleAssignmentNotifications(Object.values(grouped).flat());
+      }
     } catch (err) {
       console.error("Error loading dashboard:", err);
     } finally {
@@ -141,7 +180,8 @@ const UserDashboard = () => {
     setRefreshing(false);
   }, [user?.cohortNo]);
 
-  if (loading) {
+  // Initial Loading View (5 seconds)
+  if (isInitialLoading || loading) {
     return (
       <SafeAreaView className="flex-1 bg-[#0f172b] items-center justify-center">
         <ActivityIndicator size="large" color="#3B82F6" />
@@ -208,7 +248,7 @@ const UserDashboard = () => {
         </View>
 
         {/* Next Deadline Section */}
-        <View className="py-6">
+        <View className="py-6 mb-20">
           <Text className="text-2xl font-bold text-white mb-4">Upcoming Deadline</Text>
           {nextAssignments.length === 0 ? (
             <Text className="text-gray-400 text-base px-2">No upcoming assignments</Text>

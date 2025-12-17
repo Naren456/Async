@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { GetMe } from '../api/apiCall';
 import { setUser } from '../store/reducer';
 import { StatusBar } from 'expo-status-bar';
+import { DataManager } from '../utils/DataManager';
 
 
 
@@ -27,6 +28,9 @@ export default function AppEntry() {
           // 3. Restore Redux session
           // Pass the token to the reducer
           dispatch(setUser({ user: result.user, token: token }));
+
+          // 3.1 Pre-fetch data for instant load
+          await DataManager.prefetchUserData(result.user);
 
           // 4. Navigate based on user role
           if (result.user.role === "TEACHER") {
