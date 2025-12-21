@@ -31,12 +31,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./Frontend/package-lock.json
 
-      - name: Force NPM & Disable Corepack
-        run: |
-          npm install -g npm@latest
-          node -v
-          npm -v
-
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
@@ -48,7 +42,5 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Publish update
-        # We use a pipe (|) to treat the following text as a literal block, 
-        # which prevents YAML parsing errors with colons and special characters.
         run: |
-          npx eas-cli update --branch production --message "GitHub Update - ${{ github.event.head_commit.message }}"
+          eas update --branch production --message "GitHub Update - ${{ github.event.head_commit.message }}"
