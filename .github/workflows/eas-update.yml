@@ -9,9 +9,16 @@ jobs:
   update:
     name: EAS Update
     runs-on: ubuntu-latest
+    
     defaults:
       run:
         working-directory: ./Frontend
+
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EXPO_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_CLIENT_ID }}
+      EXPO_PUBLIC_IOS_URL_SCHEME: ${{ secrets.EXPO_PUBLIC_IOS_URL_SCHEME }}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
 
     steps:
       - name: Checkout repository
@@ -21,12 +28,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          # Removing the cache for one run can help clear "sticky" version issues
           cache: 'npm'
           cache-dependency-path: ./Frontend/package-lock.json
 
-      # This forces the runner to use the npm version bundled with Node 20
-      - name: Force NPM & Disable Corepack (Yarn)
+      - name: Force NPM & Disable Corepack
         run: |
           npm install -g npm@latest
           node -v
@@ -37,12 +42,13 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-          # EXPLICITLY TELL EXPO ACTION NOT TO USE YARN
           packager: npm 
 
       - name: Install dependencies
-        # Use --foreground-scripts to ensure engines are checked correctly
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Publish update
-        run: eas update --branch production --message "Update from GitHub Actions"
+        # We use a pipe (|) to treat the following text as a literal block, 
+        # which prevents YAML parsing errors with colons and special characters.
+        run: |
+          npx eas-cli update --branch production --message "GitHub Update - ${{ github.event.head_commit.message }}"
