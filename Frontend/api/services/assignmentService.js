@@ -56,3 +56,12 @@ export const GetAssignmentsByCohort = async (cohortNo) => {
     throw error.response?.data || { message: 'Something went wrong' };
   }
 };
+
+export const toggleAssignmentCompletion = async (assignmentId) => {
+  try {
+    const response = await client.post(`${ENDPOINTS.ASSIGNMENTS.BASE}/toggle-completion`,{assignmentId});
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to update status' };
+  }
+};

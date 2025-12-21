@@ -24,6 +24,7 @@ model User {
   term        Int?             @default(1)
   cgr         Float?
   cohort      Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
+  notificationTone String?
   assignments UserAssignment[]
   activities  UserActivity[]
 

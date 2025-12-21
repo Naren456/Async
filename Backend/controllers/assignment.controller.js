@@ -24,7 +24,8 @@ export const createAssignment = async (req, res) => {
 export const getAssignmentsByCohortGrouped = async (req, res) => {
   try {
     const { cohortNo } = req.params;
-    const result = await assignmentService.getAssignmentsByCohort(cohortNo);
+    const userId = req.user;
+    const result = await assignmentService.getAssignmentsByCohort(cohortNo,userId);
     return res.json({ success: true, ...result });
   } catch (err) {
     console.error("Error fetching assignments:", err);
@@ -50,3 +51,20 @@ export const deleteAssignment = async (req, res) => {
     res.status(status).json({ success: false, message: err.message });
   }
 };
+
+export const toggleCompletion = async (req,res) => {
+  try {
+    const {assignmentId} = req.body;
+    const userId = req.user;
+        console.log("Toggling:", { userId, assignmentId });
+    if(!assignmentId){
+      return res.status(400).json({success : false , message : "Assignment ID is required"});
+    }
+    const result = await assignmentService.toggleAssignmentCompletion(userId,assignmentId);
+    res.status(200).json({success:true,completed: result.completed});
+  }
+  catch(err){
+    console.error("Toggle Error Details:", err);
+    res.status(500).json({success:false, message : err.message});
+  }
+}

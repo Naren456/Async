@@ -20,7 +20,7 @@ import AssignmentCard from "../../components/AssignmentCard";
 import StatCard from "../../components/StatCard";
 import { DataManager } from "../../utils/DataManager";
 import { scheduleAssignmentNotifications } from "../../utils/notificationScheduler";
-
+import { toggleAssignmentCompletion } from "../../api/services/assignmentService";
 
 // --- Types ---
 export type Assignment = {
@@ -30,6 +30,7 @@ export type Assignment = {
   isoDate: string;
   displayDate: string;
   link: string;
+  Completed: boolean;
 };
 
 type GroupedAssignments = Record<string, Assignment[]>;
@@ -79,11 +80,14 @@ const transformGrouped = (grouped: any): GroupedAssignments => {
         link: a.link || "",
         isoDate: iso,
         displayDate: display,
+        Completed: a.Completed || false
       } as Assignment;
     });
   });
   return result;
 };
+
+
 
 const UserDashboard = () => {
   const router = useRouter();
@@ -101,7 +105,22 @@ const UserDashboard = () => {
   const [groupedAssignments, setGroupedAssignments] = useState<GroupedAssignments>({});
   const [nextAssignments, setNextAssignments] = useState<Assignment[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-
+const handleToggleComplete = async (assignmentId: string) => {
+  try {
+    // Optimistic update for nextAssignments
+    setNextAssignments((prev) => 
+      prev.map((item) => 
+        item.id === assignmentId ? { ...item, Completed: !item.Completed } : item
+      )
+    );
+    // Also update groupedAssignments if you want them to stay in sync
+    
+    await toggleAssignmentCompletion(assignmentId);
+  } catch (err) {
+    console.error("Failed to toggle", err);
+    loadDashboard(); // Revert on error
+  }
+};
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialLoading(false);
@@ -263,6 +282,8 @@ const UserDashboard = () => {
                   subject={assign.subject}
                   dueDate={assign.displayDate}
                   link={assign.link}
+                  Completed={assign.Completed}
+                  onToggleComplete={() => handleToggleComplete(assign.id)}
                 />
               </View>
             ))
