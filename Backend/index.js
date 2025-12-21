@@ -9,7 +9,7 @@ import subjectRouter from './routes/subject.route.js';
 import assignmentRouter from './routes/assignment.route.js';
 import adminRouter from './routes/admin.route.js';
 import notesRouter from './routes/note.route.js';
-import './jobs/assignmentCleanUp.js'; 
+// import './jobs/assignmentCleanUp.js'; 
 import './jobs/syncAssignment.js'
 import scheduleDeadlineNotifications from './cron/scheduler.js';
 
