@@ -2,8 +2,12 @@ import 'dotenv/config'
 
 export default {"expo": {
     "name": "ASync",
-    "slug": "async",
+    "slug": "A_Sync",
     "version": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/ad21c5dd-0135-4666-b260-2da9d68c9ec2"
+    },
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "async",

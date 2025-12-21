@@ -34,6 +34,10 @@ app.use(cors({
   credentials: true 
 }));
 
+// app.use(cors({
+
+// }))
+
 // CRITICAL: Parse JSON bodies
 app.use(express.json());
 
@@ -45,8 +49,9 @@ app.use('/api/assignments', assignmentRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/notes', notesRouter);
 
+
 app.get('/', (req, res) => {
-  res.send('Hello from the backend!');
+  res.send('Hello from the !');
 });
 
 app.use((err, req, res, next) => {

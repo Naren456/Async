@@ -28,7 +28,7 @@ export const createAssignment = async (data) => {
   return assignment;
 };
 
-export const getAssignmentsByCohort = async (cohortNo) => {
+export const getAssignmentsByCohort = async (cohortNo,userId) => {
   const cohort = Number(cohortNo);
   if (Number.isNaN(cohort)) {
     throw { status: 400, message: "Invalid cohort number" };
@@ -36,7 +36,9 @@ export const getAssignmentsByCohort = async (cohortNo) => {
 
   const assignments = await prisma.assignment.findMany({
     where: { cohortNo: cohort },
-    include: { subject: true },
+    include: { subject: true , users: { 
+    where: { userId: userId } 
+  }},
     orderBy: { dueDate: "asc" },
   });
 
@@ -52,6 +54,7 @@ export const getAssignmentsByCohort = async (cohortNo) => {
       dueDate: a.dueDate,
       openingDate: a.openingDate,
       link: a.link,
+      Completed: a.users.length > 0 ? a.users[0].completed : false,
       displayDate: a.dueDate
         ? new Date(a.dueDate).toLocaleString(undefined, {
             year: "numeric",
@@ -82,4 +85,21 @@ export const deleteAssignment = async (id) => {
   await prisma.assignment.delete({
     where: { id },
   });
+};
+
+
+export const toggleAssignmentCompletion = async(userId , assignmentId)=>{
+  const existing = await prisma.userAssignment.findUnique({where:{userId_assignmentId:{userId , assignmentId}}});
+  if(existing){
+    return await prisma.userAssignment.update({
+      where :{id:existing.id},
+      data:{completed:!existing.completed}
+    });
+  }
+    else{
+      return await prisma.userAssignment.create({
+        data:{userId,assignmentId,completed:true}
+      });
+    
+  }
 };
