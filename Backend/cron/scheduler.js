@@ -127,8 +127,8 @@ const getMessage = (tone, urgency, userName, assignmentTitle, subjectName) => {
     // BRO MODE (Hinglish)
     if (tone === 'bro') {
         if (urgency === 'CRITICAL') return `� ${safeName}, scene serious hai! "${assignmentTitle}" ke liye bas 45 mins bache hain. Jaldi kar le bhai!`;
-        if (urgency === 'URGENT') return `⚠️ Bhai sun, 5 ghante hain bas. "${assignmentTitle}" khatam kar de fir chill marenge.`;
-        if (urgency === 'TODAY') return `� Aur bhai, aaj deadline hai "${assignmentTitle}" ki. Bhool mat jaiyo!`;
+        if (urgency === 'URGENT') return `⚠️ ${safeName} Bhai sun, 5 ghante hain bas. "${assignmentTitle}" khatam kar de fir chill marenge.`;
+        if (urgency === 'TODAY') return `� ${safeName}Aur bhai, aaj deadline hai "${assignmentTitle}" ki. Bhool mat jaiyo!`;
         return `📅 Bhai kal submission hai "${assignmentTitle}" ka. Dekh le apne hisaab se.`;
     }
 
