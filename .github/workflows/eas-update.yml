@@ -42,5 +42,6 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Publish update
+        # Added --platform android to avoid native module conflicts with Web bundling
         run: |
-          eas update --branch production --message "GitHub Update - ${{ github.event.head_commit.message }}"
+          eas update --branch production --platform android --message "GitHub Update - ${{ github.event.head_commit.message }}"
