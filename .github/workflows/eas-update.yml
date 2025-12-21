@@ -14,32 +14,34 @@ jobs:
         working-directory: ./Frontend
 
     steps:
-      # 1. Checkout must come first so the Frontend directory actually exists
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # 2. Now that files are present, you can check for the token
-      - name: Check for EXPO_TOKEN
-        run: |
-          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
-            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets."
-            exit 1
-          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.x
+          # Removing the cache for one run can help clear "sticky" version issues
           cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json
+          cache-dependency-path: ./Frontend/package-lock.json
+
+      # This forces the runner to use the npm version bundled with Node 20
+      - name: Force NPM & Disable Corepack (Yarn)
+        run: |
+          npm install -g npm@latest
+          node -v
+          npm -v
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+          # EXPLICITLY TELL EXPO ACTION NOT TO USE YARN
+          packager: npm 
 
       - name: Install dependencies
+        # Use --foreground-scripts to ensure engines are checked correctly
         run: npm ci
 
       - name: Publish update
