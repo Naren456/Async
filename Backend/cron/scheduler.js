@@ -102,41 +102,41 @@ const getMessage = (tone, urgency, userName, assignmentTitle, subjectName) => {
     
     // STRICT MODE
     if (tone === 'strict') {
-        if (urgency === 'CRITICAL') return `🚨 URGENT: ${safeName}, submit "${assignmentTitle}" NOW. Times up.`;
-        if (urgency === 'URGENT') return `⚠️ Warning: ${safeName}, "${assignmentTitle}" is due in 5 hours. Do not delay.`;
-        if (urgency === 'TODAY') return `⏰ ${safeName}, deadline today for "${assignmentTitle}". Get it done.`;
-        return `📅 ${safeName}, assignment "${assignmentTitle}" is due tomorrow. Plan accordingly.`;
+        if (urgency === 'CRITICAL') return `🚨 URGENT: ${safeName}, submit "${assignmentTitle}" for ${subjectName} NOW. Times up.`;
+        if (urgency === 'URGENT') return `⚠️ Warning: ${safeName}, "${assignmentTitle}" for ${subjectName} is due in 5 hours. Do not delay.`;
+        if (urgency === 'TODAY') return `⏰ ${safeName}, deadline today for "${assignmentTitle}" (${subjectName}). Get it done.`;
+        return `📅 ${safeName}, assignment "${assignmentTitle}" in ${subjectName} is due tomorrow. Plan accordingly.`;
     }
     
     // FUNNY MODE
     if (tone === 'funny') {
-        if (urgency === 'CRITICAL') return `😱 RUN FOREST RUN! "${assignmentTitle}" is due in < 45 mins!`;
-        if (urgency === 'URGENT') return `👀 ${safeName}, your assignment is staring at you... 5 hours left!`;
-        if (urgency === 'TODAY') return `💣 Tick tock ${safeName}! "${assignmentTitle}" explodes (is due) today!`;
-        return `🔮 I see a deadline in your future... "${assignmentTitle}" is due tomorrow!`;
+        if (urgency === 'CRITICAL') return `😱 RUN FOREST RUN! "${assignmentTitle}" (${subjectName}) is due in < 45 mins!`;
+        if (urgency === 'URGENT') return `👀 ${safeName}, your ${subjectName} assignment is staring at you... 5 hours left!`;
+        if (urgency === 'TODAY') return `💣 Tick tock ${safeName}! "${assignmentTitle}" for ${subjectName} explodes (is due) today!`;
+        return `🔮 I see a deadline in your future... "${assignmentTitle}" (${subjectName}) is due tomorrow!`;
     }
 
     // FRIENDLY ROMANTIC MODE
     if (tone === 'friendly_romantic') {
-        if (urgency === 'CRITICAL') return `✨ Hey dear, gentle nudge: "${assignmentTitle}" is due in 45 mins!`;
-        if (urgency === 'URGENT') return `� Don't stress, but "${assignmentTitle}" needs attention in 5 hours.`;
-        if (urgency === 'TODAY') return `🌟 Hope you're having a good day! Remember "${assignmentTitle}" is due today.`;
-        return `� Just checking in! "${assignmentTitle}" is due tomorrow.`;
+        if (urgency === 'CRITICAL') return `✨ Hey dear, gentle nudge: "${assignmentTitle}" for ${subjectName} is due in 45 mins!`;
+        if (urgency === 'URGENT') return `💖 Don't stress, but "${assignmentTitle}" in ${subjectName} needs attention in 5 hours.`;
+        if (urgency === 'TODAY') return `🌟 Hope you're having a good day! Remember "${assignmentTitle}" (${subjectName}) is due today.`;
+        return `💌 Just checking in! "${assignmentTitle}" for ${subjectName} is due tomorrow.`;
     }
     
     // BRO MODE (Hinglish)
     if (tone === 'bro') {
-        if (urgency === 'CRITICAL') return `� ${safeName}, scene serious hai! "${assignmentTitle}" ke liye bas 45 mins bache hain. Jaldi kar le bhai!`;
-        if (urgency === 'URGENT') return `⚠️ ${safeName} Bhai sun, 5 ghante hain bas. "${assignmentTitle}" khatam kar de fir chill marenge.`;
-        if (urgency === 'TODAY') return `� ${safeName}Aur bhai, aaj deadline hai "${assignmentTitle}" ki. Bhool mat jaiyo!`;
-        return `📅 Bhai kal submission hai "${assignmentTitle}" ka. Dekh le apne hisaab se.`;
+        if (urgency === 'CRITICAL') return `🤯 ${safeName}, scene serious hai! ${subjectName} ka "${assignmentTitle}" ke liye bas 45 mins bache hain. Jaldi kar le bhai!`;
+        if (urgency === 'URGENT') return `⚠️ ${safeName} Bhai sun, 5 ghante hain bas. ${subjectName} wala assignment khatam kar de fir chill marenge.`;
+        if (urgency === 'TODAY') return `🤛 ${safeName} Aur bhai, aaj deadline hai "${assignmentTitle}" (${subjectName}) ki. Bhool mat jaiyo!`;
+        return `📅 Bhai kal submission hai "${assignmentTitle}" (${subjectName}) ka. Dekh le apne hisaab se.`;
     }
 
     // FRIENDLY (Default)
-    if (urgency === 'CRITICAL') return `🚨 Almost due! You have less than 45 mins for "${assignmentTitle}". You got this!`;
-    if (urgency === 'URGENT') return `👋 Hey ${safeName}, just a heads up: "${assignmentTitle}" is due in 5 hours.`;
-    if (urgency === 'TODAY') return `☀️ Hi ${safeName}, reminder that "${assignmentTitle}" is due today. Good luck!`;
-    return `📅 Hi ${safeName}, you have an assignment "${assignmentTitle}" due tomorrow.`;
+    if (urgency === 'CRITICAL') return `🚨 Almost due! You have less than 45 mins for "${assignmentTitle}" in ${subjectName}. You got this!`;
+    if (urgency === 'URGENT') return `👋 Hey ${safeName}, just a heads up: "${assignmentTitle}" for ${subjectName} is due in 5 hours.`;
+    if (urgency === 'TODAY') return `☀️ Hi ${safeName}, reminder that "${assignmentTitle}" (${subjectName}) is due today. Good luck!`;
+    return `📅 Hi ${safeName}, you have an assignment "${assignmentTitle}" in ${subjectName} due tomorrow.`;
 };
 
 // Helper function to send notifications
