@@ -18,26 +18,29 @@ scheduleDeadlineNotifications();
 const app = express();
 const PORT = process.env.PORT || 8000;
 const MOBILE_APP_URL = process.env.MOBILE_APP_URL;
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     // 1. Allow requests with no origin (like mobile apps, curl, or Postman)
-//     // if (!origin) return callback(null, true);
-
-//     const allowedOrigins = ["http://localhost:8081", MOBILE_APP_URL];
-
-//     if (allowedOrigins.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   credentials: true 
-// }));
+// Allowed origins for CORS
+const allowedOrigins = [
+  "http://localhost:8081",
+  "http://localhost:5000",
+  process.env.MOBILE_APP_URL,
+  process.env.CHROME_EXTENSION_ORIGIN, // chrome-extension://<extension-id>
+].filter(Boolean); // Remove undefined values
 
 app.use(cors({
-  origin: "*",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or Postman)
+    if (!origin) return callback(null, true);
+    
+    // Allow if origin is in the allowed list OR matches chrome-extension pattern
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.startsWith('chrome-extension://')) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
-}))
+}));
 
 // CRITICAL: Parse JSON bodies
 app.use(express.json());
@@ -65,6 +68,7 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log("http://localhost:8000")
   console.log("Server running on port 8000");
 });

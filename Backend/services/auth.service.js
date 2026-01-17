@@ -63,9 +63,18 @@ export const signinUser = async (email, password) => {
 };
 
 export const googleSigninUser = async (idToken) => {
+  // Support multiple client IDs for different platforms
+  const GOOGLE_CLIENT_IDS = [
+    process.env.GOOGLE_CLIENT_ID, // Mobile/Web
+    process.env.CHROME_EXTENSION_CLIENT_ID, // Chrome Extension
+  ].filter(Boolean); // Remove undefined values
+
   const ticket = await client.verifyIdToken({
     idToken,
-    audience: GOOGLE_CLIENT_ID,
+    audience: [
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.CHROME_EXTENSION_CLIENT_ID || '271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com'
+    ],
   });
   const payload = ticket.getPayload();
 

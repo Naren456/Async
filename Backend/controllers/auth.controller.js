@@ -136,16 +136,22 @@ export const updatePushToken = async (req, res) => {
   }
 };
 
+
+
 export const sendTestNotification = async (req, res) => {
   try {
     const userId = req.user;
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    if (!user || !user.pushToken) {
-      return res.status(404).json({ message: "User or push token not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    await sendPushNotification(user.pushToken, "ASync Test", "This is a test notification from ASync!");
+    // Send Push Notification (if token exists)
+    if (user.pushToken) {
+      await sendPushNotification(user.pushToken, "ASync Test", "This is a test notification from ASync! (Push)");
+    }
+    
     res.status(200).json({ message: "Test notification sent" });
   } catch (error) {
     console.error("Error sending test notification:", error);
