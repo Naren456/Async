@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Async - Assignment Tracker",
+  "version": "1.0.0",
+  "description": "Track and manage your college assignments directly from your browser",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_title": "Async - Assignment Tracker"
+  },
+  "permissions": [
+    "storage",
+    "notifications",
+    "identity",
+    "alarms"
+  ],
+  "oauth2": {
+    "client_id": "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
+  "host_permissions": [
+    "https://async-vr1z.onrender.com/*",
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

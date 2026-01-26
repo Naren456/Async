@@ -1,0 +1,38 @@
+# Chrome# Extension config (contains secrets)
+config.js
+
+# Environment files
+.env
+.env.local
+
+# Node modules and build
+node_modules/
+dist/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Old vanilla JS files (replaced by React)
+popup.js.old
+styles.css.old
+
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Extension package files
+*.crx
+*.pem
+*.zip
+
+# Logs
+*.log
