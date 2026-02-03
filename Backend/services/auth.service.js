@@ -8,6 +8,11 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const determineCohort = (email) => {
+  // Whitelist for Chrome Web Store Reviewer
+  if (email === "async.test.user01@gmail.com") {
+    return 4;
+  }
+
   if (!email.endsWith("@online.bits-pilani.ac.in")) {
     return null;
   }

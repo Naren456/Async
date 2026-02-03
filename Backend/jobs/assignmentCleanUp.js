@@ -3,6 +3,7 @@ import prisma from "../config/db.js"; // adjust path if needed
 
 // Run every minute (for testing). Change to "*/10 * * * *" for every 10 min in production
 cron.schedule("0 0 * * *", async () => {
+  /* Commented out to allow persistence of past assignments for Coursera sync
   try {
     const now = new Date();
 
@@ -22,4 +23,5 @@ cron.schedule("0 0 * * *", async () => {
   } catch (err) {
     console.error("❌ Error auto-deleting expired assignments:", err);
   }
+  */
 });
