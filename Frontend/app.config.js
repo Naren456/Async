@@ -30,7 +30,7 @@ export default {"expo": {
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.android.async",
+      "package": "com.narendra.async",
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.INTERNET"
