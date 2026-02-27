@@ -21,7 +21,7 @@ export const LoginScreen = () => {
         {/* Header */}
         <div className="text-center mb-8 relative z-10">
           <div className="inline-block p-3 rounded-2xl bg-white/5 mb-4 ring-1 ring-white/10 group-hover:scale-110 transition-transform duration-500">
-            <span className="text-4xl filter drop-shadow-lg">🎓</span>
+            <img src={chrome.runtime.getURL("icons/icon48.png")} alt="Logo" className="w-10 h-10 filter drop-shadow-lg" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent mb-2 tracking-tight">
             Async

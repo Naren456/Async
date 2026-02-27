@@ -42,7 +42,13 @@ export const AssignmentCard = ({ assignment, onToggle }) => {
   };
 
   const formattedDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   };
 
   const status = getDueStatus(assignment.dueDate);
@@ -58,8 +64,8 @@ export const AssignmentCard = ({ assignment, onToggle }) => {
 
       {/* Subject Badge & Date */}
       <div className="relative z-10 flex justify-between items-start mb-3">
-        <div className="inline-flex items-center px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold text-accent-blue uppercase tracking-wider backdrop-blur-md">
-          {assignment.subjectCode}
+        <div className="inline-flex items-center px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold text-accent-blue uppercase tracking-wider backdrop-blur-md max-w-[60%] truncate" title={assignment.subject?.name || assignment.subjectCode}>
+          {assignment.subject?.name || assignment.subjectCode}
         </div>
         
         <div className={`text-[10px] font-medium flex items-center px-2 py-0.5 rounded-full border ${

@@ -79,11 +79,88 @@ chrome.notifications.onClicked.addListener(() => {
   chrome.action.openPopup();
 });
 
-// Handle messages from popup
+// Handle messages from popup and content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkNow') {
     checkForUpcomingAssignments();
     sendResponse({ success: true });
+    return true;
   }
+
+  if (request.action === 'getAssignmentStatus') {
+    handleGetAssignmentStatus(request.title).then(sendResponse);
+    return true; // Keep channel open for async response
+  }
+
+  if (request.action === 'toggleCompletionByTitle') {
+    handleToggleByTitle(request.title).then(sendResponse);
+    return true;
+  }
+  
   return true;
 });
+
+async function handleGetAssignmentStatus(title) {
+  try {
+    const assignments = await getLatestAssignments();
+    const assignment = assignments.find(a => a.title.toLowerCase().includes(title.toLowerCase()));
+    return { completed: assignment ? assignment.Completed : false };
+  } catch (err) {
+    console.error('Error getting status:', err);
+    return { completed: false };
+  }
+}
+
+async function handleToggleByTitle(title) {
+  try {
+    const { authToken } = await chrome.storage.local.get(['authToken']);
+    if (!authToken) return { success: false, error: 'Not authenticated' };
+
+    const assignments = await getLatestAssignments();
+    const assignment = assignments.find(a => a.title.toLowerCase().includes(title.toLowerCase()));
+    
+    if (!assignment) return { success: false, error: 'Assignment not found' };
+
+    const response = await fetch(`${API_BASE_URL}/assignments/toggle-completion`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ assignmentId: assignment.id }),
+    });
+
+    return { success: response.ok };
+  } catch (err) {
+    console.error('Error toggling:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+async function getLatestAssignments() {
+  const { authToken, currentUser } = await chrome.storage.local.get(['authToken', 'currentUser']);
+  if (!authToken || !currentUser) return [];
+
+  const response = await fetch(
+    `${API_BASE_URL}/assignments/by-cohort/${currentUser.cohortNo}`,
+    {
+      headers: { 'Authorization': `Bearer ${authToken}` },
+    }
+  );
+
+  if (!response.ok) return [];
+
+  const data = await response.json();
+  
+  // Flatten if necessary (matching api.js logic)
+  let allAssignments = [];
+  if (data.grouped) {
+    Object.values(data.grouped).forEach(group => {
+      allAssignments = [...allAssignments, ...group];
+    });
+  } else {
+    allAssignments = data.assignments || [];
+  }
+  
+  return allAssignments;
+}
