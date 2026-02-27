@@ -14,19 +14,13 @@
       "android": {
         "buildType": "apk"
       },
-      "ios": {
-        "simulator": true
-      },
       "channel": "preview"
     },
     "production": {
       "channel": "production",
       "autoIncrement": true,
       "android": {
-        "buildType": "apk"
-      },
-      "ios": {
-        "resourceClass": "m1-medium"
+        "buildType": "app-bundle"
       }
     }
   },
@@ -35,9 +29,5 @@
   },
   "cli": {
     "appVersionSource": "remote"
-  },
-  "cli": {
-    "appVersionSource": "remote"
   }
 }
-
