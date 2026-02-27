@@ -12,6 +12,9 @@ const determineCohort = (email) => {
   if (email === "async.test.user01@gmail.com") {
     return 4;
   }
+  if(email.endsWith("@ds.study.iitm.ac.in")){
+     return 2025
+  }
 
   if (!email.endsWith("@online.bits-pilani.ac.in")) {
     return null;
@@ -22,6 +25,7 @@ const determineCohort = (email) => {
   if (email.startsWith("2025")) {
     return 6;
   }
+
   return null;
 };
 

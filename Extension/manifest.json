@@ -2,11 +2,12 @@
   "manifest_version": 3,
   "name": "Async - Assignment Tracker",
   "version": "1.0.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwXU5yGbqbg/0JxQ/ZlGR3Aza4lYe69equn8q4cfOLOxm2gOK7dTDWVPuhTkpGx/MlOj0UHg1/ysxE5S8uAz4R61VqBdVvucMIAIyXTgLJ62xRL3999XHJx/cVvvmzkybbL+0JjjHo7Vgp+G5A8ft53bq/Su+kRAHp+Dx9Bf+KwpF9/C9vY5vBqrult64xY+oLDrL71ZKLcSs0kM1xXijyg5CotlEAFXT4Pa+EYa0R4dwyR/2NR8CmBr9JaSeuipjhnMwhU8OROD/KIV7krDYRXygjOA3WF9CX1HOfUsN6nrfrTP2oOMHooOBX5twWcKzct74KFGPeNV0v5iAtMQpxQIDAQAB",
   "description": "Track and manage your college assignments directly from your browser",
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   "action": {
     "default_title": "Async - Assignment Tracker"
@@ -25,12 +26,12 @@
     ]
   },
   "host_permissions": [
-    "https://async-vr1z.onrender.com/*",
-    "http://localhost:8000/*"
+    "https://async-vr1z.onrender.com/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
+
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   }
