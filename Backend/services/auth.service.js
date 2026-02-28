@@ -12,8 +12,8 @@ const determineCohort = (email) => {
   if (email === "async.test.user01@gmail.com") {
     return 4;
   }
-  if(email.endsWith("@ds.study.iitm.ac.in")){
-     return 2025
+  if (email.endsWith("@ds.study.iitm.ac.in")) {
+    return 2025
   }
 
   if (!email.endsWith("@online.bits-pilani.ac.in")) {
@@ -34,7 +34,7 @@ export const signupUser = async (userData) => {
 
   const assignedCohort = determineCohort(email);
   if (!assignedCohort) {
-    throw { status: 400, message: "Email domain or year not authorized." };
+    throw { status: 400, message: "Email domain or year not authorized. Use BITS Pilani or IITM student email." };
   }
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -81,8 +81,8 @@ export const googleSigninUser = async (idToken) => {
   const ticket = await client.verifyIdToken({
     idToken,
     audience: [
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.CHROME_EXTENSION_CLIENT_ID || '271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com'
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.CHROME_EXTENSION_CLIENT_ID || '271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com'
     ],
   });
   const payload = ticket.getPayload();
@@ -106,7 +106,7 @@ export const googleSigninUser = async (idToken) => {
     } else {
       const assignedCohort = determineCohort(email);
       if (!assignedCohort) {
-        throw { status: 403, message: "Access denied. Only specific BITS Pilani emails are allowed for new registration." };
+        throw { status: 403, message: "Access denied. Only authorized BITS Pilani or IITM student emails are allowed for new registration." };
       }
 
       user = await prisma.user.create({
@@ -150,7 +150,7 @@ export const getUserProfile = async (userId) => {
 
 export const updateUserProfile = async (userId, updates) => {
   const { name, email, cohortNo, semester, term, cgr } = updates;
-  
+
   const updated = await prisma.user.update({
     where: { id: userId },
     data: {
