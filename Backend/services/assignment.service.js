@@ -33,7 +33,7 @@ export const getAssignmentsByCohort = async (cohortNo,userId) => {
   if (Number.isNaN(cohort)) {
     throw { status: 400, message: "Invalid cohort number" };
   }
-
+   const now = new Date();
   const assignments = await prisma.assignment.findMany({
     where: { cohortNo: cohort 
       , dueDate: { gte: now }   
