@@ -35,7 +35,9 @@ export const getAssignmentsByCohort = async (cohortNo,userId) => {
   }
 
   const assignments = await prisma.assignment.findMany({
-    where: { cohortNo: cohort },
+    where: { cohortNo: cohort 
+      , dueDate: { gte: now }   
+    },
     include: { subject: true , users: { 
     where: { userId: userId } 
   }},
