@@ -130,6 +130,7 @@ export default function SignIn() {
       } else {
         // some other error happened
         console.error("Google Sign-In Error:", error);
+        console.log(error.message)
         showToast(error.message || "Something went wrong", "error");
       }
     } finally {

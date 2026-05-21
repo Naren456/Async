@@ -11,6 +11,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 import AssignmentCard from "../../components/AssignmentCard";
 import { DataManager } from "../../utils/DataManager";
+import { Toast } from "../../components/Toast";
+import useFeedback from "../../hooks/useFeedback";
 import { toggleAssignmentCompletion } from "../../api/services/assignmentService";
 
 // --- Local Types ---
@@ -32,6 +34,16 @@ const Assignment = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { playSuccessSound } = useFeedback();
+  const [toast, setToast] = useState({ visible: false, message: "", type: "info" as "success" | "error" | "info" });
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+    setToast({ visible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, visible: false }));
+  };
 
   // --- Transform API response to local type ---
   const transformGrouped = (grouped: any): GroupedAssignments => {
@@ -100,7 +112,11 @@ const Assignment = () => {
   // --- FIXED: Optimized Toggle Logic ---
   const handleToggleComplete = async (assignmentId: string) => {
     try {
-      // 1. Optimistic Update
+      // 1. Find if we are completing it (Transition to true)
+      const currentItem = Object.values(groupedAssignments).flat().find(a => a.id === assignmentId);
+      const isCompleting = currentItem ? !currentItem.Completed : false;
+
+      // 2. Optimistic Update
       setGroupedAssignments((prev) => {
         const newState = { ...prev };
         for (const date in newState) {
@@ -111,13 +127,20 @@ const Assignment = () => {
         return newState;
       });
 
-      // 2. Persist to API
+      if (isCompleting) {
+        showToast("Assignment Completed! Great job!", "success");
+        playSuccessSound();
+      }
+
+      // 3. Persist to API
       await toggleAssignmentCompletion(assignmentId);
     } catch (err) {
-      Alert.alert("Error", "Failed to update status. Please try again.");
+      showToast("Failed to update status", "error");
       loadAssignments(); // Rollback on failure
     }
   };
+
+
 
   const onRefresh = useCallback(async () => {
     if (!cohortNo) return;
@@ -176,10 +199,17 @@ const Assignment = () => {
               ))}
             </View>
           ))
-        )}
-      </ScrollView>
+        )}</ScrollView>
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
+      />
     </SafeAreaView>
   );
 };
+
+
 
 export default Assignment;

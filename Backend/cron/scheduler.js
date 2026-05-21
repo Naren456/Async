@@ -161,7 +161,8 @@ const sendReminder = async (assignment, urgency, users) => {
 };
 
 // Run every 30 minutes
-const scheduleDeadlineNotifications = () => {
+export const scheduleDeadlineNotifications = () => {
+  console.log('Scheduler initialized...');
   // Run once immediately on server startup
   checkDeadlines();
   

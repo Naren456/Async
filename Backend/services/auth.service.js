@@ -8,15 +8,17 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 const determineCohort = (email) => {
+  console.log(`Determining cohort for email: ${email}`);
   // Whitelist for Chrome Web Store Reviewer
   if (email === "async.test.user01@gmail.com") {
     return 4;
   }
   if (email.endsWith("@ds.study.iitm.ac.in")) {
-    return 2025
+    return 2025;
   }
 
   if (!email.endsWith("@online.bits-pilani.ac.in")) {
+    console.log(`Domain not authorized for email: ${email}`);
     return null;
   }
   if (email.startsWith("2024")) {
@@ -72,26 +74,27 @@ export const signinUser = async (email, password) => {
 };
 
 export const googleSigninUser = async (idToken) => {
-  // Support multiple client IDs for different platforms
-  const GOOGLE_CLIENT_IDS = [
-    process.env.GOOGLE_CLIENT_ID, // Mobile/Web
-    process.env.CHROME_EXTENSION_CLIENT_ID, // Chrome Extension
-  ].filter(Boolean); // Remove undefined values
-
+  // Support multiple explicit client IDs across web, android preview builds, and extension platforms
   const ticket = await client.verifyIdToken({
     idToken,
     audience: [
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.CHROME_EXTENSION_CLIENT_ID || '271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com'
-    ],
+      process.env.GOOGLE_CLIENT_ID, // 1. Web Client ID (...u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com)
+      "271566804440-ttrj3lmenaoklgajdf8cmu12e0sk2kqg.apps.googleusercontent.com",
+      "271566804440-1mf5v0q4jjtgfcu9u1ujtjg93htulmto.apps.googleusercontent.com", // 2. Fixed: Explicit Production/Preview Android App Client ID
+      process.env.CHROME_EXTENSION_CLIENT_ID, // 3. Dynamic Chrome Extension ID
+    ].filter(Boolean), // Cleans out any unassigned or undefined environment fields safely
   });
+  
   const payload = ticket.getPayload();
 
+  // Safety Guard: explicit check to capture audience mismatch failures gracefully
   if (!payload) {
-    throw { status: 401, message: "Invalid Google token" };
+    console.error("No payload found in Google token: Audience verification rejected.");
+    throw { status: 401, message: "Invalid Google token or unauthorized application audience signature match." };
   }
 
   const { sub: googleId, email, name, picture: profilePic } = payload;
+  console.log(`Google Sign-In successful for: ${email} (ID: ${googleId})`);
 
   let user = await prisma.user.findUnique({ where: { googleId } });
 

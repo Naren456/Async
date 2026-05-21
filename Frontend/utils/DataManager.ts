@@ -2,6 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GetAssignmentsByCohort, GetUserSubjectsWithNotes } from '../api/apiCall';
 
 export class DataManager {
+    // Lock gatekeeper flag to prevent concurrent duplicate initialization bursts
+    private static isFetching = false;
+
     static KEYS = {
         ASSIGNMENTS: (cohort: string) => `cached_assignments_${cohort}`,
         SUBJECTS: (userId: string) => `cached_subjects_${userId}`,
@@ -71,10 +74,18 @@ export class DataManager {
 
     /**
      * Pre-fetches all critical user data (Assignments, Subjects).
-     * Used during login/splash.
+     * Used during login/splash. Optimized to eliminate duplicate simultaneous processing.
      */
     static async prefetchUserData(user: any) {
         if (!user) return;
+        
+        // Return immediately if another prefetch handler is already executing
+        if (this.isFetching) {
+            return;
+        }
+
+        // Set flag lock to intercept concurrent double-mount rendering execution triggers
+        this.isFetching = true;
         console.log('DataManager: Starting pre-fetch for user', user.name || user.email);
 
         const promises = [];
@@ -98,6 +109,11 @@ export class DataManager {
             );
         }
 
-        await Promise.allSettled(promises);
+        try {
+            await Promise.allSettled(promises);
+        } finally {
+            // Unlock the sequence once all pending promises have fully completed
+            this.isFetching = false;
+        }
     }
 }

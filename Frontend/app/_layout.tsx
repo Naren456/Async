@@ -35,18 +35,19 @@ function AppLayout() {
   }, [user, expoPushToken]);
 
   useEffect(() => {
-    console.log("Configuring Google Sign-In with Web Client ID:", process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID);
     try {
-      console.log("Configuring Google Sign-In...");
-      GoogleSignin.configure({
+      const config = {
         webClientId: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com",
-        offlineAccess: true,
-      });
+        offlineAccess: false,
+      };
+      console.log("DEBUG: Final Google Sign-In Config (Simplified):", JSON.stringify(config, null, 2));
+      GoogleSignin.configure(config);
       console.log("Google Sign-In configured successfully");
     } catch (error) {
       console.error("Google Sign-In configuration failed:", error);
     }
   }, []);
+
 
 
 

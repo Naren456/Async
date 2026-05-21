@@ -11,9 +11,11 @@ import adminRouter from './routes/admin.route.js';
 import notesRouter from './routes/note.route.js';
 // import './jobs/assignmentCleanUp.js'; 
 // import './jobs/syncAssignment.js'
-import scheduleDeadlineNotifications from './cron/scheduler.js';
+import scheduler from './cron/scheduler.js';
 
-scheduleDeadlineNotifications();
+scheduler();
+
+
 
 const app = express();
 const PORT = process.env.PORT || 8000;

@@ -66,7 +66,8 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
               )}
             </Pressable>
           )}
-         \
+          
+
           </View>
        
 

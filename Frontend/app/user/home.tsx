@@ -18,6 +18,8 @@ import {
 import { useRouter } from "expo-router";
 import AssignmentCard from "../../components/AssignmentCard";
 import StatCard from "../../components/StatCard";
+import { Toast } from "../../components/Toast";
+import useFeedback from "../../hooks/useFeedback";
 import { DataManager } from "../../utils/DataManager";
 import { scheduleAssignmentNotifications } from "../../utils/notificationScheduler";
 import { toggleAssignmentCompletion } from "../../api/services/assignmentService";
@@ -105,22 +107,42 @@ const UserDashboard = () => {
   const [groupedAssignments, setGroupedAssignments] = useState<GroupedAssignments>({});
   const [nextAssignments, setNextAssignments] = useState<Assignment[]>([]);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const { playSuccessSound } = useFeedback();
+  const [toast, setToast] = useState({ visible: false, message: "", type: "info" as "success" | "error" | "info" });
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+    setToast({ visible: true, message, type });
+  };
+
+  const hideToast = () => {
+    setToast((prev) => ({ ...prev, visible: false }));
+  };
+
 const handleToggleComplete = async (assignmentId: string) => {
   try {
-    // Optimistic update for nextAssignments
+    // 1. Find if we are completing it
+    const currentItem = nextAssignments.find(a => a.id === assignmentId);
+    const isCompleting = currentItem ? !currentItem.Completed : false;
+
+    // 2. Optimistic update for nextAssignments
     setNextAssignments((prev) => 
       prev.map((item) => 
         item.id === assignmentId ? { ...item, Completed: !item.Completed } : item
       )
     );
-    // Also update groupedAssignments if you want them to stay in sync
+    
+    if (isCompleting) {
+      showToast("Assignment Completed! Great job!", "success");
+      playSuccessSound();
+    }
     
     await toggleAssignmentCompletion(assignmentId);
   } catch (err) {
-    console.error("Failed to toggle", err);
+    showToast("Failed to update status", "error");
     loadDashboard(); // Revert on error
   }
 };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialLoading(false);
@@ -290,8 +312,16 @@ const handleToggleComplete = async (assignmentId: string) => {
           )}
         </View>
       </ScrollView>
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
+      />
     </SafeAreaView>
   );
 };
+
+
 
 export default UserDashboard;

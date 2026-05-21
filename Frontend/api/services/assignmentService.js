@@ -4,6 +4,7 @@ import { ENDPOINTS } from '../endpoints';
 export const GetAssignments = async (cohort) => {
   try {
     const response = await client.get(ENDPOINTS.ASSIGNMENTS.COURSERA(cohort));
+    
     return response.data;
   } catch (error) {
     console.error("Error in GetAssignments:", error);

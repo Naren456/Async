@@ -1,11 +1,13 @@
-import React from "react";
-import { Text, View, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View, TouchableOpacity, Image, ActivityIndicator, Alert } from "react-native";
+// Fix: Use 'react-native-safe-area-context' to resolve the deprecation warning
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { BookOpen } from "lucide-react-native";
-
+import * as SecureStore from "expo-secure-store";
+import { useDispatch } from "react-redux";
 
 import "./global.css";
 
@@ -16,45 +18,80 @@ import {
 
 import { AuthGoogleSignIn } from "../api/apiCall";
 import { DataManager } from "../utils/DataManager";
-import { useDispatch } from "react-redux";
 import { setUser } from "../store/reducer";
-import * as SecureStore from "expo-secure-store";
-import { Alert } from "react-native";
 
 export default function Welcome() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // Initialize the Google Sign-In Configuration when the screen mounts
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID, // Automatically extracted from your .env file
+      offlineAccess: false,
+    });
+  }, []);
 
   const onGoogleButtonPress = async () => {
     setIsGoogleLoading(true);
     try {
+      // 1. Ensure Google Play Services are available (Android specific)
       await GoogleSignin.hasPlayServices();
+      
+      // 2. Wipe existing local authentications to force account picker
       await GoogleSignin.signOut();
+      
+      // 3. Trigger authentications overlay
       const userInfo = await GoogleSignin.signIn();
 
-      if (userInfo.data?.idToken) {
-        const result = await AuthGoogleSignIn(userInfo.data.idToken);
+      // Fix: Robust fallback extraction supporting both flattened and nested response schemas
+      const responseData = userInfo as any;
+      const idToken = responseData?.idToken || responseData?.data?.idToken;
 
+      if (idToken) {
+        // 4. Validate token string on Render Node.js backend 
+        const result = await AuthGoogleSignIn(idToken);
+
+        // 5. Commit backend details into encrypted device storage and state
         await SecureStore.setItemAsync("authToken", result.token);
         dispatch(setUser({ user: result.user, token: result.token }));
 
-        // Pre-fetch data
+        // 6. Pre-fetch user notes/assignments data local cache storage layers
         await DataManager.prefetchUserData(result.user);
 
+        // 7. Route based on role configuration mappings
         if (result.user.role === "TEACHER") {
           router.replace("/admin");
         } else {
           router.replace("/user/home");
         }
+      } else {
+        // Safe alert fallback to catch structural anomalies without breaking native side
+        Alert.alert(
+          "Authentication Error", 
+          "Failed to retrieve secure tokens from Google payload structure."
+        );
+        console.log("Anomalous GoogleSignin structure payload received:", JSON.stringify(userInfo));
       }
     } catch (error: any) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) return;
-      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        Alert.alert("Error", "Google Play Services are unavailable");
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         return;
       }
-      Alert.alert("Google Sign-In Failed", error.message || "Something went wrong");
+      if (error.code === statusCodes.IN_PROGRESS) {
+        return;
+      }
+      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert("Error", "Google Play Services are unavailable or outdated.");
+        return;
+      }
+      
+      Alert.alert(
+        "Google Sign-In Failed", 
+        error.message || "Something went wrong during authentication."
+      );
+      console.log("Error code:", error.code);
+      console.log("Error message:", error.message);
     } finally {
       setIsGoogleLoading(false);
     }
