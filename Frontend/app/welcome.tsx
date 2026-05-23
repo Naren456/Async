@@ -28,7 +28,7 @@ export default function Welcome() {
   // Initialize the Google Sign-In Configuration when the screen mounts
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID, // Automatically extracted from your .env file
+      webClientId: '271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com',  // Automatically extracted from your .env file
       offlineAccess: false,
     });
   }, []);
