@@ -10,7 +10,7 @@ import assignmentRouter from './routes/assignment.route.js';
 import adminRouter from './routes/admin.route.js';
 import notesRouter from './routes/note.route.js';
 // import './jobs/assignmentCleanUp.js'; 
-// import './jobs/syncAssignment.js'
+import './jobs/syncAssignment.js'
 import scheduler from './cron/scheduler.js';
 
 scheduler();
@@ -70,7 +70,11 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log("http://localhost:8000")
-  console.log("Server running on port 8000");
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log("http://localhost:8000");
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+export default app;

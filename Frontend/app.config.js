@@ -3,10 +3,8 @@ import 'dotenv/config';
 export default {
   name: "ASync",
   slug: "A_Sync",
+  owner: "narendra78",
   version: "1.0.0",
-  updates: {
-    url: "https://u.expo.dev/ad21c5dd-0135-4666-b260-2da9d68c9ec2"
-  },
   runtimeVersion: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
@@ -90,7 +88,7 @@ export default {
     router: {},
     googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     eas: {
-      projectId: "ad21c5dd-0135-4666-b260-2da9d68c9ec2"
+      projectId: "b3509111-0a7b-477c-8027-881177af28de"
     }
   }
 };

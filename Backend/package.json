@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "author": "",
   "type": "module",
