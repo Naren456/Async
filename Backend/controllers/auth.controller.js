@@ -70,7 +70,9 @@ export const updateProfile = async (req, res) => {
 // ----- Google Sign-in -----
 export const googleSignin = async (req, res) => {
   try {
-    const { idToken } = req.body;
+    console.log("GOOGLE SIGNIN HEADERS:", req.headers);
+    console.log("GOOGLE SIGNIN BODY:", req.body);
+    const { idToken } = req.body || {};
 
     if (!idToken) {
       return res.status(400).json({ message: "Google ID Token is required" });

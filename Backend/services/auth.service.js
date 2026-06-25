@@ -78,10 +78,10 @@ export const googleSigninUser = async (idToken) => {
   const ticket = await client.verifyIdToken({
     idToken,
     audience: [
-      process.env.GOOGLE_CLIENT_ID, // 1. Web Client ID (...u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com)
-      "271566804440-ttrj3lmenaoklgajdf8cmu12e0sk2kqg.apps.googleusercontent.com",
-      "271566804440-1mf5v0q4jjtgfcu9u1ujtjg93htulmto.apps.googleusercontent.com", // 2. Fixed: Explicit Production/Preview Android App Client ID
-      process.env.CHROME_EXTENSION_CLIENT_ID, // 3. Dynamic Chrome Extension ID
+      process.env.GOOGLE_CLIENT_ID, // Web Client ID
+      process.env.ANDROID_CLIENT_ID, // Android Client ID
+      process.env.IOS_CLIENT_ID, // iOS Client ID
+      process.env.CHROME_EXTENSION_CLIENT_ID, // Chrome Extension Client ID
     ].filter(Boolean), // Cleans out any unassigned or undefined environment fields safely
   });
   
@@ -144,6 +144,7 @@ export const getUserProfile = async (userId) => {
       term: true,
       cgr: true,
       profilePic: true,
+      notificationTone: true,
     },
   });
 
@@ -152,7 +153,7 @@ export const getUserProfile = async (userId) => {
 };
 
 export const updateUserProfile = async (userId, updates) => {
-  const { name, email, cohortNo, semester, term, cgr } = updates;
+  const { name, email, cohortNo, semester, term, cgr, notificationTone } = updates;
 
   const updated = await prisma.user.update({
     where: { id: userId },
@@ -163,6 +164,7 @@ export const updateUserProfile = async (userId, updates) => {
       ...(semester !== undefined ? { semester: semester === null ? null : Number(semester) } : {}),
       ...(term !== undefined ? { term: term === null ? null : Number(term) } : {}),
       ...(cgr !== undefined ? { cgr: cgr === null ? null : Number(cgr) } : {}),
+      ...(notificationTone !== undefined ? { notificationTone } : {}),
     },
   });
 
