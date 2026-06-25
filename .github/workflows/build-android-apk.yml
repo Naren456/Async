@@ -1,0 +1,48 @@
+name: Build Android APK
+on:
+  workflow_dispatch: # Allows you to manually trigger the build from GitHub
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com"
+      EXPO_PUBLIC_ANDROID_CLIENT_ID: "271566804440-hn986qevqbuj4kkbrfj9p5jk36r7qnqi.apps.googleusercontent.com"
+      EXPO_PUBLIC_IOS_CLIENT_ID: "271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs.apps.googleusercontent.com"
+      EXPO_PUBLIC_IOS_URL_SCHEME: "com.googleusercontent.apps.271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs"
+      EXPO_PUBLIC_API_BASE_URL: "https://async-server.vercel.app"
+      EXPO_PUBLIC_ORIGIN: "app://async.android"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./Frontend
+        run: npm install
+
+      - name: Prebuild Android project
+        working-directory: ./Frontend
+        run: npx expo prebuild --platform android --clean
+
+      - name: Build Android APK
+        working-directory: ./Frontend/android
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ASync-Android-APK
+          path: Frontend/android/app/build/outputs/apk/release/app-release.apk
