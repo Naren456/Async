@@ -52,8 +52,15 @@ jobs:
         working-directory: ./Frontend/ios
         run: |
           mkdir -p Payload
-          # Find the generated .app file and copy it into the Payload folder
-          cp -R build/Build/Products/Release-iphoneos/*.app Payload/
+          echo "Searching for .app file..."
+          find . -name "*.app" -type d
+          APP_PATH=$(find . -name "*.app" -type d | grep -v "Simulator" | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: .app file not found! xcodebuild might have failed silently or outputted elsewhere."
+            exit 1
+          fi
+          echo "Copying $APP_PATH to Payload/"
+          cp -R "$APP_PATH" Payload/
           zip -qr app.ipa Payload
 
       - name: Upload IPA Artifact
