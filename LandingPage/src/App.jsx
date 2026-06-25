@@ -156,15 +156,56 @@ function App() {
                   : "opacity-0 translate-y-12"
               }`}
             >
-              <div className="relative w-72 sm:w-80 h-[580px] sm:h-[640px] rounded-[3rem] border-4 border-slate-600 bg-slate-900 shadow-2xl shadow-blue-500/10 shrink-0 overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-slate-800 rounded-b-2xl z-10" />
-                <div className="h-full w-full rounded-[2.6rem] overflow-hidden">
-                  <img
-                    src="https://github.com/user-attachments/assets/3a525388-579a-492a-819f-589a50d67ca4"
-                    alt="ASync Dashboard Screenshot"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
+              <div className="relative w-80 sm:w-96 h-[640px] sm:h-[740px] shrink-0">
+                <div className="absolute -left-[3px] top-16 w-[3px] h-7 rounded-l-sm bg-gradient-to-r from-slate-400 to-slate-500 z-30" />
+                <div className="absolute -left-[3px] top-28 w-[3px] h-7 rounded-l-sm bg-gradient-to-r from-slate-400 to-slate-500 z-30" />
+                <div className="absolute -right-[3px] top-20 w-[3px] h-9 rounded-r-sm bg-gradient-to-l from-slate-400 to-slate-500 z-30" />
+                <div className="relative w-full h-full rounded-[3.5rem] bg-gradient-to-b from-slate-400 via-slate-500 to-slate-600 p-[3px] shadow-2xl shadow-blue-500/10">
+                  <div className="absolute top-[14px] left-1/2 -translate-x-1/2 w-[110px] h-[24px] bg-black rounded-full z-20" />
+                  <div className="w-full h-full rounded-[3.3rem] overflow-hidden bg-black p-0.5 relative">
+                    <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center px-6 pt-2.5 pb-1 bg-gradient-to-b from-black/30 to-transparent text-white text-[11px]">
+                      <span className="font-semibold">9:41</span>
+                      <div className="flex items-center gap-1.5">
+                        <svg className="w-3.5 h-2.5" viewBox="0 0 14 10" fill="none"><rect x="0.5" y="0.5" width="13" height="9" rx="1.5" stroke="white" strokeOpacity="0.8"/><rect x="2" y="2" width="7" height="6" rx="1" fill="white" fillOpacity="0.8"/></svg>
+                      </div>
+                    </div>
+                    <div className="h-full w-full rounded-[3rem] overflow-hidden bg-gradient-to-b from-slate-900 to-blue-950 p-4 sm:p-5 pt-12 flex flex-col">
+                      <div className="bg-blue-500/15 rounded-xl p-3 mb-4">
+                        <p className="text-white text-sm font-semibold">Dashboard</p>
+                        <p className="text-blue-300 text-[11px]">Good morning! 2 tasks due today</p>
+                      </div>
+                      <div className="flex gap-2 mb-4">
+                        {[
+                          { value: "3", label: "Assignments", from: "from-blue-500/20", to: "to-cyan-500/20", text: "text-cyan-300" },
+                          { value: "12", label: "Notes", from: "from-purple-500/20", to: "to-pink-500/20", text: "text-purple-300" },
+                          { value: "4.8", label: "CGPA", from: "from-orange-500/20", to: "to-red-500/20", text: "text-orange-300" },
+                        ].map((s, i) => (
+                          <div key={i} className={`flex-1 bg-gradient-to-br ${s.from} ${s.to} rounded-xl p-2 sm:p-3`}>
+                            <p className={`${s.text} text-base sm:text-lg font-bold`}>{s.value}</p>
+                            <p className="text-slate-400 text-[9px] sm:text-[10px]">{s.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-white text-[11px] font-semibold mb-2">Upcoming</p>
+                      <div className="flex-1 space-y-2 overflow-hidden">
+                        {[
+                          { label: "Math Assignment", sub: "Due Tomorrow", dot: "bg-blue-400" },
+                          { label: "Physics Lab", sub: "Due in 3 days", dot: "bg-cyan-400" },
+                          { label: "Chemistry Quiz", sub: "Next Week", dot: "bg-purple-400" },
+                        ].map((item, i) => (
+                          <div key={i} className="bg-slate-800/60 rounded-xl p-2.5 sm:p-3 flex items-center gap-2.5">
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700/60 flex items-center justify-center">
+                              <div className={`w-2 h-2 rounded-full ${item.dot}`} />
+                            </div>
+                            <div>
+                              <p className="text-white text-[11px] sm:text-xs font-medium">{item.label}</p>
+                              <p className="text-slate-500 text-[9px] sm:text-[10px]">{item.sub}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
