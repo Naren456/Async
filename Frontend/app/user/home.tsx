@@ -40,7 +40,7 @@ export type Assignment = {
 type GroupedAssignments = Record<string, Assignment[]>;
 
 // --- Helper: Sort grouped assignments ---
-export const sortGroupedAssignments = (grouped: GroupedAssignments) => {
+export const sortGroupedAssignments = (grouped: GroupedAssignments, limitToFirstDate: boolean = false) => {
   if (!grouped || Object.keys(grouped).length === 0) return [];
 
   const parseDate = (dateStr: string) => {
@@ -55,6 +55,10 @@ export const sortGroupedAssignments = (grouped: GroupedAssignments) => {
   const sortedDates = Object.keys(grouped).sort(
     (a, b) => parseDate(a).getTime() - parseDate(b).getTime()
   );
+
+  if (limitToFirstDate && sortedDates.length > 0) {
+    return grouped[sortedDates[0]] || [];
+  }
 
   return sortedDates.flatMap(date => grouped[date] || []);
 };
@@ -106,6 +110,7 @@ const UserDashboard = () => {
   });
   const [groupedAssignments, setGroupedAssignments] = useState<GroupedAssignments>({});
   const [nextAssignments, setNextAssignments] = useState<Assignment[]>([]);
+  const [totalDeadlines, setTotalDeadlines] = useState(0);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { playSuccessSound } = useFeedback();
   const [toast, setToast] = useState({ visible: false, message: "", type: "info" as "success" | "error" | "info" });
@@ -203,11 +208,14 @@ const handleToggleComplete = async (assignmentId: string) => {
       const upcomingData = await GetAssignmentsByCohort(user.cohortNo, "upcoming");
       if (upcomingData && upcomingData.grouped) {
         const upcomingGrouped = transformGrouped(upcomingData.grouped);
-        const sortedUpcoming = sortGroupedAssignments(upcomingGrouped);
-        setNextAssignments(sortedUpcoming);
+        const allUpcoming = sortGroupedAssignments(upcomingGrouped);
+        const firstDateUpcoming = sortGroupedAssignments(upcomingGrouped, true);
+        
+        setNextAssignments(firstDateUpcoming);
+        setTotalDeadlines(allUpcoming.length);
 
         // Schedule local notifications for these upcoming assignments
-        await scheduleAssignmentNotifications(sortedUpcoming);
+        await scheduleAssignmentNotifications(allUpcoming);
       }
     } catch (err) {
       console.error("Error loading dashboard:", err);
@@ -241,7 +249,9 @@ const handleToggleComplete = async (assignmentId: string) => {
       if (user?.cohortNo) {
         GetAssignmentsByCohort(user.cohortNo, "upcoming").then(data => {
           if (data && data.grouped) {
-            setNextAssignments(sortGroupedAssignments(transformGrouped(data.grouped)));
+            const upcomingGrouped = transformGrouped(data.grouped);
+            setNextAssignments(sortGroupedAssignments(upcomingGrouped, true));
+            setTotalDeadlines(sortGroupedAssignments(upcomingGrouped).length);
           }
         }).catch(() => {});
       }
@@ -305,7 +315,7 @@ const handleToggleComplete = async (assignmentId: string) => {
             <View className="w-[48%]">
               <StatCard
                 title="Deadlines"
-                value={nextAssignments.length}
+                value={totalDeadlines}
                 icon={<Calendar size={26} color="#3B82F6" />}
                 color="#3B82F6"
               />
