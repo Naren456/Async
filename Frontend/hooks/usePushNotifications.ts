@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import { Platform, Linking } from 'react-native';
+import { Platform, Linking, Alert } from 'react-native';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -44,7 +44,7 @@ export const usePushNotifications = () => {
                 finalStatus = status;
             }
             if (finalStatus !== 'granted') {
-                alert('Failed to get push token for push notification!');
+                Alert.alert('Failed to get push token for push notification!');
                 return;
             }
 
@@ -67,7 +67,7 @@ export const usePushNotifications = () => {
                 token = `${e}`;
             }
         } else {
-            alert('Must use physical device for Push Notifications');
+            Alert.alert('Must use physical device for Push Notifications');
         }
 
         return token;
