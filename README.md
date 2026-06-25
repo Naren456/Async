@@ -1,187 +1,145 @@
-# ASync Mobile App
+<div align="center">
 
-## Description
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Expo](https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=prisma&logoColor=white)
+![Codemagic](https://img.shields.io/badge/Codemagic-F55F35?style=for-the-badge&logo=codemagic&logoColor=white)
 
-**ASync** is a mobile application built with React Native (Expo) and a Node.js backend. It's designed to help college students manage their academic resources, track assignments, view deadlines, and access course notes. The application features role-based access for students and teachers (admins), with a dedicated admin panel for managing content and users.
+</div>
 
+# ASync Mobile App 
 
+**ASync** is a modern, cross-platform mobile application designed to help college students and educators seamlessly manage academic resources, track assignments, and organize deadlines. Built with a stunning dark-mode "Deep Focus" aesthetic, the app integrates robust role-based access control, a sleek React Native interface, and a powerful Node.js/PostgreSQL backend.
 
+---
 
 ## Screenshots 
 
-### Auth Screen
-<p> 
-  <img src="https://github.com/user-attachments/assets/e5ff1d0f-cf97-40d4-aa3c-76a73c7728fe" width="250" />
-  <img src="https://github.com/user-attachments/assets/504d2e89-b6c6-4cb8-ad75-ae6cb0507b06" width="250"/>
+### Auth & Onboarding
+<p align="center"> 
+  <img src="https://github.com/user-attachments/assets/e5ff1d0f-cf97-40d4-aa3c-76a73c7728fe" width="22%" />
+  <img src="https://github.com/user-attachments/assets/504d2e89-b6c6-4cb8-ad75-ae6cb0507b06" width="22%"/>
 </p>
 
-### User Screen
-<p>
-  <img src="https://github.com/user-attachments/assets/3a525388-579a-492a-819f-589a50d67ca4" width="250"/>
-  <img src="https://github.com/user-attachments/assets/35ab4704-c0d4-47a7-81ca-95be4adb8687" width="250"/>
-  <img src="https://github.com/user-attachments/assets/835832eb-5f5c-4b8c-99d9-831c19932af7" width="250"/>
-  <img src="https://github.com/user-attachments/assets/01c69e8b-8e11-4bce-b4d0-e1dd26847dc2" width="250"/>
-  <img src="https://github.com/user-attachments/assets/51c0f12e-b5e2-48c8-9a1f-110380a47b9e" width="250"/>
+### Student Dashboard
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/3a525388-579a-492a-819f-589a50d67ca4" width="19%"/>
+  <img src="https://github.com/user-attachments/assets/35ab4704-c0d4-47a7-81ca-95be4adb8687" width="19%"/>
+  <img src="https://github.com/user-attachments/assets/835832eb-5f5c-4b8c-99d9-831c19932af7" width="19%"/>
+  <img src="https://github.com/user-attachments/assets/01c69e8b-8e11-4bce-b4d0-e1dd26847dc2" width="19%"/>
+  <img src="https://github.com/user-attachments/assets/51c0f12e-b5e2-48c8-9a1f-110380a47b9e" width="19%"/>
 </p>
 
-### Admin Screen
-
-<p >
-  <img src="https://github.com/user-attachments/assets/506dc18d-f487-40f3-84e0-3a714c836359" width="250"/>
-  <img src="https://github.com/user-attachments/assets/d47b169f-0a64-4541-9cb4-72019e718d28" width="250"/>
-  <img src="https://github.com/user-attachments/assets/5dcb5ab0-176a-4b75-b9cb-72a0d4551e62" width="250"/>
-  <img src="https://github.com/user-attachments/assets/3142b334-d8d3-477e-b51a-7f2183ee8c60" width="250"/>
-  <img src="https://github.com/user-attachments/assets/db40e750-0653-4471-8827-abe3ba12604c" width="250"/>
-  <img src="https://github.com/user-attachments/assets/1eecf529-a658-4a97-82fa-4413990b412d" width="250"/>
+### Admin / Teacher Panel
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/506dc18d-f487-40f3-84e0-3a714c836359" width="16%"/>
+  <img src="https://github.com/user-attachments/assets/d47b169f-0a64-4541-9cb4-72019e718d28" width="16%"/>
+  <img src="https://github.com/user-attachments/assets/5dcb5ab0-176a-4b75-b9cb-72a0d4551e62" width="16%"/>
+  <img src="https://github.com/user-attachments/assets/3142b334-d8d3-477e-b51a-7f2183ee8c60" width="16%"/>
+  <img src="https://github.com/user-attachments/assets/db40e750-0653-4471-8827-abe3ba12604c" width="16%"/>
+  <img src="https://github.com/user-attachments/assets/1eecf529-a658-4a97-82fa-4413990b412d" width="16%"/>
 </p>
 
 ## Demo 
-🎥 [Watch Demo Video on Google Drive](https://drive.google.com/file/d/1DWEfB8W5igEUpIqNDGv97bxKVqlaRhlA/view?usp=sharing)
-## ✨ Features
-
-* **User Authentication:** Secure sign-up and sign-in using email/password, managed with JWT.
-* **Role-Based Access:** Distinct interfaces and capabilities for `STUDENT` and `TEACHER` roles.
-* **Student Dashboard:** Displays user stats like total subjects, assignments, and upcoming deadlines.
-* **Assignment Tracking:**
-    * Students view assignments relevant to their cohort, grouped by due date, with links to assignment details.
-    * Teachers manage assignments (create, edit, delete) via an admin form.
-* **Coursera Integration:** Fetches assignment data from Coursera ICS calendar URLs based on cohort. Includes backend jobs for syncing assignments.
-* **Subject & Notes Management:**
-    * Teachers manage subjects (CRUD) and can upload PDF notes associated with subjects. PDFs are stored using Cloudinary.
-    * Students can filter subjects by semester/term and view associated notes.
-    * Integrated PDF viewer for notes.tsx].
-* **Profile Management:** Users can view and update their name and email.
-* **Admin Panel:** Teachers have access to a dashboard with overall statistics and quick actions to manage assignments, subjects, users, and analytics.
-* **Scheduled Jobs:** Backend includes cron jobs for cleaning up old assignments and syncing Coursera data.
-* **Push Notifications:** Includes setup for requesting permissions and scheduling local notifications using `expo-notifications`.
+Watch our app in action: [Watch Demo Video on Google Drive](https://drive.google.com/file/d/1DWEfB8W5igEUpIqNDGv97bxKVqlaRhlA/view?usp=sharing)
 
 ---
 
-## 💻 Tech Stack
+## Key Features
 
-* **Frontend:**
-    * React Native
-    * Expo SDK
-    * Expo Router (File-based routing)
-    * Redux & React-Redux (State Management)
-    * NativeWind (Tailwind CSS for React Native)
-    * Axios (HTTP client)
-    * Formik & Yup (Form handling and validation)
-    * Lucide Icons
-    * `react-native-pdf` (PDF Viewing).tsx]
-    * `expo-notifications`
-* **Backend:**
-    * Node.js
-    * Express
-    * Prisma (ORM for PostgreSQL)
-    * PostgreSQL (Database)
-    * JWT (JSON Web Tokens for Auth)
-    * Cloudinary (Cloud storage for PDF uploads)
-    * Multer (Middleware for handling `multipart/form-data`, used for uploads)
-    * Node Cron (Task scheduling)
-    * `ical.js` / `ical` (Parsing ICS calendar files)
-    * Bcryptjs (Password hashing)
+* **Role-Based Workflows:** Distinct, optimized interfaces for `STUDENT` and `TEACHER` (Admin) roles.
+* **Coursera Sync:** Automatically fetches assignment data from Coursera ICS calendar URLs and syncs it to student cohorts via backend cron jobs.
+* **Automated CI/CD:** Zero-touch deployments using GitHub Actions for Android `.apk` builds and Codemagic for iOS `.ipa` builds.
+* **Smart Assignment Tracking:** Students view timeline-grouped due dates with native local push notification reminders.
+* **Notes Management:** Teachers can upload PDF resources directly to Cloudinary. Students view them via a native integrated PDF viewer.
+* **Deep Focus UI:** Custom, semantic dark-mode palette designed for low eye strain and maximum productivity, complete with dynamic island mockups for the landing page.
 
 ---
 
-## 📁 Project Structure
+## Tech Stack
 
-```
+### Frontend & UI
+- **Framework:** React Native, Expo SDK, Expo Router
+- **State & Styling:** Redux Toolkit, NativeWind (Tailwind CSS)
+- **Forms & Icons:** Formik, Yup, Lucide Icons
+
+### Backend & API
+- **Runtime:** Node.js, Express
+- **Database:** PostgreSQL with Prisma ORM
+- **Auth & Storage:** JWT, Cloudinary, Multer
+- **Jobs:** Node Cron, `ical.js` (for calendar parsing)
+
+### DevOps & CI/CD
+- **Android Build:** GitHub Actions (`build-android-apk.yml`)
+- **iOS Build:** Codemagic (`codemagic.yaml`)
+
+---
+
+## Repository Structure
+
+```text
 .
-├── Backend/
-│   ├── config/         # Database, Cloudinary, JWT config
-│   ├── controllers/    # Request handling logic
-│   ├── jobs/           # Scheduled tasks (cron jobs)
-│   ├── middleware/     # Auth, upload middleware
-│   ├── prisma/         # Prisma schema and migrations
-│   ├── routes/         # API endpoint definitions
-│   ├── utils/          # Helper functions (ICS parser, etc.)
-│   ├── index.js        # Main server entry point
-│   ├── package.json
-│   └── ...
-├── Frontend/
-│   ├── api/            # Functions for calling the backend API
-│   ├── app/            # Expo Router screens and layouts
-│   ├── assets/         # Images, fonts
-│   ├── components/     # Reusable UI components
-│   ├── store/          # Redux state management
-│   ├── utils/          # Utility functions (e.g., notifications)
-│   ├── app.json        # Expo config
-│   ├── eas.json        # EAS Build config
-│   ├── metro.config.js # Metro bundler config
-│   ├── tailwind.config.js # Tailwind CSS config
-│   ├── package.json
-│   └── ...
-└── .gitignore          # Project root gitignore
-
+├── Backend/            # Node.js/Express server, Prisma ORM, Cron jobs
+├── Frontend/           # React Native Expo app, Redux store, NativeWind UI
+├── LandingPage/        # Modern React/Vite landing page showcasing the app
+├── .github/workflows/  # Automated Android build pipelines
+├── codemagic.yaml      # Automated iOS build pipelines
+└── README.md
 ```
-
-
-## 🚀 Getting Started
-
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/Naren456/Async.git
-    cd async
-    ```
-
-2.  **Backend Setup:**
-    ```bash
-    cd Backend
-    npm install
-    ```
-    * Create a `.env` file based on `.env.example` (if available) or configure the following environment variables:
-        * `DATABASE_URL`: Your PostgreSQL connection string.
-        * `JWT_SECRET`: A secret key for signing JWTs.
-        * `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Credentials for your Cloudinary account.
-    * Apply database migrations:
-        ```bash
-        npx prisma migrate dev
-        ```
-    * (Optional) Seed the database if seed scripts are available:
-        ```bash
-        npx prisma db seed
-        ```
-    * Start the development server:
-        ```bash
-        npm run dev
-        ```
-
-3.  **Frontend Setup:**
-    ```bash
-    cd ../Frontend
-    npm install
-    ```
-    * Configure the backend API URL in `Frontend/api/config.js` or via environment variables if set up that way.
-    * Start the Expo development server:
-        ```bash
-        npx expo start
-        ```
-    * Follow the instructions in the terminal to run the app on an emulator, simulator, or physical device using the Expo Go app or a development build.
 
 ---
 
-## 🛠️ Building for Production (Android APK)
+## Getting Started (Development)
 
-**Using EAS Build (Recommended):**
+### 1. Backend Setup
+```bash
+git clone https://github.com/Naren456/Async.git
+cd Async/Backend
+npm install
+```
+Configure your `.env` file with your `DATABASE_URL`, `JWT_SECRET`, and Cloudinary credentials.
+```bash
+npx prisma migrate dev
+npm run dev
+```
 
-1.  Install EAS CLI: `npm install -g eas-cli`
-2.  Login: `eas login`
-3.  Configure `eas.json` and `app.json` (especially `android.package` and build profiles).
-4.  Start build: `cd Frontend && eas build -p android --profile production`
-5.  Follow prompts (especially for Keystore setup).
-6.  Download the APK from the EAS build details page.
+### 2. Frontend Setup
+```bash
+cd ../Frontend
+npm install
+npx expo start
+```
+Scan the QR code with the Expo Go app on your phone, or press `i` to open in the iOS simulator.
 
-**Building Locally:**
+### 3. Landing Page Setup
+```bash
+cd ../LandingPage
+npm install
+npm run dev
+```
 
-1.  **Prerequisites:** Android Studio, SDK, JDK, Android Keystore.
-2.  Generate native project: `cd Frontend && npx expo prebuild --platform android --clean`
-3.  Configure signing in `Frontend/android/gradle.properties` and potentially `Frontend/android/app/build.gradle`.
-4.  Build: `cd android && ./gradlew assembleRelease` (use `gradlew.bat` on Windows).
-5.  Find APK in `Frontend/android/app/build/outputs/apk/release/`.
+---
 
+## Building for Production
 
+We use automated CI/CD pipelines to build the production binaries.
 
+### Android (.apk)
+Pushing code to the `main` branch will automatically trigger the GitHub Action (`build-android-apk.yml`) which runs an EAS local build and publishes the resulting APK as a GitHub Release artifact.
 
+### iOS (.ipa)
+Building an iOS app usually requires a Mac. We bypass this using a dedicated pipeline!
+1. **Codemagic:** Our `codemagic.yaml` automatically provisions a `mac_mini_m2`, injects the environment variables, and generates an unsigned `app.ipa`.
+2. **LambdaTest:** For physical device validation without owning an iPhone, we stream the `.ipa` to cloud devices via [LambdaTest Accessibility Scanner](https://accessibility.lambdatest.com/scanner/app).
+3. **Physical Installation:** If you have an iPhone, see our [iOS Installation Guide](iOS_Installation_Guide.md) to sideload the app using AltStore without a 7-day expiration!
 
+*(For technical details on the headless iOS compilation architecture, see [build_iomac.md](build_iomac.md)).*
 
+---
+
+## Contributing
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Naren456/Async/issues).
+
+## License
+This project is open-sourced under the MIT License.
