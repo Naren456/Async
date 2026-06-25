@@ -5,13 +5,8 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       node: 20
-      vars:
-        EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com"
-        EXPO_PUBLIC_ANDROID_CLIENT_ID: "271566804440-hn986qevqbuj4kkbrfj9p5jk36r7qnqi.apps.googleusercontent.com"
-        EXPO_PUBLIC_IOS_CLIENT_ID: "271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs.apps.googleusercontent.com"
-        EXPO_PUBLIC_IOS_URL_SCHEME: "com.googleusercontent.apps.271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs"
-        EXPO_PUBLIC_API_BASE_URL: "https://async-server.vercel.app"
-        EXPO_PUBLIC_ORIGIN: "app://async.android"
+      groups:
+        - async_secrets
     scripts:
       - name: Install npm dependencies
         script: |
