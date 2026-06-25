@@ -2,6 +2,9 @@ name: Build Unsigned iOS IPA
 on:
   workflow_dispatch: # Allows you to manually trigger the build from GitHub
 
+permissions:
+  contents: write
+
 jobs:
   build-ios:
     runs-on: macos-latest
@@ -57,3 +60,12 @@ jobs:
         with:
           name: ASync-Unsigned-IPA
           path: Frontend/ios/app.ipa
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ios-build-${{ github.run_number }}
+          name: iOS Unsigned IPA Build #${{ github.run_number }}
+          files: Frontend/ios/app.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
