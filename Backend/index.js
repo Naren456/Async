@@ -10,7 +10,7 @@ import assignmentRouter from './routes/assignment.route.js';
 import adminRouter from './routes/admin.route.js';
 import notesRouter from './routes/note.route.js';
 // import './jobs/assignmentCleanUp.js'; 
-import './jobs/syncAssignment.js'
+// import './jobs/syncAssignment.js'
 import scheduler from './cron/scheduler.js';
 
 scheduler();

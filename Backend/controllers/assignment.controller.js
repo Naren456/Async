@@ -24,8 +24,9 @@ export const createAssignment = async (req, res) => {
 export const getAssignmentsByCohortGrouped = async (req, res) => {
   try {
     const { cohortNo } = req.params;
+    const { filter } = req.query; // Get filter from query params
     const userId = req.user;
-    const result = await assignmentService.getAssignmentsByCohort(cohortNo,userId);
+    const result = await assignmentService.getAssignmentsByCohort(cohortNo, userId, filter);
     return res.json({ success: true, ...result });
   } catch (err) {
     console.error("Error fetching assignments:", err);

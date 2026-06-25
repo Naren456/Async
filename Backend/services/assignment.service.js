@@ -28,23 +28,44 @@ export const createAssignment = async (data) => {
   return assignment;
 };
 
-export const getAssignmentsByCohort = async (cohortNo,userId) => {
+export const getAssignmentsByCohort = async (cohortNo, userId, filter = "all") => {
   const cohort = Number(cohortNo);
   if (Number.isNaN(cohort)) {
     throw { status: 400, message: "Invalid cohort number" };
   }
-   const now = new Date();
+
+  const now = new Date();
+  const whereClause = { cohortNo: cohort };
+
+  if (filter === "upcoming") {
+    whereClause.dueDate = { gte: now };
+  } else if (filter === "due") {
+    whereClause.dueDate = { lt: now };
+  }
+
+  console.log("Fetching assignments with filter:", filter, "whereClause:", whereClause);
+
   const assignments = await prisma.assignment.findMany({
-    where: { cohortNo: cohort 
-      , dueDate: { gte: now }   
+    where: whereClause,
+    include: { 
+      subject: true, 
+      users: { 
+        where: { userId: userId } 
+      }
     },
-    include: { subject: true , users: { 
-    where: { userId: userId } 
-  }},
     orderBy: { dueDate: "asc" },
   });
 
-  const grouped = assignments.reduce((acc, a) => {
+  // If fetching specifically "due", filter out completed assignments
+  let filteredAssignments = assignments;
+  if (filter === "due") {
+    filteredAssignments = assignments.filter((a) => {
+      const isCompleted = a.users.length > 0 ? a.users[0].completed : false;
+      return !isCompleted;
+    });
+  }
+
+  const grouped = filteredAssignments.reduce((acc, a) => {
     const key = formatDateKey(a.dueDate);
 
     if (!acc[key]) acc[key] = [];
@@ -72,7 +93,7 @@ export const getAssignmentsByCohort = async (cohortNo,userId) => {
     return acc;
   }, {});
 
-  return { cohortNo: cohort, grouped, count: assignments.length };
+  return { cohortNo: cohort, grouped, count: filteredAssignments.length };
 };
 
 export const deleteAssignment = async (id) => {
