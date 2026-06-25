@@ -1,0 +1,53 @@
+workflows:
+  ios-unsigned-workflow:
+    name: Build Unsigned iOS IPA
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      node: 20
+      vars:
+        EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com"
+        EXPO_PUBLIC_ANDROID_CLIENT_ID: "271566804440-hn986qevqbuj4kkbrfj9p5jk36r7qnqi.apps.googleusercontent.com"
+        EXPO_PUBLIC_IOS_CLIENT_ID: "271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs.apps.googleusercontent.com"
+        EXPO_PUBLIC_IOS_URL_SCHEME: "com.googleusercontent.apps.271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs"
+        EXPO_PUBLIC_API_BASE_URL: "https://async-server.vercel.app"
+        EXPO_PUBLIC_ORIGIN: "app://async.android"
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          cd Frontend
+          npm install
+      - name: Run Expo Prebuild
+        script: |
+          cd Frontend
+          npx expo prebuild --platform ios --clean
+      - name: Build Unsigned iOS App
+        script: |
+          cd Frontend/ios
+          set -o pipefail
+          xcodebuild -workspace ASync.xcworkspace \
+            -scheme ASync \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            SWIFT_SUPPRESS_WARNINGS=YES \
+            SWIFT_STRICT_CONCURRENCY=minimal \
+            build
+      - name: Package into IPA
+        script: |
+          cd Frontend/ios
+          mkdir -p Payload
+          echo "Searching for .app file..."
+          APP_PATH=$(find . -name "*.app" -type d | grep -v "Simulator" | head -n 1)
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: .app file not found!"
+            exit 1
+          fi
+          echo "Copying $APP_PATH to Payload/"
+          cp -R "$APP_PATH" Payload/
+          zip -qr app.ipa Payload
+    artifacts:
+      - Frontend/ios/app.ipa

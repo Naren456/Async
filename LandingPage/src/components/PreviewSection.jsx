@@ -72,39 +72,39 @@ function PreviewSection() {
               <div className="relative w-full h-full rounded-[2.8rem] bg-gradient-to-b from-slate-400 via-slate-500 to-slate-600 p-[3px] shadow-2xl shadow-blue-500/10">
                 <StatusBar />
                 <div className="w-full h-full rounded-[2.6rem] overflow-hidden bg-black p-0.5 relative">
-                  <div className="h-full w-full rounded-[2.4rem] overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800 p-3 pt-16 flex flex-col">
-                    <div className="bg-blue-900/40 rounded-xl p-3 mb-3">
-                      <p className="text-white text-[13px] font-semibold mb-0.5">Dashboard</p>
-                      <p className="text-blue-200/70 text-[9px]">Good morning! 2 tasks due today</p>
+                  <div className="h-full w-full rounded-[2.4rem] overflow-hidden bg-[#0f172a] p-3 pt-14 flex flex-col">
+                    <div className="bg-[#1e293b] rounded-2xl p-3.5 mb-4">
+                      <p className="text-white text-[14px] font-bold tracking-wide mb-0.5">Dashboard</p>
+                      <p className="text-blue-200/70 text-[10px]">Good morning! 2 tasks due today</p>
                     </div>
                     <div className="flex gap-2 mb-4">
-                      <div className="flex-1 bg-cyan-900/40 rounded-xl p-2.5">
-                        <p className="text-cyan-400 text-base font-bold">3</p>
+                      <div className="flex-1 bg-[#164e63]/80 rounded-2xl p-3">
+                        <p className="text-[#38bdf8] text-lg font-bold">3</p>
                         <p className="text-slate-400 text-[9px] mt-0.5">Assignments</p>
                       </div>
-                      <div className="flex-1 bg-purple-900/40 rounded-xl p-2.5">
-                        <p className="text-purple-300 text-base font-bold">12</p>
+                      <div className="flex-1 bg-[#4c1d95]/80 rounded-2xl p-3">
+                        <p className="text-[#c084fc] text-lg font-bold">12</p>
                         <p className="text-slate-400 text-[9px] mt-0.5">Notes</p>
                       </div>
-                      <div className="flex-1 bg-orange-900/40 rounded-xl p-2.5">
-                        <p className="text-orange-300 text-base font-bold">4.8</p>
+                      <div className="flex-1 bg-[#7c2d12]/80 rounded-2xl p-3">
+                        <p className="text-[#fdba74] text-lg font-bold">4.8</p>
                         <p className="text-slate-400 text-[9px] mt-0.5">CGPA</p>
                       </div>
                     </div>
-                    <p className="text-white text-[11px] font-semibold mb-2">Upcoming</p>
-                    <div className="flex-1 space-y-2 overflow-hidden">
+                    <p className="text-white text-[12px] font-bold mb-3 tracking-wide">Upcoming</p>
+                    <div className="flex-1 space-y-2.5 overflow-hidden">
                       {[
                         { label: "Math Assignment", sub: "Due Tomorrow", dot: "bg-blue-400" },
                         { label: "Physics Lab", sub: "Due in 3 days", dot: "bg-cyan-400" },
                         { label: "Chemistry Quiz", sub: "Next Week", dot: "bg-purple-400" },
                       ].map((item, i) => (
-                        <div key={i} className="bg-slate-800/60 rounded-xl p-2 flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-slate-700/60 flex items-center justify-center">
-                            <div className={`w-1.5 h-1.5 rounded-full ${item.dot}`} />
+                        <div key={i} className="bg-[#1e293b] rounded-2xl p-2.5 flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-[#0f172a] flex items-center justify-center">
+                            <div className={`w-2 h-2 rounded-full ${item.dot}`} />
                           </div>
                           <div>
-                            <p className="text-white text-[10px] font-medium">{item.label}</p>
-                            <p className="text-slate-500 text-[8px]">{item.sub}</p>
+                            <p className="text-white text-[12px] font-semibold">{item.label}</p>
+                            <p className="text-slate-500 text-[10px] mt-0.5">{item.sub}</p>
                           </div>
                         </div>
                       ))}
