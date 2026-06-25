@@ -47,7 +47,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            SWIFT_STRICT_CONCURRENCY=minimal \
+            SWIFT_SUPPRESS_WARNINGS=YES \
             build
 
           echo "xcodebuild finished. Listing contents of build directory:"
