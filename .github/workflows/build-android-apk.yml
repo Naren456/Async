@@ -9,12 +9,12 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     env:
-      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com"
-      EXPO_PUBLIC_ANDROID_CLIENT_ID: "271566804440-hn986qevqbuj4kkbrfj9p5jk36r7qnqi.apps.googleusercontent.com"
-      EXPO_PUBLIC_IOS_CLIENT_ID: "271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs.apps.googleusercontent.com"
-      EXPO_PUBLIC_IOS_URL_SCHEME: "com.googleusercontent.apps.271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs"
-      EXPO_PUBLIC_API_BASE_URL: "https://async-server.vercel.app"
-      EXPO_PUBLIC_ORIGIN: "app://async.android"
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+      EXPO_PUBLIC_ANDROID_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_ANDROID_CLIENT_ID }}
+      EXPO_PUBLIC_IOS_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_IOS_CLIENT_ID }}
+      EXPO_PUBLIC_IOS_URL_SCHEME: ${{ secrets.EXPO_PUBLIC_IOS_URL_SCHEME }}
+      EXPO_PUBLIC_API_BASE_URL: ${{ secrets.EXPO_PUBLIC_API_BASE_URL }}
+      EXPO_PUBLIC_ORIGIN: ${{ secrets.EXPO_PUBLIC_ORIGIN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
