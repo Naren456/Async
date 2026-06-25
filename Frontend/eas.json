@@ -14,7 +14,13 @@
       "android": {
         "buildType": "apk"
       },
-      "channel": "preview"
+      "ios": {
+        "simulator": true
+      },
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "https://async-server.vercel.app"
+      }
     },
     "production": {
       "channel": "production",
@@ -31,4 +37,3 @@
     "appVersionSource": "remote"
   }
 }
-

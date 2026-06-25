@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
 import {
   Text,
   View,
@@ -6,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
@@ -27,6 +29,7 @@ export type Assignment = {
 };
 
 type GroupedAssignments = Record<string, Assignment[]>;
+type FilterType = "All" | "Upcoming" | "Due";
 
 const Assignment = () => {
   const cohortNo = useSelector((state: any) => state.user?.cohortNo);
@@ -34,6 +37,7 @@ const Assignment = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<FilterType>("Upcoming");
   const { playSuccessSound } = useFeedback();
   const [toast, setToast] = useState({ visible: false, message: "", type: "info" as "success" | "error" | "info" });
 
@@ -109,6 +113,22 @@ const Assignment = () => {
     }
   }, [cohortNo]);
 
+  // Sync state from cache when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadFromCache = async () => {
+        if (!cohortNo) return;
+        try {
+          const cached = await DataManager.getAssignments(cohortNo);
+          if (cached) {
+            setGroupedAssignments(transformGrouped(cached));
+          }
+        } catch (err) {}
+      };
+      loadFromCache();
+    }, [cohortNo])
+  );
+
   // --- FIXED: Optimized Toggle Logic ---
   const handleToggleComplete = async (assignmentId: string) => {
     try {
@@ -132,7 +152,10 @@ const Assignment = () => {
         playSuccessSound();
       }
 
-      // 3. Persist to API
+      // 3. Update cache so other screens see the change immediately
+      await DataManager.updateAssignmentCompletion(cohortNo, assignmentId, isCompleting);
+
+      // 4. Persist to API
       await toggleAssignmentCompletion(assignmentId);
     } catch (err) {
       showToast("Failed to update status", "error");
@@ -158,10 +181,56 @@ const Assignment = () => {
     }
   }, [cohortNo]);
 
+  const getFilteredAssignments = () => {
+    const now = new Date();
+    const filtered: GroupedAssignments = {};
+
+    Object.entries(groupedAssignments).forEach(([date, assignments]) => {
+      const filteredList = assignments.filter((a) => {
+        if (filter === "All") return true;
+
+        const isPast = new Date(a.isoDate) < now;
+
+        if (filter === "Upcoming") {
+          return !isPast; // Future or today
+        }
+        if (filter === "Due") {
+          return isPast && !a.Completed; // Past due and not completed
+        }
+        return true;
+      });
+
+      if (filteredList.length > 0) {
+        filtered[date] = filteredList;
+      }
+    });
+
+    return filtered;
+  };
+
+  const filteredGroupedAssignments = getFilteredAssignments();
+
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b] px-2 mb-18">
-      <View className="px-2 py-3 flex-row justify-between items-center mb-2">
-        <Text className="text-xl font-bold text-gray-100 tracking-wide">Assignment</Text>
+    <SafeAreaView className="flex-1 bg-[#0f172b] mb-18">
+      <View className="px-4 py-3 flex-row justify-between items-center mb-2">
+        <Text className="text-xl font-bold text-gray-100 tracking-wide">Assignments</Text>
+      </View>
+      
+      {/* Filters */}
+      <View className="flex-row px-4 mb-4">
+        {(["All", "Upcoming", "Due"] as FilterType[]).map((f) => (
+          <Pressable
+            key={f}
+            onPress={() => setFilter(f)}
+            className={`px-5 py-1.5 rounded-full border mr-3 ${
+              filter === f ? "bg-blue-600 border-blue-600" : "bg-[#1e293b] border-white/10"
+            }`}
+          >
+            <Text className={`${filter === f ? "text-white" : "text-gray-400"} font-medium`}>
+              {f}
+            </Text>
+          </Pressable>
+        ))}
       </View>
       
       <ScrollView 
@@ -179,10 +248,10 @@ const Assignment = () => {
           <View className="mx-2 mt-10 flex-1 justify-center items-center py-20">
             <Text className="text-red-400 text-base text-center mb-4">{error}</Text>
           </View>
-        ) : Object.keys(groupedAssignments).length === 0 ? (
-          <Text className="text-gray-400 px-5 text-base">No upcoming assignments</Text>
+        ) : Object.keys(filteredGroupedAssignments).length === 0 ? (
+          <Text className="text-gray-400 px-1 text-base">No assignments found for this filter.</Text>
         ) : (
-          Object.entries(groupedAssignments).map(([date, assignments]) => (
+          Object.entries(filteredGroupedAssignments).map(([date, assignments]) => (
             <View key={date} className="mb-6 rounded-xl bg-[#1e293b]/60 border border-white/10 p-4">
               <Text className="text-lg font-semibold text-blue-300 mb-3">{date}</Text>
               {assignments.map((assign: Assignment) => (

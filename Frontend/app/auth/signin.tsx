@@ -6,6 +6,7 @@ import {
   TextInput,
   ActivityIndicator,
   Image,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -66,6 +67,7 @@ export default function SignIn() {
     try {
       const result = await AuthsignIn(values);
       await SecureStore.setItemAsync("authToken", result.token);
+      await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
       // 🔥 MODIFICATION: Pass the token to the setUser action
       dispatch(setUser({ user: result.user, token: result.token }));
       
@@ -98,12 +100,15 @@ export default function SignIn() {
   const onGoogleButtonPress = async () => {
     setIsGoogleLoading(true);
     try {
-      await GoogleSignin.hasPlayServices();
+      if (Platform.OS === 'android') {
+        await GoogleSignin.hasPlayServices();
+      }
       const userInfo = await GoogleSignin.signIn();
 
       if (userInfo.data?.idToken) {
         const result = await AuthGoogleSignIn(userInfo.data.idToken);
         await SecureStore.setItemAsync("authToken", result.token);
+        await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
         dispatch(setUser({ user: result.user, token: result.token }));
 
         // Pre-fetch data for instant load on next screens

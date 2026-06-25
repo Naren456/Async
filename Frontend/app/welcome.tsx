@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, TouchableOpacity, Image, ActivityIndicator, Alert } from "react-native";
+import { Text, View, TouchableOpacity, Image, ActivityIndicator, Alert, Platform } from "react-native";
 // Fix: Use 'react-native-safe-area-context' to resolve the deprecation warning
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -9,8 +9,7 @@ import { BookOpen } from "lucide-react-native";
 import * as SecureStore from "expo-secure-store";
 import { useDispatch } from "react-redux";
 
-import "./global.css";
-
+// global.css is imported in _layout.tsx, do not import it here
 import {
   GoogleSignin,
   statusCodes,
@@ -25,19 +24,15 @@ export default function Welcome() {
   const dispatch = useDispatch();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  // Initialize the Google Sign-In Configuration when the screen mounts
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: '271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com',  // Automatically extracted from your .env file
-      offlineAccess: false,
-    });
-  }, []);
+  // Google Sign-In Configuration is managed securely and centrally in _layout.tsx
 
   const onGoogleButtonPress = async () => {
     setIsGoogleLoading(true);
     try {
       // 1. Ensure Google Play Services are available (Android specific)
-      await GoogleSignin.hasPlayServices();
+      if (Platform.OS === 'android') {
+        await GoogleSignin.hasPlayServices();
+      }
       
       // 2. Wipe existing local authentications to force account picker
       await GoogleSignin.signOut();
@@ -98,19 +93,19 @@ export default function Welcome() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-blue-900">
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1e3a8a' }}>
       <StatusBar style="light" />
 
       <LinearGradient
         colors={["#1e3a8a", "#1d4ed8", "#3b82f6"]}
-        className="flex-1"
+        style={{ flex: 1 }}
       >
         {/* Main Container */}
         <View className="flex-1 items-center justify-center px-8">
 
           {/* Animated Icon */}
           <View className="mb-10">
-            <View className="p-6 rounded-3xl bg-white/10 backdrop-blur-md shadow-xl">
+            <View className="p-6 rounded-3xl bg-white/20 shadow-xl">
               <View className="w-20 h-20 rounded-2xl bg-white/25 items-center justify-center">
                 <BookOpen size={40} strokeWidth={2} color="white" />
               </View>
@@ -180,9 +175,9 @@ export default function Welcome() {
         </View>
 
         {/* Soft decorative circles */}
-        <View className="absolute top-20 right-12 w-20 h-20 rounded-full bg-white/10 blur-xl" />
-        <View className="absolute bottom-32 left-10 w-16 h-16 rounded-full bg-white/10 blur-lg" />
-        <View className="absolute top-1/2 right-5 w-10 h-10 rounded-full bg-white/10 blur-md" />
+        <View className="absolute top-20 right-12 w-20 h-20 rounded-full bg-white/10" />
+        <View className="absolute bottom-32 left-10 w-16 h-16 rounded-full bg-white/10" />
+        <View className="absolute top-1/2 right-5 w-10 h-10 rounded-full bg-white/10" />
       </LinearGradient>
     </SafeAreaView>
   );

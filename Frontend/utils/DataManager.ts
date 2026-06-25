@@ -43,6 +43,32 @@ export class DataManager {
     }
 
     /**
+     * Update the completion status of a single assignment in the cache.
+     */
+    static async updateAssignmentCompletion(cohortNo: string, assignmentId: string, completed: boolean) {
+        try {
+            const cached = await this.getAssignments(cohortNo);
+            if (cached) {
+                let updated = false;
+                for (const date in cached) {
+                    cached[date] = cached[date].map((item: any) => {
+                        if (item.id === assignmentId) {
+                            updated = true;
+                            return { ...item, Completed: completed };
+                        }
+                        return item;
+                    });
+                }
+                if (updated) {
+                    await AsyncStorage.setItem(this.KEYS.ASSIGNMENTS(cohortNo), JSON.stringify(cached));
+                }
+            }
+        } catch (err) {
+            console.error('DataManager: Error updating assignment cache:', err);
+        }
+    }
+
+    /**
      * Get cached subjects for a user.
      */
     static async getSubjects(userId: string) {

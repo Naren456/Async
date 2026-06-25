@@ -45,9 +45,9 @@ export const DeleteAssignment = async (assignmentId) => {
   }
 };
 
-export const GetAssignmentsByCohort = async (cohortNo) => {
+export const GetAssignmentsByCohort = async (cohortNo, filter = 'all') => {
   try {
-    const response = await client.get(ENDPOINTS.ASSIGNMENTS.BY_COHORT(cohortNo));
+    const response = await client.get(`${ENDPOINTS.ASSIGNMENTS.BY_COHORT(cohortNo)}?filter=${filter}`);
     return response.data;
   } catch (error) {
     console.error('GetAssignmentsByCohort Error:', error);

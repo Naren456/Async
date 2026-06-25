@@ -1,28 +1,19 @@
-import { useEffect, useState } from 'react';
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 
 const useFeedback = () => {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const player = useAudioPlayer(require('../assets/sounds/success.wav'));
 
   async function playSuccessSound() {
     try {
-      const { sound } = await Audio.Sound.createAsync(
-        require('../assets/sounds/success.wav')
-      );
-      setSound(sound);
-      await sound.playAsync();
+      if (player) {
+        // Reset to beginning and play
+        player.seekTo(0);
+        player.play();
+      }
     } catch (error) {
       console.log('Error playing sound:', error);
     }
   }
-
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
 
   return { playSuccessSound };
 };

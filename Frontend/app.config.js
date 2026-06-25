@@ -26,7 +26,7 @@ export default {
       backgroundColor: "#E6F4FE",
       foregroundImage: "./assets/images/adaptive-icon.png"
     },
-    edgeToEdgeEnabled: true,
+    // edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: "com.narendra.async",
     googleServicesFile: "./google-services.json"
@@ -37,7 +37,12 @@ export default {
     favicon: "./assets/images/favicon.png"
   },
 
+  updates: {
+    url: "https://u.expo.dev/b3509111-0a7b-477c-8027-881177af28de"
+  },
+
   plugins: [
+    "expo-asset",
     "expo-router",
     [
       "expo-splash-screen",
@@ -73,7 +78,11 @@ export default {
       "expo-build-properties",
       {
         "android": {
-          "ndkVersion": "27.1.12297006"
+          "ndkVersion": "27.1.12297006",
+          "usesCleartextTraffic": true
+        },
+        "ios": {
+          "useFrameworks": "static"
         }
       }
     ]

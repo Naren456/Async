@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
 import {
   Text,
   View,
@@ -23,6 +24,7 @@ import useFeedback from "../../hooks/useFeedback";
 import { DataManager } from "../../utils/DataManager";
 import { scheduleAssignmentNotifications } from "../../utils/notificationScheduler";
 import { toggleAssignmentCompletion } from "../../api/services/assignmentService";
+import { GetAssignmentsByCohort } from "../../api/apiCall";
 
 // --- Types ---
 export type Assignment = {
@@ -37,8 +39,8 @@ export type Assignment = {
 
 type GroupedAssignments = Record<string, Assignment[]>;
 
-// --- Helper: get next deadline ---
-export const nextDeadlineAssignments = (grouped: GroupedAssignments) => {
+// --- Helper: Sort grouped assignments ---
+export const sortGroupedAssignments = (grouped: GroupedAssignments) => {
   if (!grouped || Object.keys(grouped).length === 0) return [];
 
   const parseDate = (dateStr: string) => {
@@ -54,9 +56,7 @@ export const nextDeadlineAssignments = (grouped: GroupedAssignments) => {
     (a, b) => parseDate(a).getTime() - parseDate(b).getTime()
   );
 
-  // Return the earliest date’s assignments
-  const nextDate = sortedDates[0];
-  return grouped[nextDate] || [];
+  return sortedDates.flatMap(date => grouped[date] || []);
 };
 
 // --- Transform API response ---
@@ -136,6 +136,9 @@ const handleToggleComplete = async (assignmentId: string) => {
       playSuccessSound();
     }
     
+    // Update cache so other screens see the change
+    await DataManager.updateAssignmentCompletion(user.cohortNo, assignmentId, isCompleting);
+
     await toggleAssignmentCompletion(assignmentId);
   } catch (err) {
     showToast("Failed to update status", "error");
@@ -164,9 +167,6 @@ const handleToggleComplete = async (assignmentId: string) => {
         Setassign(totalCount);
         const grouped = transformGrouped(cached);
         setGroupedAssignments(grouped);
-
-        const next = nextDeadlineAssignments(grouped);
-        setNextAssignments(next);
         
         hasLoadedFromCache = true;
       }
@@ -197,12 +197,17 @@ const handleToggleComplete = async (assignmentId: string) => {
         
         const grouped = transformGrouped(freshData);
         setGroupedAssignments(grouped);
+      }
 
-        const next = nextDeadlineAssignments(grouped);
-        setNextAssignments(next);
+      // Fetch ONLY upcoming assignments using the API
+      const upcomingData = await GetAssignmentsByCohort(user.cohortNo, "upcoming");
+      if (upcomingData && upcomingData.grouped) {
+        const upcomingGrouped = transformGrouped(upcomingData.grouped);
+        const sortedUpcoming = sortGroupedAssignments(upcomingGrouped);
+        setNextAssignments(sortedUpcoming);
 
-        // Schedule local notifications for these assignments
-        await scheduleAssignmentNotifications(Object.values(grouped).flat());
+        // Schedule local notifications for these upcoming assignments
+        await scheduleAssignmentNotifications(sortedUpcoming);
       }
     } catch (err) {
       console.error("Error loading dashboard:", err);
@@ -214,6 +219,34 @@ const handleToggleComplete = async (assignmentId: string) => {
   useEffect(() => {
     loadDashboard();
   }, [user?.cohortNo]);
+
+  // Sync state from cache when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      const loadFromCache = async () => {
+        if (!user?.cohortNo) return;
+        try {
+          const cached = await DataManager.getAssignments(user.cohortNo);
+          if (cached) {
+            const totalCount = Object.values(cached).reduce((acc: number, list: any) => acc + list.length, 0);
+            Setassign(totalCount);
+            const grouped = transformGrouped(cached);
+            setGroupedAssignments(grouped);
+          }
+        } catch (err) {}
+      };
+      loadFromCache();
+      
+      // Also silently fetch upcoming assignments to keep it fresh
+      if (user?.cohortNo) {
+        GetAssignmentsByCohort(user.cohortNo, "upcoming").then(data => {
+          if (data && data.grouped) {
+            setNextAssignments(sortGroupedAssignments(transformGrouped(data.grouped)));
+          }
+        }).catch(() => {});
+      }
+    }, [user?.cohortNo])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -290,7 +323,7 @@ const handleToggleComplete = async (assignmentId: string) => {
 
         {/* Next Deadline Section */}
         <View className="py-6 mb-20">
-          <Text className="text-2xl font-bold text-white mb-4">Upcoming Deadline</Text>
+          <Text className="text-2xl font-bold text-white mb-4">Upcoming Assignments</Text>
           {nextAssignments.length === 0 ? (
             <Text className="text-gray-400 text-base px-2">No upcoming assignments</Text>
           ) : (

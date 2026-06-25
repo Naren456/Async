@@ -33,7 +33,10 @@ export const GetMe = async () => {
     return response.data;
   } catch (error) {
     console.error("GetMe API Error:", error.response?.status, error.message);
-    throw error.response?.data || { message: "Token validation failed" };
+    if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error' || !error.response) {
+      throw { isNetworkError: true, message: "Cannot connect to server. Please check your internet connection." };
+    }
+    throw { ...error.response?.data, status: error.response?.status, message: "Token validation failed" };
   }
 };
 

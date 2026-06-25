@@ -37,7 +37,8 @@ function AppLayout() {
   useEffect(() => {
     try {
       const config = {
-        webClientId: "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com",
+        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com",
+        iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID || "271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs.apps.googleusercontent.com",
         offlineAccess: false,
       };
       console.log("DEBUG: Final Google Sign-In Config (Simplified):", JSON.stringify(config, null, 2));

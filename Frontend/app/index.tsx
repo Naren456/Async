@@ -42,12 +42,35 @@ export default function AppEntry() {
           // 5. No token found, redirect to the welcome screen
           router.replace("/welcome");
         }
-      } catch (e) {
-        // 6. Token is invalid/expired (e.g., 401 error). Clear it.
-        console.error("Session check failed, navigating to welcome screen:", e);
+      } catch (e: any) {
+        console.error("Session check failed:", e);
 
+        // 6. Handle Offline Mode vs Expired Token
+        if (e.isNetworkError) {
+          console.log("Network error detected. Attempting to enter offline mode...");
+          try {
+            const cachedUserString = await SecureStore.getItemAsync("userProfile");
+            if (cachedUserString && token) {
+              const cachedUser = JSON.parse(cachedUserString);
+              dispatch(setUser({ user: cachedUser, token: token }));
+              
+              if (cachedUser.role === "TEACHER") {
+                router.replace("/admin");
+              } else {
+                router.replace("/user/home");
+              }
+              return; // Exit here so we don't clear the token!
+            }
+          } catch (cacheErr) {
+            console.error("Failed to load cached user profile for offline mode:", cacheErr);
+          }
+        }
+
+        // 7. Token is invalid/expired (e.g., 401 error) or no cached profile exists. Clear it.
+        console.log("Invalid session, logging out.");
         if (token) {
           await SecureStore.deleteItemAsync("authToken");
+          await SecureStore.deleteItemAsync("userProfile");
         }
         dispatch(setUser({ user: null }));
 

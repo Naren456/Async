@@ -5,13 +5,6 @@ const { withNativeWind } = require("nativewind/metro");
 
 const config = getDefaultConfig(__dirname);
 
-config.transformer = {
-  ...config.transformer, 
-  getTransformOptions: async () => ({
-    transform: {
-      inlineRequires: true,
-    },
-  }),
-};
+// Removed custom transformer override because it breaks NativeWind CSS extraction in release builds
 
 module.exports = withNativeWind(config, { input: "./app/global.css" });

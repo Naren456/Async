@@ -34,6 +34,7 @@ const UserProfile = () => {
   const [editSemester, setEditSemester] = useState('');
   const [editTerm, setEditTerm] = useState('');
   const [editCgr, setEditCgr] = useState('');
+  const [editTone, setEditTone] = useState('friendly');
 
   useEffect(() => {
     if (user) {
@@ -43,6 +44,7 @@ const UserProfile = () => {
       setEditSemester(user.semester !== null && user.semester !== undefined ? String(user.semester) : '');
       setEditTerm(user.term !== null && user.term !== undefined ? String(user.term) : '');
       setEditCgr(user.cgr !== null && user.cgr !== undefined ? String(user.cgr) : '');
+      setEditTone(user.notificationTone || 'friendly');
     }
   }, [user]);
 
@@ -80,6 +82,7 @@ const UserProfile = () => {
     setEditSemester(user?.semester !== null && user?.semester !== undefined ? String(user?.semester) : '');
     setEditTerm(user?.term !== null && user?.term !== undefined ? String(user?.term) : '');
     setEditCgr(user?.cgr !== null && user?.cgr !== undefined ? String(user?.cgr) : '');
+    setEditTone(user?.notificationTone || 'friendly');
     setEditModalVisible(true);
   };
 
@@ -93,6 +96,7 @@ const UserProfile = () => {
         semester: data.semester ? Number(data.semester) : null,
         term: data.term ? Number(data.term) : null,
         cgr: data.cgr && data.cgr.trim() ? Number(data.cgr.trim()) : null,
+        notificationTone: data.notificationTone,
       };
       const response = await UpdateProfile(updatedData);
       dispatch(setUser({ user: response.user, token: user.token }));
@@ -164,6 +168,10 @@ const UserProfile = () => {
                 <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">CGR</Text>
                 <Text className="text-white text-xl font-bold">{user?.cgr || 'N/A'}</Text>
               </View>
+              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl border border-white/5 mt-4">
+                <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Tone</Text>
+                <Text className="text-white text-xl font-bold capitalize">{user?.notificationTone?.replace('_', ' ') || 'Friendly'}</Text>
+              </View>
             </View>
           </View>
         </ProfileSection>
@@ -201,6 +209,7 @@ const UserProfile = () => {
           semester: editSemester,
           term: editTerm,
           cgr: editCgr,
+          notificationTone: editTone,
         }}
       />
     </SafeAreaView>

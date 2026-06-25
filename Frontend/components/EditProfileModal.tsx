@@ -14,8 +14,17 @@ interface EditProfileModalProps {
     semester: string;
     term: string;
     cgr: string;
+    notificationTone: string;
   };
 }
+
+const TONE_OPTIONS = [
+  { value: 'friendly', label: 'Friendly (Default)' },
+  { value: 'strict', label: 'Strict' },
+  { value: 'funny', label: 'Funny' },
+  { value: 'friendly_romantic', label: 'Romantic' },
+  { value: 'bro', label: 'Bro (Hinglish)' }
+];
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, onSave, isLoading, initialValues }) => {
   const [editName, setEditName] = useState('');
@@ -24,6 +33,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
   const [editSemester, setEditSemester] = useState('');
   const [editTerm, setEditTerm] = useState('');
   const [editCgr, setEditCgr] = useState('');
+  const [editTone, setEditTone] = useState('friendly');
 
   useEffect(() => {
     if (visible) {
@@ -33,6 +43,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
       setEditSemester(initialValues.semester);
       setEditTerm(initialValues.term);
       setEditCgr(initialValues.cgr);
+      setEditTone(initialValues.notificationTone || 'friendly');
     }
   }, [visible, initialValues]);
 
@@ -44,6 +55,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
       semester: editSemester,
       term: editTerm,
       cgr: editCgr,
+      notificationTone: editTone,
     });
   };
 
@@ -138,6 +150,31 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
               placeholderTextColor="#6B7280"
               keyboardType="decimal-pad"
             />
+          </View>
+
+          <View className="mb-10">
+            <Text className="text-white text-base font-medium mb-2">Notification Tone</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+              {TONE_OPTIONS.map((tone) => {
+                const isSelected = editTone === tone.value;
+                return (
+                  <TouchableOpacity
+                    key={tone.value}
+                    onPress={() => setEditTone(tone.value)}
+                    activeOpacity={0.7}
+                    className={`px-4 py-2 rounded-full border mr-3 ${
+                      isSelected 
+                        ? 'bg-blue-600 border-blue-600' 
+                        : 'bg-[#1e293b] border-white/10'
+                    }`}
+                  >
+                    <Text className={`font-medium ${isSelected ? 'text-white' : 'text-gray-400'}`}>
+                      {tone.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
           </View>
         </ScrollView>
       </SafeAreaView>
