@@ -42,15 +42,12 @@ android
 
 my-app-release-key.keystore
 credentials.json
-google-services.json
 
 # Security
 *.keystore
-google-services.json
 credentials.json
 
 .easignore
-GoogleService-Info.plist
 google-services.json.env
 
 .idea
