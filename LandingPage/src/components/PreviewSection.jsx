@@ -32,7 +32,7 @@ function PreviewSection() {
 
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16 mb-16">
           <div className="flex-1 grid grid-cols-2 gap-4">
-            <div className="w-44 sm:w-52 h-80 sm:h-96 rounded-[2rem] border-4 border-slate-600 bg-slate-900 mx-auto shadow-2xl shadow-blue-500/10 overflow-hidden">
+            <div className="w-52 sm:w-60 h-[420px] sm:h-[480px] rounded-[2rem] border-4 border-slate-600 bg-slate-900 mx-auto shadow-2xl shadow-blue-500/10 overflow-hidden">
               <div className="h-full w-full rounded-[1.6rem] overflow-hidden">
                 <img
                   src="https://github.com/user-attachments/assets/3a525388-579a-492a-819f-589a50d67ca4"
@@ -43,7 +43,7 @@ function PreviewSection() {
               </div>
             </div>
             <div className="pt-8">
-              <div className="w-44 sm:w-52 h-80 sm:h-96 rounded-[2rem] border-4 border-slate-600 bg-slate-900 mx-auto shadow-2xl shadow-blue-500/10 overflow-hidden">
+              <div className="w-52 sm:w-60 h-[420px] sm:h-[480px] rounded-[2rem] border-4 border-slate-600 bg-slate-900 mx-auto shadow-2xl shadow-blue-500/10 overflow-hidden">
                 <div className="h-full w-full rounded-[1.6rem] overflow-hidden">
                   <img
                     src="https://github.com/user-attachments/assets/35ab4704-c0d4-47a7-81ca-95be4adb8687"

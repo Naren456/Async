@@ -37,16 +37,21 @@ jobs:
       - name: Build Unsigned iOS App
         working-directory: ./Frontend/ios
         run: |
+          set -o pipefail
           # Use wildcards or exact names depending on what Expo generates. Expo usually uses the "name" from app.config.js
           xcodebuild -workspace ASync.xcworkspace \
             -scheme ASync \
             -configuration Release \
             -sdk iphoneos \
+            -derivedDataPath build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             SWIFT_STRICT_CONCURRENCY=minimal \
-            build | xcpretty
+            build
+
+          echo "xcodebuild finished. Listing contents of build directory:"
+          ls -R build/ || echo "build directory does not exist!"
 
       - name: Package into IPA
         working-directory: ./Frontend/ios

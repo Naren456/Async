@@ -156,7 +156,7 @@ function App() {
                   : "opacity-0 translate-y-12"
               }`}
             >
-              <div className="relative w-56 sm:w-64 h-[460px] sm:h-[520px] rounded-[3rem] border-4 border-slate-600 bg-slate-900 shadow-2xl shadow-blue-500/10 shrink-0 overflow-hidden">
+              <div className="relative w-72 sm:w-80 h-[580px] sm:h-[640px] rounded-[3rem] border-4 border-slate-600 bg-slate-900 shadow-2xl shadow-blue-500/10 shrink-0 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-slate-800 rounded-b-2xl z-10" />
                 <div className="h-full w-full rounded-[2.6rem] overflow-hidden">
                   <img
