@@ -33,7 +33,7 @@ const sendNarendraNotification = async () => {
         const tickets = await sendPushNotification(
             user.pushToken,
             "Hello Narendra! 👋",
-            "This is a test notification from your backend script."
+            "Siddharth's backend is working fine"
         );
 
         console.log("📨 Notification sent successfully! Tickets:", tickets);
