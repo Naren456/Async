@@ -92,7 +92,7 @@ const UploadNoteScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4 border-b border-white/10">
         <TouchableOpacity onPress={() => router.back()} className="p-2">
@@ -126,7 +126,7 @@ const UploadNoteScreen = () => {
 
         {/* Selected File Info & Title */}
         {selectedFile && (
-          <View className="mb-6 p-4 bg-[#1e293b] rounded-xl border border-white/10">
+          <View className="mb-6 p-4 bg-[#101216] rounded-xl border border-white/10">
             <View className="flex-row justify-between items-center mb-4">
               <Text
                 className="text-green-400 font-medium flex-1 mr-2"
@@ -146,7 +146,7 @@ const UploadNoteScreen = () => {
               onChangeText={setNoteTitle}
               placeholder="Enter note title"
               placeholderTextColor="#6B7280"
-              className="bg-[#0f172b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#08090B] text-white rounded-lg px-4 py-3 border border-white/10"
             />
           </View>
         )}

@@ -15,24 +15,24 @@ const UserAppLayout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#3B82F6",
-        tabBarInactiveTintColor: "#94A3B8",
+        tabBarActiveTintColor: "#4F8CFF",
+        tabBarInactiveTintColor: "#7C8493",
         tabBarStyle: {
-          backgroundColor: "#0f172a",
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          backgroundColor: "#101216",
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
           position: "absolute",
           overflow: "hidden",
           height: 70 + insets.bottom,
           paddingBottom: insets.bottom,
           borderTopWidth: 1,          // thin line on top
-          borderTopColor: "rgba(255,255,255,0.1)", // subtle divider
+          borderTopColor: "#242832",
           elevation: 10,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",
-          letterSpacing: 0.4,
+          letterSpacing: 0.1,
           marginBottom: 5,
         },
       }}

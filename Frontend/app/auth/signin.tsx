@@ -18,7 +18,7 @@ import { BookOpen, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
 import { AuthsignIn, AuthGoogleSignIn } from "../../api/apiCall";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/reducer";
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "../../utils/secureStore";
 import {
   GoogleSignin,
   statusCodes,
@@ -144,26 +144,26 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       <StatusBar style="light" />
       <LinearGradient
-        colors={["#1e3a8a", "#2563eb", "#60a5fa"]}
-        locations={[0, 0.5, 1]}
+        colors={["#08090B", "#101216", "#08090B"]}
+        locations={[0, 0.55, 1]}
         style={{ flex: 1 }}
       >
         <View className="flex-1 items-center justify-center px-8">
           {/* Header */}
           <View className="justify-center items-center mb-12">
-            <View className="mb-4 p-4 rounded-full bg-white/15 backdrop-blur-sm">
-              <View className="w-12 h-12 rounded-full bg-white/25 items-center justify-center">
-                <BookOpen size={24} color="white" strokeWidth={2} />
+            <View className="mb-4 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+              <View className="w-12 h-12 rounded-xl bg-blue-500 items-center justify-center">
+                <BookOpen size={24} color="#F5F7FA" strokeWidth={2} />
               </View>
             </View>
             <Text className="text-4xl font-bold text-white mb-2">
               Welcome Back
             </Text>
             <Text className="text-base text-white/80 text-center">
-              Sign in to manage your assignments
+              Sign in to your focused academic workspace
             </Text>
           </View>
 
@@ -192,7 +192,7 @@ export default function SignIn() {
                     <View className="absolute left-3 top-3 z-10">
                       <Mail
                         size={20}
-                        color="rgba(0,0,0,0.4)"
+                        color="#9CA3AF"
                         strokeWidth={2}
                       />
                     </View>
@@ -201,8 +201,8 @@ export default function SignIn() {
                       onBlur={handleBlur("email")}
                       value={values.email}
                       placeholder="Enter your email"
-                      placeholderTextColor="rgba(0,0,0,0.4)"
-                      className="bg-white rounded-xl px-12 py-4 text-gray-800 text-base"
+                      placeholderTextColor="#7C8493"
+                      className="bg-[#101216] border border-[#242832] rounded-xl px-12 py-4 text-[#F5F7FA] text-base"
                       keyboardType="email-address"
                       autoCapitalize="none"
                       autoComplete="email"
@@ -224,7 +224,7 @@ export default function SignIn() {
                     <View className="absolute left-3 top-3 z-10">
                       <Lock
                         size={20}
-                        color="rgba(0,0,0,0.4)"
+                        color="#9CA3AF"
                         strokeWidth={2}
                       />
                     </View>
@@ -234,8 +234,8 @@ export default function SignIn() {
                       onBlur={handleBlur("password")}
                       value={values.password}
                       placeholder="Enter your password"
-                      placeholderTextColor="rgba(0,0,0,0.4)"
-                      className="bg-white rounded-xl px-12 py-4 text-gray-800 text-base pr-12"
+                      placeholderTextColor="#7C8493"
+                      className="bg-[#101216] border border-[#242832] rounded-xl px-12 py-4 text-[#F5F7FA] text-base pr-12"
                       autoComplete="password"
                     />
                     <TouchableOpacity
@@ -246,13 +246,13 @@ export default function SignIn() {
                       {showPassword ? (
                         <EyeOff
                           size={20}
-                          color="rgba(0,0,0,0.4)"
+                          color="#9CA3AF"
                           strokeWidth={2}
                         />
                       ) : (
                         <Eye
                           size={20}
-                          color="rgba(0,0,0,0.4)"
+                          color="#9CA3AF"
                           strokeWidth={2}
                         />
                       )}
@@ -283,7 +283,7 @@ export default function SignIn() {
                 <TouchableOpacity
                   onPress={() => handleSubmit()}
                   disabled={isLoading || isGoogleLoading}
-                  className={`py-4 rounded-xl mb-4 ${isLoading ? "bg-white/50" : "bg-white"
+                  className={`py-4 rounded-xl mb-4 ${isLoading ? "bg-blue-500/50" : "bg-blue-500"
                     }`}
                   style={{
                     shadowColor: "#000",
@@ -296,13 +296,13 @@ export default function SignIn() {
                 >
                   {isLoading ? (
                     <View className="flex-row items-center justify-center">
-                      <ActivityIndicator size="small" color="#3B82F6" />
-                      <Text className="text-blue-600 ml-2 font-bold text-lg">
+                      <ActivityIndicator size="small" color="#F5F7FA" />
+                      <Text className="text-white ml-2 font-bold text-lg">
                         Signing In...
                       </Text>
                     </View>
                   ) : (
-                    <Text className="text-blue-600 text-center font-bold text-lg">
+                    <Text className="text-white text-center font-bold text-lg">
                       Sign In
                     </Text>
                   )}
@@ -323,10 +323,10 @@ export default function SignIn() {
                     }}
                   >
                     <LinearGradient
-                      colors={["#3b82f6", "#2563eb", "#1d4ed8"]}
+                      colors={["#151820", "#101216"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="flex-row items-center justify-center rounded-xl py-4 px-6"
+                      className="flex-row items-center justify-center rounded-xl py-4 px-6 border border-[#242832]"
                     >
                       {isGoogleLoading ? (
                         <View className="flex-row items-center justify-center">

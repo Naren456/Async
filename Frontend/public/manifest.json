@@ -1,0 +1,22 @@
+{
+  "short_name": "ASync",
+  "name": "ASync Mobile",
+  "description": "ASync - Assignment Management Platform",
+  "icons": [
+    {
+      "src": "/assets/images/favicon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/images/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/?source=pwa",
+  "background_color": "#0f172b",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#0f172b"
+}

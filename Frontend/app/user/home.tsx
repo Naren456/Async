@@ -267,7 +267,7 @@ const handleToggleComplete = async (assignmentId: string) => {
   // Initial Loading View (5 seconds)
   if (isInitialLoading || loading) {
     return (
-      <SafeAreaView className="flex-1 bg-[#0f172b] items-center justify-center">
+      <SafeAreaView className="flex-1 bg-[#08090B] items-center justify-center">
         <ActivityIndicator size="large" color="#3B82F6" />
         <Text className="text-gray-400 mt-4">Loading dashboard...</Text>
       </SafeAreaView>
@@ -275,9 +275,9 @@ const handleToggleComplete = async (assignmentId: string) => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
-      <View className="px-5 py-4 border-b border-white/10 bg-[#1e293b]/80">
+      <View className="px-5 py-4 border-b border-white/10 bg-[#101216]/80">
         <Text className="text-2xl font-bold text-white">Hello, {user?.name}</Text>
         <View className="flex-row items-center mt-1">
           <Clock size={14} color="#60A5FA" />
@@ -340,7 +340,7 @@ const handleToggleComplete = async (assignmentId: string) => {
             nextAssignments.map((assign) => (
               <View
                 key={assign.id}
-                className="mb-4 rounded-xl bg-[#1e293b]/60 border border-white/10 p-4"
+                className="mb-4 rounded-xl bg-[#101216]/60 border border-white/10 p-4"
               >
                 <AssignmentCard
                   title={assign.title}

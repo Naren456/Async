@@ -9,6 +9,7 @@ import subjectRouter from './routes/subject.route.js';
 import assignmentRouter from './routes/assignment.route.js';
 import adminRouter from './routes/admin.route.js';
 import notesRouter from './routes/note.route.js';
+import publicRouter from './routes/public.route.js';
 // import './jobs/assignmentCleanUp.js'; 
 // import './jobs/syncAssignment.js'
 import scheduler from './cron/scheduler.js';
@@ -25,6 +26,7 @@ const allowedOrigins = [
   "http://localhost:8081",
   "http://localhost:5000",
   process.env.MOBILE_APP_URL,
+  process.env.LANDING_PAGE_URL,
   process.env.CHROME_EXTENSION_ORIGIN, // chrome-extension://<extension-id>
 ].filter(Boolean); // Remove undefined values
 
@@ -55,6 +57,7 @@ app.use('/api/subjects', subjectRouter);
 app.use('/api/assignments', assignmentRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/notes', notesRouter);
+app.use('/api/public', publicRouter);
 
 
 app.get('/', (req, res) => {

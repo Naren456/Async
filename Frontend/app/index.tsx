@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ActivityIndicator, View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from '../utils/secureStore';
 import { useDispatch } from 'react-redux';
 import { GetMe } from '../api/apiCall';
 import { setUser } from '../store/reducer';
@@ -87,7 +87,7 @@ export default function AppEntry() {
 
   // Show a persistent loading screen while checking the session
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0f172b' }}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#08090B' }}>
       <StatusBar style='light' />
       <ActivityIndicator size="large" color="#60a5fa" />
       <Text style={{ marginTop: 10, color: 'white' }}>Checking session...</Text>

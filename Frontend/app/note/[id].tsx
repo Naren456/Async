@@ -68,7 +68,7 @@ export default function SubjectNotes() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#0f172b]">
+      <View className="flex-1 items-center justify-center bg-[#08090B]">
         <ActivityIndicator size="large" color="#3B82F6" />
         <Text className="text-gray-400 mt-4 text-base">Loading notes...</Text>
       </View>
@@ -77,7 +77,7 @@ export default function SubjectNotes() {
 
   if (error || !subject) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#0f172b] p-6">
+      <View className="flex-1 items-center justify-center bg-[#08090B] p-6">
         <Text className="text-red-400 text-center text-base">
           {error || "Subject not found"}
         </Text>
@@ -92,7 +92,7 @@ export default function SubjectNotes() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b] px-4">
+    <SafeAreaView className="flex-1 bg-[#08090B] px-4">
       {/* Header */}
       <View className="flex-row items-center justify-between py-4 border-b border-white/10">
         <TouchableOpacity onPress={() => router.back()} className="p-2">
@@ -125,7 +125,7 @@ export default function SubjectNotes() {
         renderItem={({ item }) => (
           <TouchableOpacity
             activeOpacity={0.85}
-            className="flex-row items-center p-4 mb-3 bg-[#1e293b]/70 rounded-2xl border border-white/10 shadow-sm"
+            className="flex-row items-center p-4 mb-3 bg-[#101216]/70 rounded-2xl border border-white/10 shadow-sm"
             onPress={() =>
               router.push({
                 pathname: "/pdf/[id]",

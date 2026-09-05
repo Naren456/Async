@@ -1,413 +1,48 @@
-import { useState, useEffect } from "react";
-import {
-  BookOpenCheck,
-  ClipboardList,
-  BookOpen,
-  Home,
-  Shield,
-  Users,
-  CheckCircle2,
-  ArrowRight,
-  Menu,
-  ArrowUp,
-  Smartphone,
-  Download,
-  GraduationCap,
-} from "lucide-react";
-import { useInView } from "./hooks/useInView";
+import { useEffect, useState } from "react";
+import { ArrowRight, Bell, BookOpen, CalendarDays, Check, ChevronRight, Clock3, Download, FileText, Github, Layers3, Menu, Upload, Users, X } from "lucide-react";
 import PreviewSection from "./components/PreviewSection";
-import FeatureCard from "./components/FeatureCard";
-import MobileMenu from "./components/MobileMenu";
-import StatsSection from "./components/StatsSection";
-import FAQ from "./components/FAQ";
 
-function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const [heroRef, heroInView] = useInView(0.1);
-  const [featuresHeaderRef, featuresHeaderInView] = useInView(0.1);
+const github = "https://github.com/Naren456/Async";
+const download = "https://github.com/Naren456/Async/releases/tag/android";
+const webAppUrl = (import.meta.env.VITE_WEB_APP_URL || "http://localhost:8081").replace(/\/$/, "");
+const loginUrl = `${webAppUrl}/auth/signin`;
+const features = [
+  [Check, "Smart assignment tracking", "Keep upcoming work, due dates, and completion in one academic timeline."],
+  [CalendarDays, "Automatic calendar sync", "Bring supported Coursera ICS calendar deadlines into ASync automatically."],
+  [Bell, "Local reminders", "Get a timely nudge before an important submission slips through the cracks."],
+  [FileText, "Notes & resources", "Teachers publish materials; students open the PDFs they need inside the app."],
+  [Users, "Role-based workspace", "Students and teachers each get tools that fit their everyday workflow."],
+];
+const tech = ["React Native", "Expo", "Node.js", "Express", "PostgreSQL", "Prisma", "Redux Toolkit", "NativeWind"];
 
-  useEffect(() => {
-    const handleScroll = () => setShowBackToTop(window.scrollY > 600);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
-  return (
-    <div className="font-sans bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950 text-slate-100 antialiased min-h-screen">
-      {/* Header */}
-      <header className="py-4 bg-slate-900/60 backdrop-blur-lg sticky top-0 z-50 border-b border-blue-500/20">
-        <nav className="container mx-auto px-6 flex justify-between items-center">
-          <a href="#" className="flex items-center space-x-3 group">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-lg group-hover:shadow-lg group-hover:shadow-blue-500/30 transition-shadow">
-              <BookOpen className="text-white" size={22} />
-            </div>
-            <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              ASync
-            </span>
-          </a>
-          <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#features"
-              className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium text-sm"
-            >
-              Features
-            </a>
-            <a
-              href="#preview"
-              className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium text-sm"
-            >
-              Preview
-            </a>
-            <a
-              href="#faq"
-              className="text-slate-300 hover:text-blue-400 transition-colors duration-200 font-medium text-sm"
-            >
-              FAQ
-            </a>
-            <a
-              href="https://github.com/Naren456/Async/releases/tag/android"
-              className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-200 hover:scale-105"
-            >
-              Download
-            </a>
-          </div>
-          <button
-            className="md:hidden p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={24} />
-          </button>
-        </nav>
-      </header>
-
-      <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-[30rem] h-[30rem] bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-          <div
-            className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-cyan-500/10 rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: "1s" }}
-          />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.03)_0%,transparent_70%)]" />
-        </div>
-
-        <div
-          ref={heroRef}
-          className="container mx-auto px-6 relative z-10"
-        >
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            <div
-              className={`flex-1 text-center lg:text-left transition-all duration-1000 ${
-                heroInView
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-12"
-              }`}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-6">
-                <GraduationCap size={16} />
-                Built for Students &amp; Teachers
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight">
-                Master Your
-                <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  Academic Workflow
-                </span>
-              </h1>
-
-              <p className="text-lg md:text-xl text-slate-300 max-w-xl mb-10 leading-relaxed">
-                The sleek, intuitive app for students and teachers. Track
-                assignments, manage notes, and never miss a deadline — all in
-                one organized place.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <a
-                  href="https://github.com/Naren456/Async/releases/tag/android"
-                  className="group px-8 py-4 rounded-xl font-semibold text-base inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-105"
-                >
-                  <Download className="mr-2" size={20} />
-                  Download ASync
-                  <ArrowRight
-                    className="ml-2 group-hover:translate-x-1 transition-transform"
-                    size={18}
-                  />
-                </a>
-                <a
-                  href="#preview"
-                  className="group px-8 py-4 rounded-xl font-semibold text-base inline-flex items-center justify-center border border-slate-600 text-slate-300 hover:border-blue-500/50 hover:text-white transition-all duration-300"
-                >
-                  <Smartphone className="mr-2" size={20} />
-                  See Preview
-                </a>
-              </div>
-            </div>
-
-            <div
-              className={`flex-1 flex justify-center transition-all duration-1000 delay-300 ${
-                heroInView
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-12"
-              }`}
-            >
-              <div className="relative w-80 sm:w-96 h-[640px] sm:h-[740px] shrink-0">
-                <div className="absolute -left-[3px] top-16 w-[3px] h-7 rounded-l-sm bg-gradient-to-r from-slate-400 to-slate-500 z-30" />
-                <div className="absolute -left-[3px] top-28 w-[3px] h-7 rounded-l-sm bg-gradient-to-r from-slate-400 to-slate-500 z-30" />
-                <div className="absolute -right-[3px] top-20 w-[3px] h-9 rounded-r-sm bg-gradient-to-l from-slate-400 to-slate-500 z-30" />
-                <div className="relative w-full h-full rounded-[3.5rem] bg-gradient-to-b from-slate-400 via-slate-500 to-slate-600 p-[3px] shadow-2xl shadow-blue-500/10">
-                  <div className="absolute top-[14px] left-1/2 -translate-x-1/2 w-[110px] h-[24px] bg-black rounded-full z-20" />
-                  <div className="w-full h-full rounded-[3.3rem] overflow-hidden bg-black p-0.5 relative">
-                    <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center px-6 pt-2.5 pb-1 bg-gradient-to-b from-black/30 to-transparent text-white text-[11px]">
-                      <span className="font-semibold">9:41</span>
-                      <div className="flex items-center gap-1.5">
-                        <svg className="w-3.5 h-2.5" viewBox="0 0 14 10" fill="none"><rect x="0.5" y="0.5" width="13" height="9" rx="1.5" stroke="white" strokeOpacity="0.8"/><rect x="2" y="2" width="7" height="6" rx="1" fill="white" fillOpacity="0.8"/></svg>
-                      </div>
-                    </div>
-                    <div className="h-full w-full rounded-[3rem] overflow-hidden bg-gradient-to-b from-slate-900 to-blue-950 p-4 sm:p-5 pt-12 flex flex-col">
-                      <div className="bg-blue-500/15 rounded-xl p-3 mb-4">
-                        <p className="text-white text-sm font-semibold">Dashboard</p>
-                        <p className="text-blue-300 text-[11px]">Good morning! 2 tasks due today</p>
-                      </div>
-                      <div className="flex gap-2 mb-4">
-                        {[
-                          { value: "3", label: "Assignments", from: "from-blue-500/20", to: "to-cyan-500/20", text: "text-cyan-300" },
-                          { value: "12", label: "Notes", from: "from-purple-500/20", to: "to-pink-500/20", text: "text-purple-300" },
-                          { value: "4.8", label: "CGPA", from: "from-orange-500/20", to: "to-red-500/20", text: "text-orange-300" },
-                        ].map((s, i) => (
-                          <div key={i} className={`flex-1 bg-gradient-to-br ${s.from} ${s.to} rounded-xl p-2 sm:p-3`}>
-                            <p className={`${s.text} text-base sm:text-lg font-bold`}>{s.value}</p>
-                            <p className="text-slate-400 text-[9px] sm:text-[10px]">{s.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                      <p className="text-white text-[11px] font-semibold mb-2">Upcoming</p>
-                      <div className="flex-1 space-y-2 overflow-hidden">
-                        {[
-                          { label: "Math Assignment", sub: "Due Tomorrow", dot: "bg-blue-400" },
-                          { label: "Physics Lab", sub: "Due in 3 days", dot: "bg-cyan-400" },
-                          { label: "Chemistry Quiz", sub: "Next Week", dot: "bg-purple-400" },
-                        ].map((item, i) => (
-                          <div key={i} className="bg-slate-800/60 rounded-xl p-2.5 sm:p-3 flex items-center gap-2.5">
-                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-700/60 flex items-center justify-center">
-                              <div className={`w-2 h-2 rounded-full ${item.dot}`} />
-                            </div>
-                            <div>
-                              <p className="text-white text-[11px] sm:text-xs font-medium">{item.label}</p>
-                              <p className="text-slate-500 text-[9px] sm:text-[10px]">{item.sub}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <StatsSection />
-
-      {/* Features Section */}
-      <section id="features" className="py-20 md:py-32 relative">
-        <div className="container mx-auto px-6">
-          <div
-            ref={featuresHeaderRef}
-            className={`text-center mb-16 transition-all duration-700 ${
-              featuresHeaderInView
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
-            }`}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Organized Power,
-              <span className="block bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Beautifully Designed
-              </span>
-            </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Everything you need to stay on top of your academic life, crafted
-              with care
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard
-              Icon={ClipboardList}
-              title="Assignments on Autopilot"
-              desc="See all assignments clearly grouped by due date. Teachers can easily manage tasks too."
-              color="blue"
-              index={0}
-            />
-            <FeatureCard
-              Icon={BookOpenCheck}
-              title="Notes, Ready When You Are"
-              desc="Access your notes anytime. Filter easily by semester and term."
-              color="cyan"
-              index={1}
-            />
-            <FeatureCard
-              Icon={Home}
-              title="At-a-Glance Dashboard"
-              desc="Your personalized home screen shows key stats and upcoming deadlines instantly."
-              color="purple"
-              index={2}
-            />
-            <FeatureCard
-              Icon={Shield}
-              title="Powerful Admin Tools"
-              desc="Manage subjects, upload notes, track assignments, and view user statistics efficiently."
-              color="green"
-              index={3}
-            />
-            <FeatureCard
-              Icon={Users}
-              title="Tailored Experience"
-              desc="Distinct interfaces optimized for both Students and Teachers."
-              color="pink"
-              index={4}
-            />
-            <FeatureCard
-              Icon={CheckCircle2}
-              title="Never Miss a Deadline"
-              desc="Smart notifications and reminders keep you ahead of schedule."
-              color="orange"
-              index={5}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Preview Section */}
-      <PreviewSection />
-
-      {/* FAQ Section */}
-      <FAQ />
-
-      {/* Download CTA Banner */}
-      <section className="py-20 md:py-32 relative border-t border-blue-500/20">
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-950/30 to-transparent" />
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Get Started?
-          </h2>
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Join thousands of students and teachers already using ASync to
-            simplify their academic life
-          </p>
-          <a
-            href="https://github.com/Naren456/Async/releases/tag/android"
-            className="group inline-flex items-center gap-3 px-10 py-5 rounded-xl font-semibold text-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-105"
-          >
-            <Download size={22} />
-            Download ASync Free
-            <ArrowRight
-              className="group-hover:translate-x-1 transition-transform"
-              size={20}
-            />
-          </a>
-          <p className="text-slate-500 text-sm mt-4">
-            Available on Android. iOS &amp; Web coming soon.
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 border-t border-blue-500/20 bg-slate-900/30">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8 mb-10">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-2 rounded-lg">
-                  <BookOpen className="text-white" size={20} />
-                </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  ASync
-                </span>
-              </div>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-                The sleek, intuitive app for students and teachers to manage
-                academic life.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2.5 text-sm text-slate-400">
-                <li>
-                  <a
-                    href="#features"
-                    className="hover:text-blue-400 transition-colors"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#preview"
-                    className="hover:text-blue-400 transition-colors"
-                  >
-                    Preview
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#faq"
-                    className="hover:text-blue-400 transition-colors"
-                  >
-                    FAQ
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2.5 text-sm text-slate-400">
-                <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
-            &copy; 2025 ASync. All rights reserved.
-          </div>
-        </div>
-      </footer>
-
-      {/* Back to Top */}
-      <button
-        onClick={scrollToTop}
-        className={`fixed bottom-6 right-6 z-40 p-3 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-110 ${
-          showBackToTop
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-4 pointer-events-none"
-        }`}
-        aria-label="Back to top"
-      >
-        <ArrowUp size={20} />
-      </button>
-    </div>
-  );
+function Button({ href, children, muted = false }) {
+  return <a href={href} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 ${muted ? "border border-[#242832] bg-[#101216] text-[#F5F7FA] hover:border-[#46506a]" : "bg-blue-500 text-white hover:bg-blue-400"}`}>{children}</a>;
 }
 
+function Dashboard() {
+  const rows = [["Database Systems", "Assignment 03", "Due tomorrow"], ["Machine Learning", "Project proposal", "Due Friday"], ["Operating Systems", "Lab submission", "Due Monday"]];
+  return <div className="mx-auto w-full max-w-3xl rounded-xl border border-[#303541] bg-[#101216] p-2 shadow-2xl shadow-black/50 motion-safe:animate-[fade-in-up_0.8s_ease-out]"><div className="overflow-hidden rounded-lg border border-[#242832] bg-[#0c0e12]"><div className="flex h-10 items-center gap-2 border-b border-[#242832] px-4"><span className="h-2 w-2 rounded-full bg-[#4a5261]"/><span className="h-2 w-2 rounded-full bg-[#4a5261]"/><span className="h-2 w-2 rounded-full bg-[#4a5261]"/><span className="ml-3 text-xs text-[#9CA3AF]">ASync workspace</span></div><div className="grid min-h-[390px] grid-cols-[1fr] sm:grid-cols-[160px_1fr]"><aside className="hidden border-r border-[#242832] p-4 sm:block"><div className="mb-7 flex items-center gap-2 font-bold text-white"><span className="grid h-7 w-7 place-items-center rounded-md bg-blue-500"><BookOpen size={15}/></span>ASync</div>{["Dashboard", "Assignments", "Notes", "Calendar", "Settings"].map((x,i)=><div className={`mb-1 flex gap-2 rounded-md px-3 py-2 text-xs ${i===0?"bg-[#1a2130] text-white":"text-[#9CA3AF]"}`} key={x}><Layers3 size={14}/>{x}</div>)}</aside><main className="p-5 sm:p-6"><div className="mb-6 flex justify-between"><div><p className="text-xs text-[#9CA3AF]">Monday, 14 September</p><h3 className="mt-1 text-xl font-semibold text-white">Good morning 👋</h3></div><Bell className="text-[#9CA3AF]" size={17}/></div><div className="grid gap-3 lg:grid-cols-[1fr_145px]"><section><h4 className="mb-3 text-sm font-semibold text-white">Upcoming</h4>{rows.map(([course, task, due])=><div className="mb-2 flex gap-3 rounded-lg border border-[#242832] bg-[#101216] p-3" key={course}><span className="h-8 w-1 rounded-full bg-blue-400"/><div className="min-w-0 flex-1"><p className="text-xs font-medium text-[#F5F7FA]">{course}</p><p className="text-[11px] text-[#9CA3AF]">{task}</p></div><span className="text-[10px] text-[#9CA3AF]">{due}</span></div>)}</section><aside className="rounded-lg border border-[#242832] bg-[#101216] p-3"><p className="text-xs font-medium text-white">Today&apos;s progress</p><p className="mt-3 text-2xl font-semibold text-white">2 <span className="text-xs font-normal text-[#9CA3AF]">of 4</span></p><div className="mt-3 h-1.5 rounded-full bg-[#242832]"><div className="h-full w-1/2 bg-blue-500"/></div><div className="mt-6 grid grid-cols-7 gap-1 text-center text-[9px] text-[#9CA3AF]">{["M","T","W","T","F","S","S"].map((d,i)=><span key={i} className={i===0?"rounded bg-blue-500 py-1 text-white":"py-1"}>{d}</span>)}</div></aside></div></main></div></div></div>;
+}
+
+function App() {
+  const [menu, setMenu] = useState(false), [scrolled, setScrolled] = useState(false);
+  useEffect(()=>{const handler=()=>setScrolled(window.scrollY>12);window.addEventListener("scroll",handler,{passive:true});return()=>window.removeEventListener("scroll",handler)},[]);
+  const links = [["Features","#features"],["How it works","#how-it-works"],["For Students","#students"],["For Teachers","#teachers"]];
+  return <div className="min-h-screen overflow-x-hidden bg-[#08090B] text-[#F5F7FA] selection:bg-blue-500/40">
+    <header className={`sticky top-0 z-50 border-b transition ${scrolled?"border-[#242832] bg-[#08090B]/95 backdrop-blur":"border-transparent bg-[#08090B]/80"}`}><nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8"><a href="#top" className="flex items-center gap-2 font-semibold text-white"><span className="grid h-8 w-8 place-items-center rounded-md bg-blue-500"><BookOpen size={17}/></span>ASync</a><div className="hidden gap-7 md:flex">{links.map(([l,h])=><a key={h} href={h} className="text-sm text-[#9CA3AF] hover:text-white">{l}</a>)}</div><div className="hidden items-center gap-4 md:flex"><a href={github} className="text-sm text-[#9CA3AF] hover:text-white"><Github className="mr-1 inline" size={16}/>GitHub</a><a href={loginUrl} className="text-sm font-medium text-[#F5F7FA] hover:text-blue-400">Login</a><Button href={download}>Get Started <ArrowRight size={15}/></Button></div><button aria-label="Toggle navigation" aria-expanded={menu} className="p-2 md:hidden" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></nav>{menu&&<div className="border-t border-[#242832] bg-[#101216] px-5 py-4 md:hidden">{links.map(([l,h])=><a onClick={()=>setMenu(false)} key={h} href={h} className="block py-3">{l}</a>)}<a href={loginUrl} className="block py-3 font-medium text-[#F5F7FA]">Login</a><Button href={download}>Get Started</Button></div>}</header>
+    <main id="top">
+      <section className="mx-auto grid max-w-7xl gap-12 px-5 pb-24 pt-20 lg:grid-cols-[.85fr_1.15fr] lg:items-center lg:px-8 lg:pb-32 lg:pt-28"><div className="motion-safe:animate-[fade-in-up_.7s_ease-out]"><p className="mb-6 text-xs font-semibold tracking-[.16em] text-blue-400">ACADEMIC PRODUCTIVITY, REIMAGINED</p><h1 className="max-w-xl text-5xl font-semibold leading-[1.04] tracking-[-.045em] text-white sm:text-6xl lg:text-7xl">Stay ahead of every deadline.<span className="block text-[#9CA3AF]">Without losing focus.</span></h1><p className="mt-7 max-w-xl text-lg leading-8 text-[#9CA3AF]">ASync brings assignments, deadlines, notes, and academic resources into one focused workspace built for students and educators.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button href={download}>Get Started <ArrowRight size={16}/></Button><Button href="#features" muted>Explore ASync <ChevronRight size={16}/></Button></div><div className="mt-9 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#9CA3AF]"><span>Student-first</span><span>Cross-platform</span><span>Open source</span></div></div><Dashboard/></section>
+      <section className="border-y border-[#242832] bg-[#101216]/40"><div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:px-8"><div><p className="text-xs font-semibold tracking-[.15em] text-blue-400">THE PROBLEM</p><h2 className="mt-4 max-w-lg text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your academic life shouldn&apos;t live in five different places.</h2></div><div className="hidden h-20 w-px bg-[#242832] lg:block"/><div className="grid gap-3 text-sm text-[#9CA3AF] sm:grid-cols-[1fr_auto_1fr] sm:items-center"><div className="space-y-2"><p>Assignments in one platform</p><p>Notes in PDFs</p><p>Deadlines in calendars</p></div><ArrowRight className="mx-auto text-blue-400"/><div className="rounded-lg border border-blue-500/40 bg-blue-500/10 p-4 text-center font-medium text-white">ASync<br/><span className="text-xs font-normal text-[#9CA3AF]">one focused workspace</span></div></div></div></section>
+      <section id="features" className="mx-auto max-w-7xl px-5 py-24 lg:px-8"><p className="text-xs font-semibold tracking-[.15em] text-blue-400">FEATURES</p><h2 className="mt-4 max-w-xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">Everything you need to stay on track.</h2><div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-12">{features.map(([Icon,title,copy],i)=><article key={title} className={`border border-[#242832] bg-[#101216] p-6 transition hover:-translate-y-1 hover:border-[#3b465e] ${i===0?"md:col-span-2 lg:col-span-7":i===1?"lg:col-span-5":i===2?"lg:col-span-4":i===3?"lg:col-span-5":"lg:col-span-3"}`}><Icon className="text-blue-400" size={21}/><h3 className="mt-10 text-lg font-medium text-white">{title}</h3><p className="mt-2 max-w-md text-sm leading-6 text-[#9CA3AF]">{copy}</p></article>)}</div></section>
+      <section id="students"><PreviewSection/></section>
+      <section id="teachers" className="border-y border-[#242832] bg-[#101216]/40"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-24 lg:grid-cols-2 lg:items-center lg:px-8"><div><p className="text-xs font-semibold tracking-[.15em] text-blue-400">FOR EDUCATORS</p><h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">A simpler workflow for educators.</h2><p className="mt-5 max-w-lg leading-7 text-[#9CA3AF]">Manage subjects, upload PDF resources, and keep assignment information accurate for the cohorts you support.</p></div><div className="rounded-xl border border-[#242832] bg-[#08090B] p-5"><div className="flex justify-between border-b border-[#242832] pb-4"><span className="font-medium">Teacher workspace</span><span className="rounded bg-blue-500/15 px-2 py-1 text-xs text-blue-400">Admin</span></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><div className="border border-[#242832] p-4"><Upload className="text-blue-400" size={19}/><p className="mt-6 text-sm text-white">Upload resource</p><p className="mt-1 text-xs text-[#9CA3AF]">PDF notes for your course</p></div><div className="border border-[#242832] p-4"><Users className="text-blue-400" size={19}/><p className="mt-6 text-sm text-white">Manage cohorts</p><p className="mt-1 text-xs text-[#9CA3AF]">Keep content relevant</p></div></div></div></div></section>
+      <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8"><p className="text-xs font-semibold tracking-[.15em] text-blue-400">AUTOMATION</p><h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Your deadlines, automatically organized.</h2><div className="mt-12 grid gap-3 md:grid-cols-3 lg:grid-cols-6">{["Coursera / Calendar","ICS Calendar","ASync Backend","Assignment Processing","Student Dashboard","Local Reminder"].map((s,i)=><div key={s} className="border border-[#242832] bg-[#101216] p-4 text-sm"><span className="mb-8 block text-xs text-[#9CA3AF]">0{i+1}</span>{s}</div>)}</div></section>
+      <section className="border-y border-[#242832] bg-[#101216]/40"><div className="mx-auto grid max-w-7xl gap-12 px-5 py-24 lg:grid-cols-2 lg:px-8"><div><p className="text-xs font-semibold tracking-[.15em] text-blue-400">DEEP FOCUS</p><h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Designed for deep focus.</h2><p className="mt-5 max-w-lg leading-7 text-[#9CA3AF]">Less noise. Fewer distractions. A workspace designed to help you see what matters next.</p></div><div className="border border-[#242832] bg-[#08090B] p-5"><div className="flex justify-between"><span className="text-sm font-medium">Next up</span><Clock3 size={16} className="text-blue-400"/></div><div className="mt-8 border-l-2 border-blue-500 pl-4"><p className="text-sm text-white">Database Systems — Assignment 03</p><p className="mt-1 text-xs text-[#9CA3AF]">Due tomorrow · 11:59 PM</p></div><p className="mt-7 text-xs text-[#9CA3AF]">One clear priority. No unnecessary noise.</p></div></div></section>
+      <section id="how-it-works" className="mx-auto max-w-7xl px-5 py-24 lg:px-8"><p className="text-xs font-semibold tracking-[.15em] text-blue-400">HOW IT WORKS</p><h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Make room for what matters.</h2><div className="mt-12 grid gap-5 md:grid-cols-3">{[["01","Connect","Get your academic workspace ready."],["02","Organize","Assignments, resources and deadlines come together automatically."],["03","Focus","Know what needs your attention next and stay ahead of deadlines."]].map(([n,t,c])=><div key={n} className="border-t border-[#3a4252] pt-5"><span className="text-sm text-blue-400">{n}</span><h3 className="mt-7 text-xl text-white">{t}</h3><p className="mt-2 text-sm leading-6 text-[#9CA3AF]">{c}</p></div>)}</div></section>
+      <section className="border-y border-[#242832] bg-[#101216]/40"><div className="mx-auto max-w-7xl px-5 py-24 lg:px-8"><p className="text-xs font-semibold tracking-[.15em] text-blue-400">ENGINEERING</p><h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Built like a real product.</h2><div className="mt-10 flex flex-wrap gap-2">{tech.map(t=><span key={t} className="border border-[#242832] bg-[#08090B] px-3 py-2 text-sm text-[#9CA3AF]">{t}</span>)}</div><div className="mt-10 grid gap-4 md:grid-cols-2"><div className="border border-[#242832] p-5 text-sm text-[#9CA3AF]"><p className="font-medium text-white">Mobile App</p><p className="my-3 text-blue-400">↓</p><p>REST API</p><p className="my-3 text-blue-400">↓</p><p>Node.js / Express → Prisma → PostgreSQL</p></div><div className="border border-[#242832] p-5 text-sm text-[#9CA3AF]"><p className="font-medium text-white">Calendar Sync</p><p className="my-3 text-blue-400">↓</p><p>ICS Calendar</p><p className="my-3 text-blue-400">↓</p><p>Cron jobs → Assignment data</p></div></div></div></section>
+      <section className="mx-auto max-w-7xl px-5 py-24 text-center lg:px-8"><Github className="mx-auto text-blue-400" size={25}/><h2 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Built in the open.</h2><p className="mx-auto mt-5 max-w-xl leading-7 text-[#9CA3AF]">ASync is open source and built to evolve with the people who use it.</p><div className="mt-8"><Button href={github} muted><Github size={16}/>View on GitHub</Button></div></section>
+      <section className="border-y border-[#242832] bg-[#101216]"><div className="mx-auto max-w-7xl px-5 py-24 text-center lg:px-8"><h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">Your next deadline is already closer than you think.</h2><p className="mx-auto mt-5 max-w-xl text-[#9CA3AF]">Bring your academic workflow into one focused workspace with ASync.</p><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><Button href={download}>Get Started <Download size={16}/></Button><Button href={github} muted>View on GitHub <Github size={16}/></Button></div></div></section>
+    </main><footer className="mx-auto max-w-7xl px-5 py-12 lg:px-8"><div className="grid gap-10 md:grid-cols-4"><div><p className="font-semibold text-white">ASync</p><p className="mt-3 text-sm text-[#9CA3AF]">Academic productivity, built for focus.</p></div>{[["Product","Features","Students","Teachers","How it works"],["Resources","GitHub","Documentation","Installation"],["Project","Open Source","MIT License"]].map(([h,...ls])=><div key={h}><p className="text-sm font-medium text-white">{h}</p>{ls.map(l=><p key={l} className="mt-3 text-sm text-[#9CA3AF]">{l}</p>)}</div>)}</div><div className="mt-12 flex justify-between border-t border-[#242832] pt-6 text-sm text-[#9CA3AF]"><span>© 2026 ASync</span><span>MIT License</span></div></footer>
+  </div>;
+}
 export default App;

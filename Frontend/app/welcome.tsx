@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { BookOpen } from "lucide-react-native";
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "../utils/secureStore";
 import { useDispatch } from "react-redux";
 
 // global.css is imported in _layout.tsx, do not import it here

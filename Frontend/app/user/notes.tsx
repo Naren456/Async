@@ -108,7 +108,7 @@ const UserNotes = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-[#0f172b] items-center justify-center">
+      <SafeAreaView className="flex-1 bg-[#08090B] items-center justify-center">
         <ActivityIndicator size="large" color="#3B82F6" />
         <Text className="text-gray-400 mt-3">Loading notes...</Text>
       </SafeAreaView>
@@ -117,7 +117,7 @@ const UserNotes = () => {
 
   if (error) {
     return (
-      <SafeAreaView className="flex-1 bg-[#0f172b] items-center justify-center p-4">
+      <SafeAreaView className="flex-1 bg-[#08090B] items-center justify-center p-4">
         <Text className="text-red-400 text-center">{error}</Text>
       </SafeAreaView>
     );
@@ -126,7 +126,7 @@ const UserNotes = () => {
 
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b] px-4">
+    <SafeAreaView className="flex-1 bg-[#08090B] px-4">
       <View className="flex-row items-center mt-4 mb-6">
         <BookOpen size={24} color="#60A5FA" />
         <Text className="text-2xl font-bold text-white ml-2">My Notes</Text>
@@ -135,7 +135,7 @@ const UserNotes = () => {
       {/* Filters */}
       <View className="flex-row mb-5">
         <TouchableOpacity
-          className="flex-1 mr-2 py-3 px-4 rounded-xl bg-[#1e293b] border border-white/10"
+          className="flex-1 mr-2 py-3 px-4 rounded-xl bg-[#101216] border border-white/10"
           onPress={() => setSemModalVisible(true)}
           activeOpacity={0.7}
         >
@@ -146,7 +146,7 @@ const UserNotes = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="flex-1 ml-2 py-3 px-4 rounded-xl bg-[#1e293b] border border-white/10"
+          className="flex-1 ml-2 py-3 px-4 rounded-xl bg-[#101216] border border-white/10"
           onPress={() => setTermModalVisible(true)}
           activeOpacity={0.7}
         >
@@ -170,7 +170,7 @@ const UserNotes = () => {
         }
         renderItem={({ item }) => (
           <TouchableOpacity
-            className="p-4 mb-3 bg-[#1e293b] rounded-2xl border border-white/10"
+            className="p-4 mb-3 bg-[#101216] rounded-2xl border border-white/10"
             activeOpacity={0.8}
             onPress={() =>
               router.push({ pathname: '/note/[id]', params: { id: item.code } })
@@ -203,7 +203,7 @@ const UserNotes = () => {
         onRequestClose={() => setSemModalVisible(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-[#0f172b] p-5 rounded-t-3xl border-t border-white/10 max-h-[60%]">
+          <View className="bg-[#08090B] p-5 rounded-t-3xl border-t border-white/10 max-h-[60%]">
             <Text className="text-white text-lg font-semibold mb-4">
               Select Semester
             </Text>
@@ -242,7 +242,7 @@ const UserNotes = () => {
         onRequestClose={() => setTermModalVisible(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-[#0f172b] p-5 rounded-t-3xl border-t border-white/10 max-h-[40%]">
+          <View className="bg-[#08090B] p-5 rounded-t-3xl border-t border-white/10 max-h-[40%]">
             <Text className="text-white text-lg font-semibold mb-4">
               Select Term
             </Text>

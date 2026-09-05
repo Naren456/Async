@@ -143,7 +143,7 @@ const AdminAssignments = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4 border-b border-white/10">
         <TouchableOpacity onPress={() => router.back()} className="p-2">
@@ -166,7 +166,7 @@ const AdminAssignments = () => {
         {/* Cohort Filter */}
         <View className="my-4">
           <Text className="text-white text-base font-semibold mb-2">Select Cohort</Text>
-          <View className="flex-row items-center justify-between bg-[#1e293b] rounded-xl p-3 border border-white/10">
+          <View className="flex-row items-center justify-between bg-[#101216] rounded-xl p-3 border border-white/10">
             <TextInput
               value={cohortFilter}
               onChangeText={setCohortFilter}

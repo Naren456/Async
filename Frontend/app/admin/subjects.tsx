@@ -112,7 +112,7 @@ const AdminSubjects = () => {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b] px-5">
+    <SafeAreaView className="flex-1 bg-[#08090B] px-5">
       {/* Header */}
       <View className="flex-row items-center justify-between py-5 border-b border-white/10">
         <TouchableOpacity onPress={() => router.back()} className="p-2">

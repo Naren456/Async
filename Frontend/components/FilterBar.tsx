@@ -16,7 +16,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 }) => (
   <View className="flex-row mb-5 space-x-3 gap-5">
     <TouchableOpacity
-      className="flex-1 py-3 px-4 rounded-xl bg-[#1e293b] border border-white/10"
+      className="flex-1 py-3 px-4 rounded-xl bg-[#101216] border border-white/10"
       onPress={onSemesterPress}
     >
       <Text className="text-gray-400 text-sm">Semester</Text>
@@ -26,7 +26,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
     </TouchableOpacity>
 
     <TouchableOpacity
-      className="flex-1 py-3 px-4 rounded-xl bg-[#1e293b] border border-white/10"
+      className="flex-1 py-3 px-4 rounded-xl bg-[#101216] border border-white/10"
       onPress={onTermPress}
     >
       <Text className="text-gray-400 text-sm">Term</Text>

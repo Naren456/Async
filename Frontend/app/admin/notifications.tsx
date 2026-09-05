@@ -41,9 +41,9 @@ const ManageNotifications = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
-      <View className="px-5 py-4 border-b border-white/10 bg-[#1e293b]/80 flex-row items-center">
+      <View className="px-5 py-4 border-b border-white/10 bg-[#101216]/80 flex-row items-center">
         <TouchableOpacity
           onPress={() => router.back()}
           className="mr-4 p-2 rounded-full bg-white/5"
@@ -65,7 +65,7 @@ const ManageNotifications = () => {
                 className={`px-4 py-2 rounded-lg border ${
                   cohort === c
                     ? 'bg-blue-600 border-blue-500'
-                    : 'bg-[#1e293b] border-white/10'
+                    : 'bg-[#101216] border-white/10'
                 }`}
               >
                 <Text
@@ -88,7 +88,7 @@ const ManageNotifications = () => {
             onChangeText={setTitle}
             placeholder="e.g., Assignment Due Reminder"
             placeholderTextColor="#64748b"
-            className="bg-[#1e293b] text-white p-4 rounded-xl border border-white/10 font-medium"
+            className="bg-[#101216] text-white p-4 rounded-xl border border-white/10 font-medium"
           />
         </View>
 
@@ -102,7 +102,7 @@ const ManageNotifications = () => {
             placeholderTextColor="#64748b"
             multiline
             numberOfLines={4}
-            className="bg-[#1e293b] text-white p-4 rounded-xl border border-white/10 font-medium h-32"
+            className="bg-[#101216] text-white p-4 rounded-xl border border-white/10 font-medium h-32"
             textAlignVertical="top"
           />
         </View>

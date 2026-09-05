@@ -113,7 +113,7 @@ const UserProfile = () => {
 
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View className="py-6">
@@ -152,23 +152,23 @@ const UserProfile = () => {
 
 
             <View className="flex-row flex-wrap justify-between mt-6 border-t border-white/10 pt-6">
-              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl mb-4 border border-white/5">
+              <View className="w-[48%] bg-[#101216] p-4 rounded-xl mb-4 border border-white/5">
                 <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Cohort</Text>
                 <Text className="text-white text-xl font-bold">{user?.cohortNo || 'N/A'}</Text>
               </View>
-              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl mb-4 border border-white/5">
+              <View className="w-[48%] bg-[#101216] p-4 rounded-xl mb-4 border border-white/5">
                 <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Semester</Text>
                 <Text className="text-white text-xl font-bold">{user?.semester || 'N/A'}</Text>
               </View>
-              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl border border-white/5">
+              <View className="w-[48%] bg-[#101216] p-4 rounded-xl border border-white/5">
                 <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Term</Text>
                 <Text className="text-white text-xl font-bold">{user?.term || 'N/A'}</Text>
               </View>
-              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl border border-white/5">
+              <View className="w-[48%] bg-[#101216] p-4 rounded-xl border border-white/5">
                 <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">CGR</Text>
                 <Text className="text-white text-xl font-bold">{user?.cgr || 'N/A'}</Text>
               </View>
-              <View className="w-[48%] bg-[#1e293b] p-4 rounded-xl border border-white/5 mt-4">
+              <View className="w-[48%] bg-[#101216] p-4 rounded-xl border border-white/5 mt-4">
                 <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">Tone</Text>
                 <Text className="text-white text-xl font-bold capitalize">{user?.notificationTone?.replace('_', ' ') || 'Friendly'}</Text>
               </View>

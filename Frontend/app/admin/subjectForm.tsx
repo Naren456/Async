@@ -86,7 +86,7 @@ const SubjectForm: React.FC<SubjectFormProps> = ({
   const fields: (keyof SubjectFormData)[] = ["code", "name", "semester", "term"];
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -100,14 +100,14 @@ const SubjectForm: React.FC<SubjectFormProps> = ({
             {editMode ? "Edit Subject" : "Create Subject"}
           </Text>
 
-          <View className="bg-[#1e293b] rounded-2xl p-5 border border-white/10 shadow-md">
+          <View className="bg-[#101216] rounded-2xl p-5 border border-white/10 shadow-md">
             {fields.map((key) => (
               <View key={key} className="mb-4">
                 <Text className="text-gray-300 mb-2 capitalize font-medium">{key}</Text>
                 <TextInput
                   value={String(form[key])} // convert number to string for TextInput
                   onChangeText={(t) => handleChange(key, t)}
-                  className="bg-[#0f172b] text-white rounded-xl px-4 py-3 border border-white/10"
+                  className="bg-[#08090B] text-white rounded-xl px-4 py-3 border border-white/10"
                   placeholder={`Enter ${key}`}
                   placeholderTextColor="#6B7280"
                   editable={!editMode || key !== "code"}

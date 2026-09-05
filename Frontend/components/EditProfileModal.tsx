@@ -66,7 +66,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <SafeAreaView className="flex-1 bg-[#0f172b]">
+      <SafeAreaView className="flex-1 bg-[#08090B]">
         <View className="flex-row items-center justify-between p-4 border-b border-white/10">
           <TouchableOpacity onPress={onClose}>
             <Text className="text-blue-400 text-base">Cancel</Text>
@@ -85,7 +85,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
             <TextInput
               value={editName}
               onChangeText={setEditName}
-              className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
               placeholder="Enter your name"
               placeholderTextColor="#6B7280"
             />
@@ -96,7 +96,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
             <TextInput
               value={editEmail}
               onChangeText={setEditEmail}
-              className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
               placeholder="Enter your email"
               placeholderTextColor="#6B7280"
               keyboardType="email-address"
@@ -109,7 +109,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
             <TextInput
               value={editCohortNo}
               onChangeText={setEditCohortNo}
-              className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
               placeholder="Enter your cohort number"
               placeholderTextColor="#6B7280"
               keyboardType="numeric"
@@ -121,7 +121,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
             <TextInput
               value={editSemester}
               onChangeText={setEditSemester}
-              className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
               placeholder="Enter your semester"
               placeholderTextColor="#6B7280"
               keyboardType="numeric"
@@ -133,7 +133,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
             <TextInput
               value={editTerm}
               onChangeText={setEditTerm}
-              className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
               placeholder="Enter your term"
               placeholderTextColor="#6B7280"
               keyboardType="numeric"
@@ -145,7 +145,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
             <TextInput
               value={editCgr}
               onChangeText={setEditCgr}
-              className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
               placeholder="Enter your CGR"
               placeholderTextColor="#6B7280"
               keyboardType="decimal-pad"
@@ -165,7 +165,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
                     className={`px-4 py-2 rounded-full border mr-3 ${
                       isSelected 
                         ? 'bg-blue-600 border-blue-600' 
-                        : 'bg-[#1e293b] border-white/10'
+                        : 'bg-[#101216] border-white/10'
                     }`}
                   >
                     <Text className={`font-medium ${isSelected ? 'text-white' : 'text-gray-400'}`}>

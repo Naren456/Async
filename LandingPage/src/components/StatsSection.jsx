@@ -27,9 +27,8 @@ function CountUp({ end, suffix = "+", started }) {
   );
 }
 
-const stats = [
+const staticStats = [
   { Icon: BookOpen, value: 50, label: "Subjects Covered", suffix: "+" },
-  { Icon: Users, value: 1000, label: "Active Users", suffix: "+" },
   {
     Icon: ClipboardCheck,
     value: 5000,
@@ -41,6 +40,39 @@ const stats = [
 
 function StatsSection() {
   const [ref, inView] = useInView(0.3);
+  const [activeUsers, setActiveUsers] = useState(null);
+  const [activeWindowDays, setActiveWindowDays] = useState(30);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "");
+
+    // Keep the page deployable without an API while avoiding a misleading fallback count.
+    if (!apiBaseUrl) return () => controller.abort();
+
+    fetch(`${apiBaseUrl}/api/public/stats`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data) => {
+        if (Number.isFinite(data.activeUsers)) setActiveUsers(data.activeUsers);
+        if (Number.isFinite(data.activeWindowDays)) setActiveWindowDays(data.activeWindowDays);
+      })
+      .catch(() => {
+        // The rest of the landing page remains useful if statistics are unavailable.
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const stats = [
+    staticStats[0],
+    {
+      Icon: Users,
+      value: activeUsers,
+      label: activeUsers === null ? "Active users" : `Active in last ${activeWindowDays} days`,
+      suffix: "",
+    },
+    ...staticStats.slice(1),
+  ];
 
   return (
     <section className="py-16 md:py-24 relative">
@@ -63,7 +95,11 @@ function StatsSection() {
                 <Icon className="text-blue-400" size={24} />
               </div>
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                <CountUp end={value} suffix={suffix} started={inView} />
+                {value === null ? (
+                  <span aria-label="Active user count unavailable">—</span>
+                ) : (
+                  <CountUp end={value} suffix={suffix} started={inView} />
+                )}
               </div>
               <p className="text-slate-400 text-sm">{label}</p>
             </div>

@@ -2,7 +2,7 @@ import { Stack, SplashScreen } from "expo-router";
 import "./global.css";
 import { Provider } from 'react-redux';
 import { store } from '../store/store';
-import * as SecureStore from "expo-secure-store"
+import * as SecureStore from "../utils/secureStore"
 import { useDispatch } from "react-redux";
 
 
@@ -13,6 +13,7 @@ import { UpdatePushToken } from "../api/apiCall";
 
 import { useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { Platform } from "react-native";
 
 // Prevent auto hide
 // Prevent auto hide
@@ -26,6 +27,28 @@ function AppLayout() {
   useEffect(() => {
     // Hide the splash screen once the layout is mounted
     SplashScreen.hideAsync();
+
+    // Register service worker and inject manifest for PWA on web
+    if (Platform.OS === "web") {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then((registration) => {
+            console.log("Service Worker registered with scope:", registration.scope);
+          })
+          .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+          });
+      }
+
+      // Add manifest link if not exists
+      if (!document.querySelector('link[rel="manifest"]')) {
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = '/manifest.json';
+        document.head.appendChild(manifestLink);
+      }
+    }
   }, []);
 
   useEffect(() => {

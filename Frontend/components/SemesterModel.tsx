@@ -10,7 +10,7 @@ type SemesterModalProps = {
 const SemesterModal: React.FC<SemesterModalProps> = ({ visible, onClose, onSelect }) => (
   <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
     <View className="flex-1 bg-black/50 justify-end">
-      <View className="bg-[#1e293b] p-6 rounded-t-3xl border-t border-white/10 max-h-[60%]">
+      <View className="bg-[#101216] p-6 rounded-t-3xl border-t border-white/10 max-h-[60%]">
         <Text className="text-white text-lg font-semibold mb-4">Select Semester</Text>
         <ScrollView>
           <TouchableOpacity className="py-3 border-b border-white/10" onPress={() => { onSelect(undefined); onClose(); }}>

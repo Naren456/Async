@@ -37,7 +37,7 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ onAnimation
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0f172b',
+        backgroundColor: '#08090B',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 9999,

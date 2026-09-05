@@ -49,7 +49,7 @@ export default function ForgotPassword() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#0f172b]">
+        <SafeAreaView className="flex-1 bg-[#08090B]">
             <StatusBar style="light" />
             <LinearGradient
                 colors={["#1e3a8a", "#2563eb", "#60a5fa"]}

@@ -28,7 +28,7 @@ const AdminAnalytics = () => {
   };
 
   const StatCard = ({ title, value, color, icon }: any) => (
-    <View className="bg-[#1e293b] p-5 rounded-xl border border-white/10 mb-4 w-[48%]">
+    <View className="bg-[#101216] p-5 rounded-xl border border-white/10 mb-4 w-[48%]">
        <View className={`w-10 h-10 rounded-full items-center justify-center mb-3`} style={{ backgroundColor: color + '20' }}>
          {icon}
        </View>
@@ -38,9 +38,9 @@ const AdminAnalytics = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-4 border-b border-white/10 bg-[#1e293b]/80">
+      <View className="flex-row items-center justify-between px-4 py-4 border-b border-white/10 bg-[#101216]/80">
         <TouchableOpacity onPress={() => router.back()} className="p-2">
           <ArrowLeft size={24} color="#60A5FA" />
         </TouchableOpacity>
@@ -74,7 +74,7 @@ const AdminAnalytics = () => {
                </View>
             </View>
 
-            <View className="bg-[#1e293b] p-5 rounded-xl border border-white/10 mb-6">
+            <View className="bg-[#101216] p-5 rounded-xl border border-white/10 mb-6">
                <Text className="text-white font-semibold mb-2">Engagement Rate</Text>
                <View className="flex-row items-end">
                    <Text className="text-4xl font-bold text-yellow-400">

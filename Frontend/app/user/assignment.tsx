@@ -6,7 +6,6 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
-  Alert,
   Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -211,9 +210,9 @@ const Assignment = () => {
   const filteredGroupedAssignments = getFilteredAssignments();
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b] mb-18">
-      <View className="px-4 py-3 flex-row justify-between items-center mb-2">
-        <Text className="text-xl font-bold text-gray-100 tracking-wide">Assignments</Text>
+    <SafeAreaView className="flex-1 bg-[#08090B] mb-18">
+      <View className="px-5 py-5 flex-row justify-between items-center mb-2">
+        <Text className="text-2xl font-bold text-[#F5F7FA] tracking-tight">Assignments</Text>
       </View>
       
       {/* Filters */}
@@ -222,11 +221,11 @@ const Assignment = () => {
           <Pressable
             key={f}
             onPress={() => setFilter(f)}
-            className={`px-5 py-1.5 rounded-full border mr-3 ${
-              filter === f ? "bg-blue-600 border-blue-600" : "bg-[#1e293b] border-white/10"
+            className={`px-5 py-2 rounded-full border mr-3 ${
+              filter === f ? "bg-blue-500 border-blue-500" : "bg-[#101216] border-[#242832]"
             }`}
           >
-            <Text className={`${filter === f ? "text-white" : "text-gray-400"} font-medium`}>
+            <Text className={`${filter === f ? "text-white" : "text-[#9CA3AF]"} font-medium`}>
               {f}
             </Text>
           </Pressable>
@@ -252,7 +251,7 @@ const Assignment = () => {
           <Text className="text-gray-400 px-1 text-base">No assignments found for this filter.</Text>
         ) : (
           Object.entries(filteredGroupedAssignments).map(([date, assignments]) => (
-            <View key={date} className="mb-6 rounded-xl bg-[#1e293b]/60 border border-white/10 p-4">
+            <View key={date} className="mb-6 rounded-xl bg-[#101216] border border-[#242832] p-4">
               <Text className="text-lg font-semibold text-blue-300 mb-3">{date}</Text>
               {assignments.map((assign: Assignment) => (
                 <AssignmentCard

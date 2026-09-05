@@ -111,7 +111,7 @@ const AssignmentForm = () => {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-4 border-b border-white/10">
         <TouchableOpacity onPress={() => router.back()} className="p-2">
@@ -122,13 +122,13 @@ const AssignmentForm = () => {
       </View>
 
       {/* Form */}
-      <View className="p-4">
+      <View className="p-4 max-w-2xl mx-auto w-full">
         <View className="mb-3">
           <Text className="text-gray-300 mb-1">Title</Text>
           <TextInput
             value={form.title}
             onChangeText={(t) => setForm((f) => ({ ...f, title: t }))}
-            className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+            className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
             placeholder="Enter title"
             placeholderTextColor="#6B7280"
           />
@@ -137,38 +137,73 @@ const AssignmentForm = () => {
         <View className="mb-3 flex-row justify-between">
           <View className="flex-1 mr-2">
             <Text className="text-gray-300 mb-1">Due Date</Text>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              className="bg-[#1e293b] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
-            >
-              <Text className="text-white">
-                {new Date(form.dueDate).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "2-digit",
-                })}
-              </Text>
-              <Calendar size={20} color="#6B7280" />
-            </TouchableOpacity>
+            {Platform.OS === 'web' ? (
+              <input 
+                type="date" 
+                value={form.dueDate.split('T')[0]}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const date = new Date(e.target.value);
+                    const current = new Date(form.dueDate);
+                    current.setFullYear(date.getFullYear());
+                    current.setMonth(date.getMonth());
+                    current.setDate(date.getDate());
+                    setForm(f => ({ ...f, dueDate: current.toISOString() }));
+                  }
+                }}
+                style={{ backgroundColor: '#101216', color: 'white', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', colorScheme: 'dark' }}
+              />
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(true)}
+                className="bg-[#101216] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+              >
+                <Text className="text-white">
+                  {new Date(form.dueDate).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                  })}
+                </Text>
+                <Calendar size={20} color="#6B7280" />
+              </TouchableOpacity>
+            )}
           </View>
 
           <View className="flex-1 ml-2">
             <Text className="text-gray-300 mb-1">Due Time</Text>
-            <TouchableOpacity
-              onPress={() => setShowTimePicker(true)}
-              className="bg-[#1e293b] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
-            >
-              <Text className="text-white">
-                {new Date(form.dueDate).toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </Text>
-              <Clock size={20} color="#6B7280" />
-            </TouchableOpacity>
+            {Platform.OS === 'web' ? (
+              <input 
+                type="time" 
+                value={new Date(form.dueDate).toTimeString().slice(0,5)}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const [hours, minutes] = e.target.value.split(':');
+                    const current = new Date(form.dueDate);
+                    current.setHours(parseInt(hours, 10));
+                    current.setMinutes(parseInt(minutes, 10));
+                    setForm(f => ({ ...f, dueDate: current.toISOString() }));
+                  }
+                }}
+                style={{ backgroundColor: '#101216', color: 'white', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', colorScheme: 'dark' }}
+              />
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowTimePicker(true)}
+                className="bg-[#101216] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+              >
+                <Text className="text-white">
+                  {new Date(form.dueDate).toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </Text>
+                <Clock size={20} color="#6B7280" />
+              </TouchableOpacity>
+            )}
           </View>
           
-          {showDatePicker && (
+          {showDatePicker && Platform.OS !== 'web' && (
             <DateTimePicker
               value={new Date(form.dueDate)}
               mode="date"
@@ -178,7 +213,7 @@ const AssignmentForm = () => {
             />
           )}
           
-          {showTimePicker && (
+          {showTimePicker && Platform.OS !== 'web' && (
             <DateTimePicker
               value={new Date(form.dueDate)}
               mode="time"
@@ -192,38 +227,73 @@ const AssignmentForm = () => {
         <View className="mb-3 flex-row justify-between">
           <View className="flex-1 mr-2">
             <Text className="text-gray-300 mb-1">Opening Date</Text>
-            <TouchableOpacity
-              onPress={() => setShowOpeningDatePicker(true)}
-              className="bg-[#1e293b] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
-            >
-              <Text className="text-white">
-                {new Date(form.openingDate).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "2-digit",
-                })}
-              </Text>
-              <Calendar size={20} color="#6B7280" />
-            </TouchableOpacity>
+            {Platform.OS === 'web' ? (
+              <input 
+                type="date" 
+                value={form.openingDate.split('T')[0]}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const date = new Date(e.target.value);
+                    const current = new Date(form.openingDate);
+                    current.setFullYear(date.getFullYear());
+                    current.setMonth(date.getMonth());
+                    current.setDate(date.getDate());
+                    setForm(f => ({ ...f, openingDate: current.toISOString() }));
+                  }
+                }}
+                style={{ backgroundColor: '#101216', color: 'white', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', colorScheme: 'dark' }}
+              />
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowOpeningDatePicker(true)}
+                className="bg-[#101216] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+              >
+                <Text className="text-white">
+                  {new Date(form.openingDate).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                  })}
+                </Text>
+                <Calendar size={20} color="#6B7280" />
+              </TouchableOpacity>
+            )}
           </View>
 
           <View className="flex-1 ml-2">
             <Text className="text-gray-300 mb-1">Opening Time</Text>
-            <TouchableOpacity
-              onPress={() => setShowOpeningTimePicker(true)}
-              className="bg-[#1e293b] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
-            >
-              <Text className="text-white">
-                {new Date(form.openingDate).toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </Text>
-              <Clock size={20} color="#6B7280" />
-            </TouchableOpacity>
+            {Platform.OS === 'web' ? (
+              <input 
+                type="time" 
+                value={new Date(form.openingDate).toTimeString().slice(0,5)}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const [hours, minutes] = e.target.value.split(':');
+                    const current = new Date(form.openingDate);
+                    current.setHours(parseInt(hours, 10));
+                    current.setMinutes(parseInt(minutes, 10));
+                    setForm(f => ({ ...f, openingDate: current.toISOString() }));
+                  }
+                }}
+                style={{ backgroundColor: '#101216', color: 'white', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', colorScheme: 'dark' }}
+              />
+            ) : (
+              <TouchableOpacity
+                onPress={() => setShowOpeningTimePicker(true)}
+                className="bg-[#101216] flex-row items-center justify-between rounded-lg px-4 py-3 border border-white/10"
+              >
+                <Text className="text-white">
+                  {new Date(form.openingDate).toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </Text>
+                <Clock size={20} color="#6B7280" />
+              </TouchableOpacity>
+            )}
           </View>
           
-          {showOpeningDatePicker && (
+          {showOpeningDatePicker && Platform.OS !== 'web' && (
             <DateTimePicker
               value={new Date(form.openingDate)}
               mode="date"
@@ -233,7 +303,7 @@ const AssignmentForm = () => {
             />
           )}
           
-          {showOpeningTimePicker && (
+          {showOpeningTimePicker && Platform.OS !== 'web' && (
             <DateTimePicker
               value={new Date(form.openingDate)}
               mode="time"
@@ -250,7 +320,7 @@ const AssignmentForm = () => {
           <TextInput
             value={form.cohortNo}
             onChangeText={(t) => setForm((f) => ({ ...f, cohortNo: t }))}
-            className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+            className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
             placeholder="Enter cohort number"
             placeholderTextColor="#6B7280"
             keyboardType="numeric"
@@ -262,7 +332,7 @@ const AssignmentForm = () => {
           <TextInput
             value={form.subjectCode}
             onChangeText={(t) => setForm((f) => ({ ...f, subjectCode: t }))}
-            className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+            className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
             placeholder="Enter subject code"
             placeholderTextColor="#6B7280"
           />
@@ -273,7 +343,7 @@ const AssignmentForm = () => {
           <TextInput
             value={form.link}
             onChangeText={(t) => setForm((f) => ({ ...f, link: t }))}
-            className="bg-[#1e293b] text-white rounded-lg px-4 py-3 border border-white/10"
+            className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
             placeholder="Enter assignment link"
             placeholderTextColor="#6B7280"
           />

@@ -38,7 +38,7 @@ const AdminUsers = () => {
   }, [user?.id, user?.role]);
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0f172b]">
+    <SafeAreaView className="flex-1 bg-[#08090B]">
       <View className="flex-row items-center justify-between px-4 py-4 border-b border-white/10">
         <TouchableOpacity onPress={() => router.back()} className="p-2">
           <ArrowLeft size={24} color="#60A5FA" />
@@ -62,7 +62,7 @@ const AdminUsers = () => {
           <>
             <Text className="text-gray-400 mt-2 mb-2">{users.length} users found</Text>
             {users.map((u) => (
-              <View key={u.id} className="bg-[#1e293b] rounded-xl p-4 mb-3 border border-white/10">
+              <View key={u.id} className="bg-[#101216] rounded-xl p-4 mb-3 border border-white/10">
                 <Text className="text-white font-semibold">{u.name} ({u.email})</Text>
                 <Text className="text-gray-400 text-sm">Role: {u.role}</Text>
               </View>
