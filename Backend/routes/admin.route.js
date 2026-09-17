@@ -8,9 +8,9 @@ const adminRouter = express.Router();
 // All admin routes require admin authentication
 adminRouter.use(requireAdmin);
 
-// GET /admin/stats
-adminRouter.get("/stats",requireAdmin, getAdminStats);
-adminRouter.get("/Users",requireAdmin,getAllUsers);
-adminRouter.post("/notifications", requireAdmin, sendNotification);
-adminRouter.post("/notifications/trigger", requireAdmin, triggerDeadlineCheck);
+// GET /admin/stats (requireAdmin already applied via router.use)
+adminRouter.get("/stats", getAdminStats);
+adminRouter.get("/Users", getAllUsers);
+adminRouter.post("/notifications", sendNotification);
+adminRouter.post("/notifications/trigger", triggerDeadlineCheck);
 export default adminRouter;

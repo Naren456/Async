@@ -25,10 +25,33 @@ model User {
   cgr         Float?
   cohort      Cohort?          @relation(fields: [cohortNo], references: [cohortNo])
   notificationTone String?
+  specialization String? // FULL_STACK | CLOUD | AIML
   assignments UserAssignment[]
   activities  UserActivity[]
 
   @@index([cohortNo])
+}
+
+model WebPushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  source    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum SubjectCategory {
+  FOUNDATION
+  FOUNDATION_OPTION
+  CORE
+  ELECTIVE
+  DISCIPLINE_ELECTIVE
+  OPEN_ELECTIVE
+  SPECIALIZATION
+  MINI_PROJECT
+  PROJECT
 }
 
 model Subject {
@@ -38,8 +61,19 @@ model Subject {
   semester    Int
   term        Int
   updatedAt   DateTime     @updatedAt
+  units       Int            @default(3)
+  category    SubjectCategory @default(CORE)
+  description String? @db.Text
+  prerequisites String[] @default([])
+  specialization String? // FULL_STACK | CLOUD | AIML | null for common
+  foundationOption Int? // 1,2,3 for Foundation Option groups ($ # @)
+  isMandatory Boolean @default(false) // for # $ @ mandatory in specialization
   assignments Assignment[]
   notes       Note[]
+
+  @@index([semester, term])
+  @@index([category])
+  @@index([specialization])
 }
 
 model Assignment {
@@ -58,6 +92,7 @@ model Assignment {
   notificationSentAt DateTime?
 
   @@index([dueDate])
+  @@index([cohortNo, dueDate])
   @@unique([title, cohortNo, subjectCode])
 }
 
@@ -76,6 +111,7 @@ model Cohort {
   cohortNo    Int          @id @default(autoincrement())
   semester    Int
   term        Int
+  curriculumVersion String @default("BSCHCS_2024")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   assignments Assignment[]
@@ -109,4 +145,15 @@ model UserActivity {
 
   @@index([createdAt])
   @@index([userId])
+}
+
+model Specialization {
+  id String @id @default(cuid())
+  name String @unique // Full-Stack, Cloud, AIML
+  description String?
+  mandatoryCodes String[] // e.g. ["BHCS ZC413","BHCS ZC419"...]
+  miniProjectCode String @default("BHCS ZC427T")
+  prerequisiteCode String? // BCS ZC237 or BCS ZC312
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

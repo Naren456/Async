@@ -5,7 +5,7 @@ export const getAdminStats = async (req, res) => {
     const stats = await adminService.getStats();
     res.json(stats);
   } catch (error) {
-    console.error("Error fetching admin stats:", error);
+    if (process.env.NODE_ENV !== "production") console.error("Error fetching admin stats:", error);
     res.status(500).json({ message: "Server error fetching admin stats" });
   }
 };
@@ -13,9 +13,14 @@ export const getAdminStats = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const users = await adminService.getAllUsers();
-    res.status(200).json(users);
+    // Don't leak password hashes
+    const safe = users.map(u => {
+      const { password, ...rest } = u;
+      return rest;
+    });
+    res.status(200).json(safe);
   } catch (error) {
-    console.error("Error fetching admin stats:", error);
+    if (process.env.NODE_ENV !== "production") console.error("Error fetching admin stats:", error);
     res.status(500).json({ message: "Server error fetching all users" });
   }
 };
@@ -27,32 +32,28 @@ export const sendNotification = async (req, res) => {
     if (!cohort || !title || !body) {
       return res.status(400).json({ message: "Cohort, title, and body are required" });
     }
+    if (typeof title !== 'string' || title.length > 100) return res.status(400).json({ message: "Invalid title (max 100 chars)" });
+    if (typeof body !== 'string' || body.length > 500) return res.status(400).json({ message: "Invalid body (max 500 chars)" });
 
     const tokens = await adminService.sendNotificationToCohort(cohort, title, body);
     
     if (tokens.length > 0) {
-      // Send notifications in batches or individually using the utility
-      // Assuming sendPushNotification handles a single token, we might need to loop or update it to handle multiple
-      // Let's check utils/notification.js content first. 
-      // If it only takes one token, we loop. If it takes an array, we pass the array.
-      // For now, I'll assume I need to import it.
-      
-      // Wait, I need to import sendPushNotification here or in the service. 
-      // Better to do it in the service, but the service is returning tokens.
-      // Let's import it here for now as the controller handles the response.
-      // Actually, looking at auth.controller.js, it imports sendPushNotification.
-      
-      // Let's loop for now as a simple implementation, or use Promise.all
       const { sendPushNotification } = await import("../utils/notification.js");
-      
-      // Send to all tokens
-      const notifications = tokens.map(token => sendPushNotification(token, title, body));
-      await Promise.all(notifications);
+      // Chunk to avoid Expo rate limits (100 per chunk is built-in, but we also throttle Promises)
+      const chunkSize = 50;
+      for (let i = 0; i < tokens.length; i += chunkSize) {
+        const chunk = tokens.slice(i, i + chunkSize);
+        const notifications = chunk.map(token => sendPushNotification(token, title, body));
+        const results = await Promise.allSettled(notifications);
+        results.forEach((r, idx) => {
+          if (r.status === 'rejected' && process.env.NODE_ENV !== "production") console.error(`Failed token ${chunk[idx]}:`, r.reason);
+        });
+      }
     }
 
     res.status(200).json({ message: `Notification sent to ${tokens.length} users` });
   } catch (error) {
-    console.error("Error sending notification:", error);
+    if (process.env.NODE_ENV !== "production") console.error("Error sending notification:", error);
     res.status(500).json({ message: "Server error sending notification" });
   }
 };

@@ -11,5 +11,15 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/admin/notifications/trigger",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/coursera/sync",
+      "schedule": "0 * * * *"
+    }
   ]
 }

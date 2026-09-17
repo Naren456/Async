@@ -142,22 +142,31 @@ const getMessage = (tone, urgency, userName, assignmentTitle, subjectName) => {
 // Helper function to send notifications
 const sendReminder = async (assignment, urgency, users) => {
      if (!users || users.length === 0) {
-         console.log(`No pending users to notify for ${assignment.title}`);
-     } else {
-         for (const user of users) {
-          if (user.pushToken) {
-            const message = getMessage(user.notificationTone || 'friendly', urgency, user.name, assignment.title, assignment.subject.name);
-            await sendPushNotification(user.pushToken, "Assignment Deadline", message, { url: assignment.link });
-          }
-        }
-        console.log(`Sent personalized notifications to ${users.length} users for assignment: ${assignment.title}`);
+         if (process.env.NODE_ENV !== "production") console.log(`No pending users to notify for ${assignment.title}`);
+         // Don't update notificationSentAt if no one to notify - avoids global throttle
+         return;
      }
+     let successCount = 0;
+     for (const user of users) {
+       if (user.pushToken) {
+         try {
+           const message = getMessage(user.notificationTone || 'friendly', urgency, user.name, assignment.title, assignment.subject.name);
+           await sendPushNotification(user.pushToken, "Assignment Deadline", message, { url: assignment.link });
+           successCount++;
+         } catch (e) {
+           if (process.env.NODE_ENV !== "production") console.error(`Failed to notify ${user.id}:`, e.message);
+         }
+       }
+     }
+     if (process.env.NODE_ENV !== "production") console.log(`Sent personalized notifications to ${successCount}/${users.length} users for assignment: ${assignment.title} [${urgency}]`);
 
-    // Mark assignment as notified
-    await prisma.assignment.update({
-      where: { id: assignment.id },
-      data: { notificationSentAt: new Date() }
-    });
+    // Mark assignment as notified - only if at least one succeeded
+    if (successCount > 0) {
+      await prisma.assignment.update({
+        where: { id: assignment.id },
+        data: { notificationSentAt: new Date() }
+      });
+    }
 };
 
 // Run every 30 minutes

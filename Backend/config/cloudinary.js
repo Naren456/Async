@@ -1,5 +1,8 @@
-// utils/cloudinary.ts
 import { v2 as cloudinary } from "cloudinary";
+
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  console.warn("WARNING: Cloudinary env vars missing - uploads will fail");
+}
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

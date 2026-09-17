@@ -29,22 +29,37 @@ export const uploadNote = async (data, fileBuffer) => {
     throw { status: 404, message: "Subject not found" };
   }
 
-  const uploadResult = await uploadToCloudinary(fileBuffer);
-
-  if (!uploadResult || !uploadResult.secure_url) {
-     throw new Error('Cloudinary upload failed');
+  // Validate PDF magic bytes %PDF
+  if (fileBuffer.slice(0, 4).toString() !== '%PDF') {
+    throw { status: 400, message: "Invalid PDF file (bad header)" };
   }
 
-  const newNote = await prisma.note.create({
-    data: {
-      title,
-      subjectCode,
-      pdfUrl: uploadResult.secure_url,
-      publicId: uploadResult.public_id,
-    },
-  });
+  let uploadResult;
+  try {
+    uploadResult = await uploadToCloudinary(fileBuffer);
+  } catch (e) {
+    throw { status: 500, message: "Cloudinary upload failed: " + (e.message || "") };
+  }
 
-  return newNote;
+  if (!uploadResult || !uploadResult.secure_url) {
+     throw { status: 500, message: 'Cloudinary upload failed' };
+  }
+
+  try {
+    const newNote = await prisma.note.create({
+      data: {
+        title: String(title).trim(),
+        subjectCode,
+        pdfUrl: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      },
+    });
+    return newNote;
+  } catch (e) {
+    // orphan cleanup: delete uploaded file if DB fails
+    try { await cloudinary.uploader.destroy(uploadResult.public_id, { resource_type: "raw" }); } catch(_){}
+    throw e;
+  }
 };
 
 export const deleteNote = async (noteId) => {
@@ -57,11 +72,14 @@ export const deleteNote = async (noteId) => {
     throw { status: 404, message: 'Note not found' };
   }
 
+  // Delete DB first, then cloudinary - so if DB fails we don't lose file orphan
+  await prisma.note.delete({ where: { id: noteId } });
   if (note.publicId) {
-    await cloudinary.uploader.destroy(note.publicId, { resource_type: "raw" });
+    try {
+      await cloudinary.uploader.destroy(note.publicId, { resource_type: "raw" });
+    } catch (e) {
+      console.warn(`Failed to delete cloudinary ${note.publicId}:`, e.message);
+      // don't throw - DB already deleted, log for manual cleanup
+    }
   }
-
-  await prisma.note.delete({
-    where: { id: noteId }
-  });
 };

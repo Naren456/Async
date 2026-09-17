@@ -1,6 +1,7 @@
 import * as authService from "../services/auth.service.js";
 import { sendPushNotification } from "../utils/notification.js";
 import prisma from "../config/db.js"; // Keep for sendTestNotification if needed, or move to service
+const isProd = process.env.NODE_ENV === "production";
 
 // ---------------- SIGNUP ----------------
 export const signup = async (req, res) => {
@@ -15,13 +16,15 @@ export const signup = async (req, res) => {
     
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      secure: isProd,
+      sameSite: "strict",
+      maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days persistent
+      path: "/",
     });
     
     res.status(201).json(result);
   } catch (error) {
-    console.error(error);
+    if (!isProd) console.error(error);
     const status = error.status || 500;
     res.status(status).json({ message: error.message || "Server error" });
   }
@@ -39,13 +42,15 @@ export const signin = async (req, res) => {
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      secure: isProd,
+      sameSite: "strict",
+      maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days persistent
+      path: "/",
     });
     
     res.json(result);
   } catch (error) {
-    console.error(error);
+    if (!isProd) console.error(error);
     const status = error.status || 500;
     res.status(status).json({ message: error.message || "Server error" });
   }
@@ -70,8 +75,10 @@ export const updateProfile = async (req, res) => {
 // ----- Google Sign-in -----
 export const googleSignin = async (req, res) => {
   try {
-    console.log("GOOGLE SIGNIN HEADERS:", req.headers);
-    console.log("GOOGLE SIGNIN BODY:", req.body);
+    if (!isProd) {
+      console.log("GOOGLE SIGNIN HEADERS:", req.headers);
+      console.log("GOOGLE SIGNIN BODY:", req.body);
+    }
     const { idToken } = req.body || {};
 
     if (!idToken) {
@@ -82,13 +89,15 @@ export const googleSignin = async (req, res) => {
 
     res.cookie("token", result.token, {
       httpOnly: true,
-      secure: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      secure: isProd,
+      sameSite: "strict",
+      maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days persistent
+      path: "/",
     });
 
     res.json(result);
   } catch (error) {
-    console.error(error);
+    if (!isProd) console.error(error);
     const status = error.status || 500;
     res.status(status).json({ message: error.message || "Server error during Google sign-in" });
   }
@@ -99,21 +108,25 @@ export const getMe = async (req, res) => {
     const userId = req.user;
     const user = await authService.getUserProfile(userId);
     
-    // Track activity
+    // Track activity - throttle to once per hour to avoid bloat
     try {
-      await prisma.userActivity.create({
-        data: {
-          userId,
-          action: "APP_OPEN"
-        }
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const recent = await prisma.userActivity.findFirst({
+        where: { userId, createdAt: { gte: oneHourAgo } },
+        select: { id: true }
       });
+      if (!recent) {
+        await prisma.userActivity.create({
+          data: { userId, action: "APP_OPEN" }
+        });
+      }
     } catch (e) {
-      console.error("Failed to log activity", e);
+      if (!isProd) console.error("Failed to log activity", e);
     }
 
     res.json({ user });
   } catch (error) {
-    console.error(error);
+    if (!isProd) console.error(error);
     const status = error.status || 500;
     res.status(status).json({ message: error.message || "Server error fetching user profile" });
   }

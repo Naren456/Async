@@ -4,7 +4,8 @@ let expo = new Expo();
 
 export const sendPushNotification = async (pushToken, title, body, data = {}) => {
   if (!Expo.isExpoPushToken(pushToken)) {
-    console.error(`Push token ${pushToken} is not a valid Expo push token`);
+    if (process.env.NODE_ENV !== "production") console.error(`Push token ${pushToken} is not a valid Expo push token`);
+    // Optionally clean up invalid token: prisma.user.updateMany where pushToken
     return;
   }
 

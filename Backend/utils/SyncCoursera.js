@@ -15,19 +15,29 @@ export async function syncCohortAssignments(cohortNo) {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // start of today
 
+    // Prefetch subjects to avoid N+1
+    const allSubjects = await prisma.subject.findMany({ select: { code: true, name: true } });
+    const subjectMap = new Map(allSubjects.map(s => [s.name.toLowerCase().trim(), s]));
+    // Aliases for Coursera ICS naming mismatches
+    const alias = {
+      "computing systems and performance": "computer systems and performance",
+      "network programming & client-server programming": "network programming and client-server programming",
+      "software development practices": "software development practices",
+    };
+
     for (const assignment of assignmentsList) {
       const dueDate = new Date(assignment.isoDate);
 
       // Skip past assignments
       if (dueDate < today) {
-        console.log(`⏭ Skipping past assignment '${assignment.title}' with dueDate ${dueDate}`);
+        if (process.env.NODE_ENV !== "production") console.log(`⏭ Skipping past assignment '${assignment.title}' with dueDate ${dueDate}`);
         continue;
       }
 
-      // --- Find subject code from Subject table ---
-      const subject = await prisma.subject.findFirst({
-        where: { name: assignment.subject },
-      });
+      // --- Find subject code from Subject table (case-insensitive + alias) ---
+      const rawName = (assignment.subject || "").toLowerCase().trim();
+      const key = alias[rawName] || rawName;
+      const subject = subjectMap.get(key);
 
       if (!subject) {
         console.warn(`⚠️ Subject not found for assignment "${assignment.title}" → skipping`);
@@ -86,13 +96,13 @@ export async function syncCohortAssignments(cohortNo) {
 }
 
 /** --- Main sync for all cohorts --- */
-export async function main() {
+export async function main({ exitAfterSync = true } = {}) {
   const cohortsToSync = [4, 6]; // Add more cohorts if needed
   for (const cohort of cohortsToSync) {
     await syncCohortAssignments(cohort);
   }
   console.log("🌟 All cohorts synced!");
-  process.exit(0);
+  if (exitAfterSync) process.exit(0);
 }
 
 

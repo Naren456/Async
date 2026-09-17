@@ -112,20 +112,24 @@ export function groupAssignmentsByDate(assignments) {
 export async function fetchUpcomingAssignmentsGrouped(cohort , days = 90) {
   try {
     const url = getICSUrl(cohort);
-    console.log(url);
-    if (!url) return {};
+    if (process.env.NODE_ENV !== "production") console.log(url);
+    if (!url) throw new Error(`No ICS URL for cohort ${cohort}`);
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Failed to fetch ICS");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!response.ok) throw new Error(`Failed to fetch ICS: ${response.status} ${response.statusText}`);
 
     const text = await response.text();
     const parsed = parseICSText(text);
     const upcoming = filterUpcomingAssignments(parsed, days);
-    console.log(upcoming);
+    if (process.env.NODE_ENV !== "production") console.log(upcoming);
     return groupAssignmentsByDate(upcoming);
   } catch (err) {
-    console.error("Error fetching ICS:", err);
-    return {};
+    if (process.env.NODE_ENV !== "production") console.error("Error fetching ICS:", err);
+    if (err.name === 'AbortError') throw new Error("ICS fetch timed out");
+    throw err;
   }
 }
 

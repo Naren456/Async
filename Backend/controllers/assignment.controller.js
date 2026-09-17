@@ -24,12 +24,23 @@ export const createAssignment = async (req, res) => {
 export const getAssignmentsByCohortGrouped = async (req, res) => {
   try {
     const { cohortNo } = req.params;
-    const { filter } = req.query; // Get filter from query params
+    const { filter } = req.query;
     const userId = req.user;
+    // Validate cohort and filter
+    const allowedFilters = ['all','upcoming','due', undefined];
+    if (filter && !allowedFilters.includes(filter)) {
+      return res.status(400).json({ success: false, message: "Invalid filter" });
+    }
+    // Enforce user can only see own cohort unless admin (IDOR)
+    const prisma = (await import("../config/db.js")).default;
+    const me = await prisma.user.findUnique({ where: { id: userId }, select: { cohortNo: true, role: true } });
+    if (me && me.role !== 'TEACHER' && me.cohortNo !== Number(cohortNo)) {
+      return res.status(403).json({ success: false, message: "Forbidden: cohort mismatch" });
+    }
     const result = await assignmentService.getAssignmentsByCohort(cohortNo, userId, filter);
     return res.json({ success: true, ...result });
   } catch (err) {
-    console.error("Error fetching assignments:", err);
+    if (process.env.NODE_ENV !== "production") console.error("Error fetching assignments:", err);
     const status = err.status || 500;
     res.status(status).json({ success: false, message: err.message });
   }
