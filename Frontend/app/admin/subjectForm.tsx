@@ -12,6 +12,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CreateSubject, UpdateSubject } from "../../api/apiCall";
 import { useSelector } from "react-redux";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Dropdown } from "../../components/Dropdown";
 
 // ✅ Define types with numbers for semester & term
 type SubjectFormData = {
@@ -29,11 +31,25 @@ type SubjectFormProps = {
 };
 
 const SubjectForm: React.FC<SubjectFormProps> = ({
-  editMode = false,
-  initialData,
-  onSuccess,
-  onCancel,
+  editMode: propEditMode = false,
+  initialData: propInitialData,
+  onSuccess: propOnSuccess,
+  onCancel: propOnCancel,
 }) => {
+  const params = useLocalSearchParams<{ code?: string; name?: string; semester?: string; term?: string }>();
+  const router = useRouter();
+  // Support both prop-based (component usage) and route-based (expo-router) usage
+  const routeInitialData: SubjectFormData | undefined = params?.code ? {
+    code: params.code,
+    name: params.name || "",
+    semester: Number(params.semester) || 1,
+    term: Number(params.term) || 1,
+  } : undefined;
+  const editMode = propEditMode || !!routeInitialData;
+  const initialData = propInitialData || routeInitialData;
+  const onSuccess = propOnSuccess || (() => router.back());
+  const onCancel = propOnCancel || (() => router.back());
+
   const [form, setForm] = useState<SubjectFormData>({
     code: "",
     name: "",
@@ -101,20 +117,48 @@ const SubjectForm: React.FC<SubjectFormProps> = ({
           </Text>
 
           <View className="bg-[#101216] rounded-2xl p-5 border border-white/10 shadow-md">
-            {fields.map((key) => (
-              <View key={key} className="mb-4">
-                <Text className="text-gray-300 mb-2 capitalize font-medium">{key}</Text>
-                <TextInput
-                  value={String(form[key])} // convert number to string for TextInput
-                  onChangeText={(t) => handleChange(key, t)}
-                  className="bg-[#08090B] text-white rounded-xl px-4 py-3 border border-white/10"
-                  placeholder={`Enter ${key}`}
-                  placeholderTextColor="#6B7280"
-                  editable={!editMode || key !== "code"}
-                  keyboardType={key === "semester" || key === "term" ? "numeric" : "default"}
-                />
-              </View>
-            ))}
+            {/* Code & Name */}
+            <View className="mb-4">
+              <Text className="text-gray-300 mb-2 capitalize font-medium">code</Text>
+              <TextInput
+                value={String(form.code)}
+                onChangeText={(t) => handleChange("code", t)}
+                className="bg-[#08090B] text-white rounded-xl px-4 py-3 border border-white/10"
+                placeholder="Enter code (e.g. BCS ZC311)"
+                placeholderTextColor="#6B7280"
+                editable={!editMode}
+              />
+            </View>
+            <View className="mb-4">
+              <Text className="text-gray-300 mb-2 capitalize font-medium">name</Text>
+              <TextInput
+                value={String(form.name)}
+                onChangeText={(t) => handleChange("name", t)}
+                className="bg-[#08090B] text-white rounded-xl px-4 py-3 border border-white/10"
+                placeholder="Enter subject name"
+                placeholderTextColor="#6B7280"
+              />
+            </View>
+            {/* Semester Dropdown */}
+            <View className="mb-4">
+              <Dropdown
+                label="semester"
+                value={String(form.semester)}
+                onValueChange={(v) => handleChange("semester", v)}
+                placeholder="Select semester"
+                options={[1,2,3,4,5,6,7,8].map(n=>({label:`Semester ${n}`, value:String(n)}))}
+              />
+            </View>
+            {/* Term Dropdown */}
+            <View className="mb-4">
+              <Dropdown
+                label="term"
+                value={String(form.term)}
+                onValueChange={(v) => handleChange("term", v)}
+                placeholder="Select term"
+                options={[1,2,3,4].map(n=>({label:`Term ${n}`, value:String(n)}))}
+              />
+            </View>
 
             <TouchableOpacity
               onPress={handleSubmit}

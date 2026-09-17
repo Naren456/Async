@@ -19,12 +19,17 @@ import { AuthsignIn, AuthGoogleSignIn } from "../../api/apiCall";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/reducer";
 import * as SecureStore from "../../utils/secureStore";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
 import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import { Toast } from "../../components/Toast";
 import { DataManager } from "../../utils/DataManager";
+
+WebBrowser.maybeCompleteAuthSession();
 
 // Validation schema
 const SignInSchema = Yup.object().shape({
@@ -52,6 +57,48 @@ export default function SignIn() {
     setToast((prev) => ({ ...prev, visible: false }));
   };
 
+  // Web Google Auth - FIX redirect_uri_mismatch
+  const redirectUri = makeRedirectUri({
+    scheme: "async",
+    useProxy: Platform.OS !== "web",
+  });
+  const [webRequest, webResponse, webPromptAsync] = Google.useIdTokenAuthRequest({
+    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
+  });
+
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    if (webResponse?.type === "success") {
+      const idToken = (webResponse as any).params?.id_token || (webResponse as any).authentication?.idToken;
+      if (idToken) handleWebGoogleSuccess(idToken);
+    } else if (webResponse?.type === "error") {
+      showToast("Web authentication failed", "error");
+      setIsGoogleLoading(false);
+    } else if (webResponse?.type === "dismiss") {
+      setIsGoogleLoading(false);
+    }
+  }, [webResponse]);
+
+  const handleWebGoogleSuccess = async (idToken: string) => {
+    try {
+      const result = await AuthGoogleSignIn(idToken);
+      await SecureStore.setItemAsync("authToken", result.token);
+      await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
+      dispatch(setUser({ user: result.user, token: result.token }));
+      await DataManager.prefetchUserData(result.user);
+      if (result.user.role === "TEACHER") router.replace("/admin");
+      else router.replace("/user/home");
+    } catch (e: any) {
+      showToast(e.message || "Something went wrong", "error");
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Configuration moved to _layout.tsx
   }, []);
@@ -61,7 +108,6 @@ export default function SignIn() {
     values: { email: string; password: string },
     setErrors: (errors: { [key: string]: string }) => void
   ) => {
-    console.log("Form values:", values);
     setIsLoading(true);
 
     try {
@@ -98,6 +144,16 @@ export default function SignIn() {
   // --- Google Sign-In Handler ---
   // --- Google Sign-In Handler ---
   const onGoogleButtonPress = async () => {
+    if (Platform.OS === 'web') {
+      if (!webRequest) {
+        showToast("Google auth not ready, please try again", "info");
+        return;
+      }
+      console.log("Web redirectUri:", redirectUri);
+      setIsGoogleLoading(true);
+      try { await webPromptAsync(); } catch (e: any) { showToast(e.message || "Failed to start web sign-in", "error"); setIsGoogleLoading(false); }
+      return;
+    }
     setIsGoogleLoading(true);
     try {
       if (Platform.OS === 'android') {
@@ -151,18 +207,18 @@ export default function SignIn() {
         locations={[0, 0.55, 1]}
         style={{ flex: 1 }}
       >
-        <View className="flex-1 items-center justify-center px-8">
+        <View className="flex-1 items-center justify-center px-4 md:px-8 w-full max-w-6xl mx-auto">
           {/* Header */}
-          <View className="justify-center items-center mb-12">
-            <View className="mb-4 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+          <View className="justify-center items-center mb-8 md:mb-12">
+            <View className="mb-4 p-3 md:p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
               <View className="w-12 h-12 rounded-xl bg-blue-500 items-center justify-center">
                 <BookOpen size={24} color="#F5F7FA" strokeWidth={2} />
               </View>
             </View>
-            <Text className="text-4xl font-bold text-white mb-2">
+            <Text className="text-3xl md:text-4xl font-bold text-white mb-2 text-center">
               Welcome Back
             </Text>
-            <Text className="text-base text-white/80 text-center">
+            <Text className="text-sm md:text-base text-white/80 text-center px-4">
               Sign in to your focused academic workspace
             </Text>
           </View>
@@ -182,7 +238,7 @@ export default function SignIn() {
               errors,
               touched,
             }) => (
-              <View className="w-full max-w-sm">
+              <View className="w-full max-w-sm md:max-w-md lg:max-w-lg">
                 {/* Email Input */}
                 <View className="mb-4">
                   <Text className="text-white mb-2 text-base font-medium">
@@ -285,13 +341,7 @@ export default function SignIn() {
                   disabled={isLoading || isGoogleLoading}
                   className={`py-4 rounded-xl mb-4 ${isLoading ? "bg-blue-500/50" : "bg-blue-500"
                     }`}
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 8,
-                  }}
+                  style={Platform.select({ web: { boxShadow: "0 4px 12px rgba(0,0,0,0.3)" } as any, default: { shadowColor:"#000", shadowOffset:{width:0,height:4}, shadowOpacity:0.3, shadowRadius:8, elevation:8 } })}
                   activeOpacity={0.8}
                 >
                   {isLoading ? (
@@ -314,13 +364,7 @@ export default function SignIn() {
                     onPress={onGoogleButtonPress}
                     disabled={isGoogleLoading || isLoading}
                     activeOpacity={0.8}
-                    style={{
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 4,
-                      elevation: 4,
-                    }}
+                    style={Platform.select({ web: { boxShadow: "0 2px 8px rgba(0,0,0,0.2)" } as any, default: { shadowColor:"#000", shadowOffset:{width:0,height:2}, shadowOpacity:0.2, shadowRadius:4, elevation:4 } })}
                   >
                     <LinearGradient
                       colors={["#151820", "#101216"]}

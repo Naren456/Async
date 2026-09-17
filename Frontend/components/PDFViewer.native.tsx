@@ -22,17 +22,32 @@ export default function PDFScreen() {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   
-  const pdfUrl = decodeURIComponent(url || "");
+  const ALLOWED_PDF_DOMAINS = ['res.cloudinary.com', 'cloudinary.com'];
+  function isAllowedPdfUrl(u: string): boolean {
+    try {
+      const p = new URL(u);
+      if (p.protocol !== 'https:') return false;
+      return ALLOWED_PDF_DOMAINS.some(d => p.hostname.endsWith(d));
+    } catch { return false; }
+  }
+  let pdfUrl = "";
+  try { pdfUrl = decodeURIComponent(url || ""); } catch { pdfUrl = url || ""; }
   const fileName = title || "document.pdf";
 
   useEffect(() => {
     const downloadPdf = async () => {
-      if (!pdfUrl) return;
+      if (!pdfUrl || !isAllowedPdfUrl(pdfUrl)) {
+        Alert.alert("Error", "Invalid PDF URL");
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
-        // Create a local URI for the file
-        const fileUri = FileSystem.documentDirectory + fileName.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
+        // Use hash of url to avoid collisions
+        const hash = pdfUrl.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0).toString(36);
+        const safeName = (fileName.replace(/[^a-zA-Z0-9]/g, '_').slice(0,30) + '_' + hash);
+        const fileUri = FileSystem.documentDirectory + safeName + '.pdf';
 
         // Check if file already exists (optional optimization, but good for retries)
         const fileInfo = await FileSystem.getInfoAsync(fileUri);

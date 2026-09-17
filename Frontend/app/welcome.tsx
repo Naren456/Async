@@ -8,6 +8,9 @@ import { StatusBar } from "expo-status-bar";
 import { BookOpen } from "lucide-react-native";
 import * as SecureStore from "../utils/secureStore";
 import { useDispatch } from "react-redux";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
 
 // global.css is imported in _layout.tsx, do not import it here
 import {
@@ -19,14 +22,77 @@ import { AuthGoogleSignIn } from "../api/apiCall";
 import { DataManager } from "../utils/DataManager";
 import { setUser } from "../store/reducer";
 
+WebBrowser.maybeCompleteAuthSession();
+
 export default function Welcome() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+  // Web Google Auth (expo-auth-session) - FIX redirect_uri_mismatch
+  // On web we must use window.location.origin (no proxy), on native we use expo proxy
+  const redirectUri = makeRedirectUri({
+    scheme: "async",
+    useProxy: Platform.OS !== "web",
+    // Web: http://localhost:8081, Production web: https://your-vercel-domain.vercel.app
+    // Native proxy: https://auth.expo.io/@narendra78/async
+  });
+  const [webRequest, webResponse, webPromptAsync] = Google.useIdTokenAuthRequest({
+    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
+  });
+
+  // Handle web auth response
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    if (webResponse?.type === "success") {
+      const idToken = (webResponse as any).params?.id_token || (webResponse as any).authentication?.idToken;
+      if (idToken) handleWebGoogleSuccess(idToken);
+    } else if (webResponse?.type === "error") {
+      Alert.alert("Google Sign-In Failed", "Web authentication failed");
+      setIsGoogleLoading(false);
+    } else if (webResponse?.type === "dismiss") {
+      setIsGoogleLoading(false);
+    }
+  }, [webResponse]);
+
+  const handleWebGoogleSuccess = async (idToken: string) => {
+    try {
+      const result = await AuthGoogleSignIn(idToken);
+      await SecureStore.setItemAsync("authToken", result.token);
+      await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
+      dispatch(setUser({ user: result.user, token: result.token }));
+      await DataManager.prefetchUserData(result.user);
+      if (result.user.role === "TEACHER") router.replace("/admin");
+      else router.replace("/user/home");
+    } catch (e: any) {
+      Alert.alert("Google Sign-In Failed", e.message || "Something went wrong");
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   // Google Sign-In Configuration is managed securely and centrally in _layout.tsx
 
   const onGoogleButtonPress = async () => {
+    if (Platform.OS === 'web') {
+      if (!webRequest) {
+        Alert.alert("Loading", "Google auth not ready, please try again");
+        return;
+      }
+      console.log("Web redirectUri:", redirectUri);
+      setIsGoogleLoading(true);
+      try {
+        await webPromptAsync();
+      } catch (e: any) {
+        Alert.alert("Error", e.message || "Failed to start web sign-in");
+        setIsGoogleLoading(false);
+      }
+      return;
+    }
     setIsGoogleLoading(true);
     try {
       // 1. Ensure Google Play Services are available (Android specific)
@@ -35,7 +101,7 @@ export default function Welcome() {
       }
       
       // 2. Wipe existing local authentications to force account picker
-      await GoogleSignin.signOut();
+      try { await GoogleSignin.signOut(); } catch {}
       
       // 3. Trigger authentications overlay
       const userInfo = await GoogleSignin.signIn();
@@ -50,6 +116,7 @@ export default function Welcome() {
 
         // 5. Commit backend details into encrypted device storage and state
         await SecureStore.setItemAsync("authToken", result.token);
+        await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
         dispatch(setUser({ user: result.user, token: result.token }));
 
         // 6. Pre-fetch user notes/assignments data local cache storage layers
@@ -101,34 +168,34 @@ export default function Welcome() {
         style={{ flex: 1 }}
       >
         {/* Main Container */}
-        <View className="flex-1 items-center justify-center px-8">
+        <View className="flex-1 items-center justify-center px-4 md:px-8 w-full max-w-6xl mx-auto">
 
           {/* Animated Icon */}
-          <View className="mb-10">
-            <View className="p-6 rounded-3xl bg-white/20 shadow-xl">
-              <View className="w-20 h-20 rounded-2xl bg-white/25 items-center justify-center">
+          <View className="mb-6 md:mb-10">
+            <View className="p-4 md:p-6 rounded-3xl bg-white/20 shadow-xl">
+              <View className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white/25 items-center justify-center">
                 <BookOpen size={40} strokeWidth={2} color="white" />
               </View>
             </View>
           </View>
 
           {/* Header Text */}
-          <View className="items-center">
-            <Text className="text-6xl font-extrabold text-white tracking-wide">
+          <View className="items-center px-4">
+            <Text className="text-4xl md:text-6xl font-extrabold text-white tracking-wide text-center">
               ASync
             </Text>
 
-            <Text className="text-xl text-white/90 text-center mt-4 font-medium leading-7">
+            <Text className="text-lg md:text-xl text-white/90 text-center mt-3 md:mt-4 font-medium leading-7">
               Never miss an assignment again
             </Text>
 
-            <Text className="text-base text-white/60 text-center mt-2 max-w-xs leading-6">
+            <Text className="text-sm md:text-base text-white/60 text-center mt-2 max-w-xs md:max-w-md leading-6">
               Smart reminders that keep you ahead in your academic journey
             </Text>
           </View>
 
           {/* Buttons */}
-          <View className="w-full max-w-sm mt-14">
+          <View className="w-full max-w-sm md:max-w-md mt-10 md:mt-14 px-4 md:px-0">
 
             {/* Google Button */}
             <TouchableOpacity
@@ -136,13 +203,7 @@ export default function Welcome() {
               disabled={isGoogleLoading}
               activeOpacity={0.9}
               className="bg-white flex-row items-center justify-center rounded-2xl py-4 shadow-lg"
-              style={{ 
-                elevation: 8,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4.65,
-              }}
+              style={Platform.select({ web: { boxShadow: "0 8px 20px rgba(0,0,0,0.3)" } as any, default: { elevation: 8 } })}
             >
               {isGoogleLoading ? (
                 <View className="flex-row items-center justify-center">

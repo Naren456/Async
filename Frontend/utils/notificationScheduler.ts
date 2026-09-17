@@ -13,18 +13,21 @@ export type Assignment = {
 // Identifier for our specific notification group
 const NOTIFICATION_GROUP_ID = 'assignment_reminder';
 
-/**
- * Configure standard notification behavior if not already done in _layout or hook
- */
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-        shouldShowBanner: true,
-        shouldShowList: true,
-    }),
-});
+// Notification handler is set in hooks/usePushNotifications.ts to avoid duplicate registration - do not set here
+// If no hook is used, fallback handler:
+if (Platform.OS !== "web") {
+  try {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+          shouldShowBanner: true,
+          shouldShowList: true,
+      }),
+    });
+  } catch {}
+}
 
 /**
  * Cancels all pending notifications that were scheduled by this scheduler.
@@ -36,6 +39,7 @@ Notifications.setNotificationHandler({
  * in AsyncStorage or filter by content/category if Expo supports it.
  */
 export const cancelAllAssignmentNotifications = async () => {
+    if (Platform.OS === "web") return;
     try {
         await Notifications.cancelAllScheduledNotificationsAsync();
         console.log('Cancelled all previous local notifications.');
@@ -51,6 +55,7 @@ export const cancelAllAssignmentNotifications = async () => {
  * 2. 30 minutes before deadline
  */
 export const scheduleAssignmentNotifications = async (assignments: Assignment[]) => {
+    if (Platform.OS === "web") return;
     // 1. Request permissions first (redundant if already asked, but good practice)
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') {
@@ -75,32 +80,30 @@ export const scheduleAssignmentNotifications = async (assignments: Assignment[])
 
     const tenDaysFromNow = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
 
+    const toSchedule: Array<{ assignment: Assignment; triggerDate: Date; title: string; body: string }> = [];
     for (const assignment of assignments) {
         if (!assignment.isoDate) continue;
-
         const dueDate = new Date(assignment.isoDate);
-        
-        // Optimization: Skip assignments due more than 10 days in the future
         if (dueDate > tenDaysFromNow) continue;
-
         const subjectName = typeof assignment.subject === 'string' ? assignment.subject : (assignment.subject as any).name || 'Subject';
-
         for (const interval of intervals) {
             const reminderTime = new Date(dueDate.getTime() - interval.hours * 60 * 60 * 1000);
-            
-            // Only schedule if the reminder time is in the future
             if (reminderTime > now) {
+                // Android limit: DATE trigger fails >7 days, skip those
+                const daysAhead = (reminderTime.getTime() - now.getTime()) / (24*60*60*1000);
+                if (Platform.OS === 'android' && daysAhead > 7) continue;
                 const timeText = interval.hours === 0.5 ? "30 minutes" : `${interval.hours} hour${interval.hours > 1 ? 's' : ''}`;
-                
-                await scheduleNotification(
-                    assignment, 
-                    reminderTime, 
-                    `${interval.emoji} ${interval.label}: ${assignment.title}`, 
-                    `Your assignment for ${subjectName} is due in ${timeText}.`
-                );
+                toSchedule.push({
+                  assignment,
+                  triggerDate: reminderTime,
+                  title: `${interval.emoji} ${interval.label}: ${assignment.title}`,
+                  body: `Your assignment for ${subjectName} is due in ${timeText}.`
+                });
             }
         }
     }
+    // Batch schedule without sequential await blocking UI
+    await Promise.allSettled(toSchedule.map(t => scheduleNotification(t.assignment, t.triggerDate, t.title, t.body)));
 };
 
 const scheduleNotification = async (
@@ -109,6 +112,7 @@ const scheduleNotification = async (
     title: string, 
     body: string
 ) => {
+    if (Platform.OS === "web") return;
     try {
         await Notifications.scheduleNotificationAsync({
             content: {

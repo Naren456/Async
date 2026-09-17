@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Dropdown } from './Dropdown';
 
 interface EditProfileModalProps {
   visible: boolean;
@@ -105,38 +106,38 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ visible, onClose, o
           </View>
 
           <View className="mb-6">
-            <Text className="text-white text-base font-medium mb-2">Cohort Number</Text>
-            <TextInput
+            <Dropdown
+              label="Cohort Number"
               value={editCohortNo}
-              onChangeText={setEditCohortNo}
-              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
-              placeholder="Enter your cohort number"
-              placeholderTextColor="#6B7280"
-              keyboardType="numeric"
+              onValueChange={setEditCohortNo}
+              placeholder="Select cohort"
+              options={[
+                { label: "Cohort 1", value: "1" },
+                { label: "Cohort 2", value: "2" },
+                { label: "Cohort 4", value: "4" },
+                { label: "Cohort 5", value: "5" },
+                { label: "Cohort 6", value: "6" },
+              ]}
             />
           </View>
 
           <View className="mb-6">
-            <Text className="text-white text-base font-medium mb-2">Semester</Text>
-            <TextInput
+            <Dropdown
+              label="Semester"
               value={editSemester}
-              onChangeText={setEditSemester}
-              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
-              placeholder="Enter your semester"
-              placeholderTextColor="#6B7280"
-              keyboardType="numeric"
+              onValueChange={setEditSemester}
+              placeholder="Select semester"
+              options={[1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({ label: `Semester ${n}`, value: String(n) }))}
             />
           </View>
 
           <View className="mb-6">
-            <Text className="text-white text-base font-medium mb-2">Term</Text>
-            <TextInput
+            <Dropdown
+              label="Term"
               value={editTerm}
-              onChangeText={setEditTerm}
-              className="bg-[#101216] text-white rounded-lg px-4 py-3 border border-white/10"
-              placeholder="Enter your term"
-              placeholderTextColor="#6B7280"
-              keyboardType="numeric"
+              onValueChange={setEditTerm}
+              placeholder="Select term"
+              options={[1, 2, 3].map((n) => ({ label: `Term ${n}`, value: String(n) }))}
             />
           </View>
 

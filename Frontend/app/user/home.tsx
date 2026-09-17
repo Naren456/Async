@@ -152,9 +152,17 @@ const handleToggleComplete = async (assignmentId: string) => {
 };
 
   useEffect(() => {
+    // Fix: hide initial loading as soon as data is ready, with max 3s fallback
+    if (!isInitialLoading) return;
+    if (Object.keys(groupedAssignments).length > 0 || nextAssignments.length > 0) {
+      setIsInitialLoading(false);
+    }
+  }, [groupedAssignments, nextAssignments]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialLoading(false);
-    }, 5000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -184,6 +192,7 @@ const handleToggleComplete = async (assignmentId: string) => {
       setLoading(true);
     }
 
+    let showForegroundProgress = false;
     try {
       // Dummy stats (replace with actual API data if needed)
       setStats({
@@ -194,7 +203,16 @@ const handleToggleComplete = async (assignmentId: string) => {
         trends: { subjects: 1, assignments: -2, deadlines: 0, cpg: 1 },
       });
 
-      const freshData = await DataManager.syncAssignments(user.cohortNo);
+      // Show in-app + system progress for foreground refresh
+      showForegroundProgress = !hasLoadedFromCache || refreshing;
+      if (showForegroundProgress) {
+        const { showSyncProgress } = await import("../../utils/syncProgress");
+        const { showSystemSyncStart } = await import("../../utils/syncNotification");
+        showSyncProgress("Syncing assignments...", "assignments");
+        showSystemSyncStart();
+      }
+
+      const freshData = await DataManager.syncAssignments(user.cohortNo, false);
       if (freshData) {
         // Calculate count from fresh data (which is grouped from DataManager)
         const totalCount = Object.values(freshData).reduce((acc: number, list: any) => acc + list.length, 0);
@@ -217,10 +235,31 @@ const handleToggleComplete = async (assignmentId: string) => {
         // Schedule local notifications for these upcoming assignments
         await scheduleAssignmentNotifications(allUpcoming);
       }
+      if (showForegroundProgress) {
+        const { updateSyncProgress, hideSyncProgress } = await import("../../utils/syncProgress");
+        const { updateSystemSyncProgress, hideSystemSyncProgress } = await import("../../utils/syncNotification");
+        updateSyncProgress(100, "All caught up ✓", "done");
+        updateSystemSyncProgress(100, "All caught up ✓");
+        hideSyncProgress(900);
+        hideSystemSyncProgress("All caught up ✓");
+      }
     } catch (err) {
       console.error("Error loading dashboard:", err);
+      if (showForegroundProgress) {
+        const { failSyncProgress } = await import("../../utils/syncProgress");
+        const { showSystemSyncError } = await import("../../utils/syncNotification");
+        failSyncProgress("Sync failed");
+        showSystemSyncError("Check your internet connection");
+      }
     } finally {
       setLoading(false);
+      // Ensure hide if not already
+      if (showForegroundProgress) {
+        try {
+          const { hideSyncProgress } = await import("../../utils/syncProgress");
+          // hide already scheduled above, but ensure not stuck
+        } catch {}
+      }
     }
   };
 
@@ -277,26 +316,29 @@ const handleToggleComplete = async (assignmentId: string) => {
   return (
     <SafeAreaView className="flex-1 bg-[#08090B]">
       {/* Header */}
-      <View className="px-5 py-4 border-b border-white/10 bg-[#101216]/80">
-        <Text className="text-2xl font-bold text-white">Hello, {user?.name}</Text>
-        <View className="flex-row items-center mt-1">
-          <Clock size={14} color="#60A5FA" />
-          <Text className="text-gray-400 text-sm ml-2">Welcome back!</Text>
+      <View className="px-4 md:px-6 lg:px-8 py-4 border-b border-white/10 bg-[#101216]/80">
+        <View className="max-w-6xl mx-auto w-full">
+          <Text className="text-xl md:text-2xl font-bold text-white">Hello, {user?.name}</Text>
+          <View className="flex-row items-center mt-1">
+            <Clock size={14} color="#60A5FA" />
+            <Text className="text-gray-400 text-sm ml-2">Welcome back!</Text>
+          </View>
         </View>
       </View>
 
       <ScrollView
-        className="flex-1 px-5"
+        className="flex-1 px-4 md:px-6 lg:px-8"
+        contentContainerStyle={{ maxWidth: 1152, alignSelf: 'center', width: '100%' }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#3B82F6"]} tintColor="#3B82F6" />
         }
         showsVerticalScrollIndicator={false}
       >
         {/* Stats */}
-        <View className="py-6">
-          <Text className="text-2xl font-bold text-white mb-4">Your Stats</Text>
-          <View className="flex-row flex-wrap justify-between">
-            <View className="w-[48%]">
+        <View className="py-4 md:py-6">
+          <Text className="text-xl md:text-2xl font-bold text-white mb-4">Your Stats</Text>
+          <View className="flex-row flex-wrap md:grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <View className="w-[48%] md:w-auto">
               <StatCard
                 title="Subjects"
                 value={stats.totalSubjects}
@@ -304,7 +346,7 @@ const handleToggleComplete = async (assignmentId: string) => {
                 color="#10B981"
               />
             </View>
-            <View className="w-[48%]">
+            <View className="w-[48%] md:w-auto">
               <StatCard
                 title="Assignments"
                 value={assgin}
@@ -312,7 +354,7 @@ const handleToggleComplete = async (assignmentId: string) => {
                 color="#F59E0B"
               />
             </View>
-            <View className="w-[48%]">
+            <View className="w-[48%] md:w-auto">
               <StatCard
                 title="Deadlines"
                 value={totalDeadlines}
@@ -320,7 +362,7 @@ const handleToggleComplete = async (assignmentId: string) => {
                 color="#3B82F6"
               />
             </View>
-            <View className="w-[48%]">
+            <View className="w-[48%] md:w-auto">
               <StatCard
                 title="CGR"
                 value={user?.cgr || 'N/A'}

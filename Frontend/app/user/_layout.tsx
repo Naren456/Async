@@ -6,11 +6,28 @@ import {
   BookOpen,
   User,
 } from "lucide-react-native";
+import { Platform } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const UserAppLayout = () => {
   const insets = useSafeAreaInsets();
+  // Hide bottom navbar on web - web uses top bar from home.web.tsx
+  if (Platform.OS === "web") {
+    return (
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: { display: "none" },
+        }}
+      >
+        <Tabs.Screen name="home" options={{ title: "Home" }} />
+        <Tabs.Screen name="assignment" options={{ title: "Assignments" }} />
+        <Tabs.Screen name="notes" options={{ title: "Notes" }} />
+        <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+      </Tabs>
+    );
+  }
   return (
     <Tabs
       screenOptions={{

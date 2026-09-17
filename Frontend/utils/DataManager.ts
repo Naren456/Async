@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GetAssignmentsByCohort, GetUserSubjectsWithNotes } from '../api/apiCall';
+import { showSyncProgress, updateSyncProgress, hideSyncProgress, failSyncProgress } from "./syncProgress";
+import { showSystemSyncStart, updateSystemSyncProgress, hideSystemSyncProgress, showSystemSyncError } from "./syncNotification";
 
 export class DataManager {
     // Lock gatekeeper flag to prevent concurrent duplicate initialization bursts
@@ -28,9 +30,16 @@ export class DataManager {
      * Fetch assignments from API and update cache.
      * Returns the fresh data.
      */
-    static async syncAssignments(cohortNo: string) {
+    static async syncAssignments(cohortNo: string, withProgress = false) {
         try {
+            if (withProgress) {
+              showSyncProgress("Fetching assignments...", "assignments");
+              updateSyncProgress(10, "Fetching assignments...");
+              showSystemSyncStart();
+              updateSystemSyncProgress(10, "Fetching assignments");
+            }
             const data = await GetAssignmentsByCohort(cohortNo);
+            if (withProgress) { updateSyncProgress(45, "Saving assignments...", "assignments"); updateSystemSyncProgress(45, "Saving assignments"); }
             if (data && data.grouped) {
                 await AsyncStorage.setItem(this.KEYS.ASSIGNMENTS(cohortNo), JSON.stringify(data.grouped));
                 return data.grouped;
@@ -84,9 +93,11 @@ export class DataManager {
     /**
      * Fetch subjects from API and update cache.
      */
-    static async syncSubjects(userId: string) {
+    static async syncSubjects(userId: string, withProgress = false) {
         try {
+            if (withProgress) { updateSyncProgress(55, "Fetching subjects...", "subjects"); updateSystemSyncProgress(55, "Fetching subjects"); }
             const data = await GetUserSubjectsWithNotes(userId);
+            if (withProgress) { updateSyncProgress(85, "Saving subjects...", "subjects"); updateSystemSyncProgress(85, "Saving subjects"); }
             if (data) {
                 await AsyncStorage.setItem(this.KEYS.SUBJECTS(userId), JSON.stringify(data));
                 return data;
@@ -104,6 +115,11 @@ export class DataManager {
      */
     static async prefetchUserData(user: any) {
         if (!user) return;
+        // Keep background sync user up to date
+        try {
+          const { setBackgroundUser } = await import("./backgroundSync");
+          await setBackgroundUser(user);
+        } catch {}
         
         // Return immediately if another prefetch handler is already executing
         if (this.isFetching) {
@@ -114,12 +130,18 @@ export class DataManager {
         this.isFetching = true;
         console.log('DataManager: Starting pre-fetch for user', user.name || user.email);
 
+        const isForegroundSync = !this.isFetching; // show progress only for user-initiated first sync
+        if (isForegroundSync) {
+          showSyncProgress("Syncing your data...", "assignments");
+          showSystemSyncStart();
+        }
+
         const promises = [];
 
         // 1. Assignments
         if (user.cohortNo) {
             promises.push(
-                this.syncAssignments(user.cohortNo)
+                this.syncAssignments(user.cohortNo, isForegroundSync)
                     .then(() => console.log('DataManager: Assignments pre-fetched.'))
                     .catch(err => console.error('DataManager: Failed to pre-fetch assignments:', err))
             );
@@ -129,14 +151,26 @@ export class DataManager {
         const userId = user.id || user._id;
         if (userId) {
             promises.push(
-                this.syncSubjects(userId)
+                this.syncSubjects(userId, isForegroundSync)
                     .then(() => console.log('DataManager: Subjects pre-fetched.'))
                     .catch(err => console.error('DataManager: Failed to pre-fetch subjects:', err))
             );
         }
 
         try {
-            await Promise.allSettled(promises);
+            const results = await Promise.allSettled(promises);
+            const anyOk = results.some(r => r.status === "fulfilled" && r.value);
+            const count = anyOk ? Object.keys(results[0] as any).length : 0;
+            if (isForegroundSync) {
+              if (anyOk) {
+                updateSyncProgress(100, "All caught up ✓", "done");
+                hideSystemSyncProgress("All caught up ✓");
+                hideSyncProgress(900);
+              } else {
+                failSyncProgress("Sync failed - check internet");
+                showSystemSyncError("Check your internet connection");
+              }
+            }
         } finally {
             // Unlock the sequence once all pending promises have fully completed
             this.isFetching = false;

@@ -15,74 +15,96 @@ export default function AppEntry() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    let mounted = true;
     const checkUserSession = async () => {
       let token = null;
       try {
-        // 1. Retrieve the token from secure storage
         token = await SecureStore.getItemAsync("authToken");
 
         if (token) {
-          // 2. If token exists, validate it and fetch user details
           const result = await GetMe();
-
-          // 3. Restore Redux session
-          // Pass the token to the reducer
+          if (!mounted) return;
+          // Save for offline future
+          await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
           dispatch(setUser({ user: result.user, token: token }));
-
-          // 3.1 Pre-fetch data for instant load
           await DataManager.prefetchUserData(result.user);
-
-          // 4. Navigate based on user role
+          if (!mounted) return;
           if (result.user.role === "TEACHER") {
             router.replace("/admin");
           } else {
             router.replace("/user/home");
           }
         } else {
-          // 5. No token found, redirect to the welcome screen
-          router.replace("/welcome");
+          if (mounted) router.replace("/welcome");
         }
       } catch (e: any) {
         console.error("Session check failed:", e);
-
-        // 6. Handle Offline Mode vs Expired Token
+        // OFFLINE BUG FIX: Do NOT sign out on network error - keep token
         if (e.isNetworkError) {
-          console.log("Network error detected. Attempting to enter offline mode...");
           try {
             const cachedUserString = await SecureStore.getItemAsync("userProfile");
-            if (cachedUserString && token) {
+            if (cachedUserString && token && mounted) {
               const cachedUser = JSON.parse(cachedUserString);
               dispatch(setUser({ user: cachedUser, token: token }));
-              
               if (cachedUser.role === "TEACHER") {
                 router.replace("/admin");
               } else {
                 router.replace("/user/home");
               }
-              return; // Exit here so we don't clear the token!
+              return;
+            }
+            // Even without cache, keep token for retry - don't delete
+            // Try to stay offline by using token alone if we have any cached assignments
+            if (token && mounted) {
+              console.log("Offline with no cached profile - keeping token, navigating to home for cached data");
+              // Create minimal user from token cache? Fall back to welcome without deleting token
+              // Don't delete token, just go to welcome but preserve token for next launch
+              router.replace("/welcome");
+              return;
             }
           } catch (cacheErr) {
             console.error("Failed to load cached user profile for offline mode:", cacheErr);
           }
+          // Network error without cache: keep token, don't sign out
+          if (mounted && token) {
+            console.log("Network error - preserving token for retry");
+            // Keep token, navigate to welcome without deleting so user can retry when online
+            router.replace("/welcome");
+            return;
+          }
         }
-
-        // 7. Token is invalid/expired (e.g., 401 error) or no cached profile exists. Clear it.
-        console.log("Invalid session, logging out.");
-        if (token) {
-          await SecureStore.deleteItemAsync("authToken");
-          await SecureStore.deleteItemAsync("userProfile");
+        // Only sign out on explicit auth failure (401) or other non-network errors
+        if (mounted) {
+          if (e.status === 401) {
+            if (token) {
+              await SecureStore.deleteItemAsync("authToken");
+              await SecureStore.deleteItemAsync("userProfile");
+            }
+            dispatch(setUser({ user: null }));
+          } else if (e.isNetworkError) {
+            // Already handled above, but fallback: don't delete
+            dispatch(setUser({ user: null }));
+          } else {
+            // Other errors (e.g., server 500) - keep token? Better to keep for retry as well
+            // Don't delete on 5xx
+            if (e.status >= 500) {
+              console.log("Server error - keeping token for retry");
+              router.replace("/welcome");
+              return;
+            }
+            if (token) {
+              await SecureStore.deleteItemAsync("authToken");
+              await SecureStore.deleteItemAsync("userProfile");
+            }
+            dispatch(setUser({ user: null }));
+          }
+          router.replace("/welcome");
         }
-        dispatch(setUser({ user: null }));
-
-        // Redirect to the welcome screen
-        router.replace("/welcome");
-      } finally {
-        // 7. Hide the splash screen once navigation is complete
-        // SplashScreen.hideAsync();
       }
     };
 
     checkUserSession();
+    return () => { mounted = false; };
   }, []);
 
   // Show a persistent loading screen while checking the session

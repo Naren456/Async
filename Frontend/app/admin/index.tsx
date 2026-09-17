@@ -8,7 +8,8 @@ import {
   Alert,
   RefreshControl,
 } from "react-native";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from '../../utils/secureStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useSelector, useDispatch } from "react-redux";
@@ -84,8 +85,15 @@ const AdminApp = () => {
         style: "destructive",
         onPress: async () => {
           await SecureStore.deleteItemAsync("authToken");
+          await SecureStore.deleteItemAsync("userProfile");
+          try {
+            const keys = await AsyncStorage.getAllKeys();
+            const cacheKeys = keys.filter(k => k.startsWith('cached_') || k === 'background_user' || k === 'last_background_sync');
+            if (cacheKeys.length) await AsyncStorage.multiRemove(cacheKeys);
+          } catch {}
+          try { const { clearBackgroundUser } = await import("../../utils/backgroundSync"); await clearBackgroundUser(); } catch {}
           dispatch(clearUser());
-          router.replace("/");
+          router.replace("/welcome");
         },
       },
     ]);

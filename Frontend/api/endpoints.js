@@ -20,8 +20,9 @@ export const ENDPOINTS = {
   },
   ADMIN: {
     STATS: '/api/admin/stats',
-    USERS: '/api/admin/Users',
+    USERS: '/api/admin/users',
     NOTIFICATIONS: '/api/admin/notifications',
+    TRIGGER: '/api/admin/notifications/trigger',
   },
   NOTES: {
     UPLOAD: '/api/notes/upload',

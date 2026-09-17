@@ -20,17 +20,17 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension')) return;
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response; // Return cached version
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).then(r => r).catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('/').then(r => r || new Response('Offline', { status: 503, statusText: 'Offline' }));
         }
-        return fetch(event.request).catch(() => {
-          // Fallback if offline
-          return caches.match('/');
-        });
-      })
+        return new Response('', { status: 503 });
+      });
+    })
   );
 });
 

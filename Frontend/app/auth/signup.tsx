@@ -8,10 +8,12 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { BookOpen, User, Mail, Lock, Users, Eye, EyeOff } from "lucide-react-native";
 import { AuthsignUp } from "../../api/apiCall";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "../../utils/secureStore";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/reducer";
 import { Toast } from "../../components/Toast";
+import { DataManager } from "../../utils/DataManager";
+import { Dropdown } from "../../components/Dropdown";
 // Validation Schema
 const SignUpSchema = Yup.object().shape({
   name: Yup.string()
@@ -62,17 +64,19 @@ export default function SignUp() {
 
     try {
       const result = await AuthsignUp(payload);
-      console.log("SignUp Success:", result);
 
       // Save token and update Redux state
       if (result.token) {
         await SecureStore.setItemAsync("authToken", result.token);
+        await SecureStore.setItemAsync("userProfile", JSON.stringify(result.user));
         dispatch(setUser({ user: result.user, token: result.token }));
+        await DataManager.prefetchUserData(result.user);
       }
 
       showToast("Account Created! Welcome to ASync!", "success");
       setTimeout(() => {
-        router.replace("/user/home");
+        if (result.user?.role === "TEACHER") router.replace("/admin");
+        else router.replace("/user/home");
       }, 1500);
 
     } catch (e: any) {
@@ -94,16 +98,16 @@ export default function SignUp() {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-          <View className="flex-1 items-center justify-center px-8 py-8">
+          <View className="flex-1 items-center justify-center px-4 md:px-8 py-6 md:py-8 w-full max-w-6xl mx-auto">
             {/* Header */}
-            <View className="justify-center items-center mb-8">
-              <View className="mb-4 p-4 rounded-full bg-white/15 backdrop-blur-sm">
+            <View className="justify-center items-center mb-6 md:mb-8">
+              <View className="mb-3 md:mb-4 p-3 md:p-4 rounded-full bg-white/15 backdrop-blur-sm">
                 <View className="w-12 h-12 rounded-full bg-white/25 items-center justify-center">
                   <BookOpen size={24} color="white" strokeWidth={2} />
                 </View>
               </View>
-              <Text className="text-4xl font-bold text-white mb-2">Join ASync</Text>
-              <Text className="text-base text-white/80 text-center">
+              <Text className="text-3xl md:text-4xl font-bold text-white mb-2 text-center">Join ASync</Text>
+              <Text className="text-sm md:text-base text-white/80 text-center px-4">
                 Start organizing your assignments today
               </Text>
             </View>
@@ -114,7 +118,7 @@ export default function SignUp() {
               onSubmit={(values, { setErrors }) => handleSignUp(values, setErrors)}
             >
               {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-                <View className="w-full max-w-sm">
+                <View className="w-full max-w-sm md:max-w-md lg:max-w-lg">
                   {/* Full Name */}
                   <View className="mb-4">
                     <Text className="text-white mb-2 text-base font-medium">Full Name</Text>
@@ -171,26 +175,19 @@ export default function SignUp() {
 
                   {/* Cohort Selection */}
                   <View className="mb-4">
-                    <Text className="text-white mb-2 text-base font-medium">Cohort Number</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-                      {[1, 2, 4, 5, 6].map((num) => (
-                        <TouchableOpacity
-                          key={num}
-                          onPress={() => handleChange("cohortNo")(num.toString())}
-                          className={`mr-3 px-6 py-3 rounded-xl border ${values.cohortNo === num.toString()
-                            ? "bg-blue-500 border-blue-500"
-                            : "bg-white/10 border-white/20"
-                            }`}
-                        >
-                          <Text
-                            className={`font-bold ${values.cohortNo === num.toString() ? "text-white" : "text-white/70"
-                              }`}
-                          >
-                            Cohort {num}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
+                    <Dropdown
+                      label="Cohort Number"
+                      value={values.cohortNo}
+                      onValueChange={(v) => handleChange("cohortNo")(v)}
+                      placeholder="Select cohort"
+                      options={[
+                        { label: "Cohort 1", value: "1" },
+                        { label: "Cohort 2", value: "2" },
+                        { label: "Cohort 4", value: "4" },
+                        { label: "Cohort 5", value: "5" },
+                        { label: "Cohort 6", value: "6" },
+                      ]}
+                    />
                     {errors.cohortNo && touched.cohortNo && (
                       <Text className="text-red-300 text-sm mt-1 ml-1">{errors.cohortNo}</Text>
                     )}
@@ -198,26 +195,13 @@ export default function SignUp() {
 
                   {/* Semester Selection */}
                   <View className="mb-4">
-                    <Text className="text-white mb-2 text-base font-medium">Semester</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                        <TouchableOpacity
-                          key={num}
-                          onPress={() => handleChange("semester")(num.toString())}
-                          className={`mr-3 px-5 py-3 rounded-xl border ${values.semester === num.toString()
-                            ? "bg-blue-500 border-blue-500"
-                            : "bg-white/10 border-white/20"
-                            }`}
-                        >
-                          <Text
-                            className={`font-bold ${values.semester === num.toString() ? "text-white" : "text-white/70"
-                              }`}
-                          >
-                            Sem {num}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
+                    <Dropdown
+                      label="Semester"
+                      value={values.semester}
+                      onValueChange={(v) => handleChange("semester")(v)}
+                      placeholder="Select semester"
+                      options={[1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({ label: `Semester ${n}`, value: String(n) }))}
+                    />
                     {errors.semester && touched.semester && (
                       <Text className="text-red-300 text-sm mt-1 ml-1">{errors.semester}</Text>
                     )}
@@ -225,26 +209,13 @@ export default function SignUp() {
 
                   {/* Term Selection */}
                   <View className="mb-6">
-                    <Text className="text-white mb-2 text-base font-medium">Term</Text>
-                    <View className="flex-row">
-                      {[1, 2, 3].map((num) => (
-                        <TouchableOpacity
-                          key={num}
-                          onPress={() => handleChange("term")(num.toString())}
-                          className={`mr-3 px-6 py-3 rounded-xl border ${values.term === num.toString()
-                            ? "bg-blue-500 border-blue-500"
-                            : "bg-white/10 border-white/20"
-                            }`}
-                        >
-                          <Text
-                            className={`font-bold ${values.term === num.toString() ? "text-white" : "text-white/70"
-                              }`}
-                          >
-                            Term {num}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
+                    <Dropdown
+                      label="Term"
+                      value={values.term}
+                      onValueChange={(v) => handleChange("term")(v)}
+                      placeholder="Select term"
+                      options={[1, 2, 3].map((n) => ({ label: `Term ${n}`, value: String(n) }))}
+                    />
                     {errors.term && touched.term && (
                       <Text className="text-red-300 text-sm mt-1 ml-1">{errors.term}</Text>
                     )}

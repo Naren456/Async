@@ -41,8 +41,7 @@ const AssignmentCard: React.FC<AssignmentCardProps> = ({
        
         {!isAdmin && (
           <Pressable 
-            onPress={(e) => {
-              e.stopPropagation();
+            onPress={() => {
               onToggleComplete?.();
             }}
             className="p-1 active:opacity-60"

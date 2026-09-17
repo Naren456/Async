@@ -4,14 +4,13 @@ import { ENDPOINTS } from '../endpoints';
 export const GetAssignments = async (cohort) => {
   try {
     const response = await client.get(ENDPOINTS.ASSIGNMENTS.COURSERA(cohort));
-    
     return response.data;
   } catch (error) {
     console.error("Error in GetAssignments:", error);
-    if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
-      throw new Error("Cannot connect to server. Please check your internet connection.");
+    if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error' || !error.response) {
+      throw Object.assign(new Error("Cannot connect to server. Please check your internet connection."), { isNetworkError: true });
     }
-    return {};
+    throw error.response?.data || { message: 'Failed to fetch coursera assignments' };
   }
 };
 

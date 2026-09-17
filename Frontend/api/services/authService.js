@@ -34,9 +34,13 @@ export const GetMe = async () => {
   } catch (error) {
     console.error("GetMe API Error:", error.response?.status, error.message);
     if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error' || !error.response) {
+      // Only treat as network error if no response at all
       throw { isNetworkError: true, message: "Cannot connect to server. Please check your internet connection." };
     }
-    throw { ...error.response?.data, status: error.response?.status, message: "Token validation failed" };
+    if (error.response?.status === 401) {
+      throw { status: 401, message: error.response?.data?.message || "Session expired" };
+    }
+    throw { ...error.response?.data, status: error.response?.status, message: error.response?.data?.message || "Token validation failed" };
   }
 };
 
@@ -66,7 +70,7 @@ export const UpdatePushToken = async (pushToken) => {
     return response.data;
   } catch (error) {
     console.error('UpdatePushToken Error:', error);
-    throw error;
+    throw error.response?.data || { message: error.message || 'Failed to update push token' };
   }
 };
 

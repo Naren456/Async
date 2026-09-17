@@ -17,10 +17,8 @@ export const GetSubjects = async () => {
 export const GetUserSubjectsWithNotes = async (userId, opts = {}) => {
   try {
     const params = new URLSearchParams();
-    if (opts.semester !== undefined && opts.term !== undefined) {
-      params.set('semester', String(opts.semester));
-      params.set('term', String(opts.term));
-    }
+    if (opts.semester !== undefined) params.set('semester', String(opts.semester));
+    if (opts.term !== undefined) params.set('term', String(opts.term));
     const qs = params.toString();
     const url = qs ? `${ENDPOINTS.SUBJECTS.USER(userId)}?${qs}` : ENDPOINTS.SUBJECTS.USER(userId);
     const response = await client.get(url);

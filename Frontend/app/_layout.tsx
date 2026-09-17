@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from '../store/store';
 import * as SecureStore from "../utils/secureStore"
 import { useDispatch } from "react-redux";
+import { SyncProgressOverlay } from "../components/SyncProgressOverlay";
 
 
 import { usePushNotifications } from "../hooks/usePushNotifications";
@@ -14,14 +15,13 @@ import { UpdatePushToken } from "../api/apiCall";
 import { useEffect } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Platform } from "react-native";
+import { registerBackgroundSync, setBackgroundUser } from "../utils/backgroundSync";
 
-// Prevent auto hide
-// Prevent auto hide
 SplashScreen.preventAutoHideAsync();
 
 function AppLayout() {
 
-  const { expoPushToken } = usePushNotifications();
+  const { expoPushToken, requestWebPushPermission } = usePushNotifications();
   const user = useSelector((state: any) => state.user);
 
   useEffect(() => {
@@ -52,21 +52,74 @@ function AppLayout() {
   }, []);
 
   useEffect(() => {
-    if (user && user.token && expoPushToken) {
+    if (user?.id && user?.token && expoPushToken) {
       UpdatePushToken(expoPushToken).catch(err => console.error("Failed to sync push token", err));
     }
-  }, [user, expoPushToken]);
+  }, [user?.id, user?.token, expoPushToken]);
+
+  // Web Push: request permission and save subscription for persistent web notifications
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    if (!user?.id) return;
+    const vapid = process.env.EXPO_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY;
+    if (!vapid) return;
+    // Don't auto-prompt on every load - only if permission is default
+    if (typeof window !== "undefined" && window.Notification && Notification.permission === "default") {
+      // Defer to avoid blocking splash
+      const t = setTimeout(async () => {
+        const sub = await requestWebPushPermission(vapid);
+        if (sub) {
+          try {
+            const { default: client } = await import("../api/client");
+            await client.post("/api/public/push-subscriptions", { subscription: JSON.parse(sub), source: "web-dashboard" });
+            console.log("Web push subscription saved");
+          } catch (e) { console.log("Web push save failed", e); }
+        }
+      }, 2500);
+      return () => clearTimeout(t);
+    } else if (Notification.permission === "granted") {
+      requestWebPushPermission(vapid).then(async (sub) => {
+        if (sub) {
+          try {
+            const { default: client } = await import("../api/client");
+            await client.post("/api/public/push-subscriptions", { subscription: JSON.parse(sub), source: "web-dashboard" });
+          } catch {}
+        }
+      });
+    }
+  }, [user?.id]);
+
+  // Background sync every 2 days - keep assignments fresh even when app closed
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    registerBackgroundSync();
+  }, []);
+
+  // Keep background user in sync for background task
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    if (user?.id && user?.cohortNo) {
+      setBackgroundUser(user);
+    } else if (!user?.id) {
+      // Don't clear immediately on splash - only if explicitly logged out handled elsewhere
+    }
+  }, [user?.id, user?.cohortNo]);
 
   useEffect(() => {
+    if (Platform.OS === "web") return; // Web uses expo-auth-session, not native GoogleSignin
     try {
-      const config = {
-        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || "271566804440-u7gm5a3lo29kdguq069quflptm67nrdc.apps.googleusercontent.com",
-        iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID || "271566804440-6vv0ibjg7iagif6alqq20in544vt1dqs.apps.googleusercontent.com",
+      const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+      const iosClientId = process.env.EXPO_PUBLIC_IOS_CLIENT_ID;
+      if (!webClientId) {
+        console.warn("EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID not set - Google Sign-In will fail");
+        return;
+      }
+      const config: any = {
+        webClientId,
         offlineAccess: false,
       };
-      console.log("DEBUG: Final Google Sign-In Config (Simplified):", JSON.stringify(config, null, 2));
+      if (iosClientId) config.iosClientId = iosClientId;
       GoogleSignin.configure(config);
-      console.log("Google Sign-In configured successfully");
     } catch (error) {
       console.error("Google Sign-In configuration failed:", error);
     }
@@ -76,14 +129,17 @@ function AppLayout() {
 
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="welcome" />
-      <Stack.Screen name="user" />
-      <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="note/[id]" />
-      <Stack.Screen name="pdf/[id]" />
-    </Stack>
+    <>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="welcome" />
+        <Stack.Screen name="user" />
+        <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="note/[id]" />
+        <Stack.Screen name="pdf/[id]" />
+      </Stack>
+      <SyncProgressOverlay />
+    </>
   )
 }
 

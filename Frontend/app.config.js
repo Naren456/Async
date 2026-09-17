@@ -1,12 +1,10 @@
-import 'dotenv/config';
-
 export default {
   name: "ASync",
-  slug: "A_Sync",
+  slug: "async",
   owner: "narendra78",
   version: "1.0.0",
-  runtimeVersion: "1.0.0",
-  orientation: "portrait",
+  runtimeVersion: { policy: "appVersion" },
+  orientation: "default",
   icon: "./assets/images/icon.png",
   scheme: "async",
   userInterfaceStyle: "automatic",
@@ -14,10 +12,12 @@ export default {
 
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.async.mobile",
+    bundleIdentifier: "com.narendra.async.ios",
     googleServicesFile: "./GoogleService-Info.plist",
     infoPlist: {
-      ITSAppUsesNonExemptEncryption: false
+      ITSAppUsesNonExemptEncryption: false,
+      UIBackgroundModes: ["fetch", "remote-notification"],
+      BGTaskSchedulerPermittedIdentifiers: ["com.narendra.async.bg-sync"]
     }
   },
 
@@ -26,10 +26,11 @@ export default {
       backgroundColor: "#E6F4FE",
       foregroundImage: "./assets/images/adaptive-icon.png"
     },
-    // edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: "com.narendra.async",
-    googleServicesFile: "./google-services.json"
+    googleServicesFile: "./google-services.json",
+    permissions: ["RECEIVE_BOOT_COMPLETED", "WAKE_LOCK"],
+    useNextNotificationsApi: true
   },
 
   web: {
@@ -69,17 +70,13 @@ export default {
     "expo-secure-store",
     [
       "@react-native-google-signin/google-signin",
-      {
-        "webClientId": process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        "iosUrlScheme": process.env.EXPO_PUBLIC_IOS_URL_SCHEME
-      }
     ],
     [
       "expo-build-properties",
       {
         "android": {
           "ndkVersion": "27.1.12297006",
-          "usesCleartextTraffic": true
+          "usesCleartextTraffic": false
         },
         "ios": {
           "useFrameworks": "static"

@@ -4,16 +4,28 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const ALLOWED_PDF_DOMAINS = ['res.cloudinary.com', 'cloudinary.com'];
+
+function isAllowedPdfUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return false;
+    if (parsed.protocol === 'javascript:' || parsed.protocol === 'data:') return false;
+    return ALLOWED_PDF_DOMAINS.some(d => parsed.hostname.endsWith(d));
+  } catch { return false; }
+}
+
 export default function PDFScreenWeb() {
   const { url, title } = useLocalSearchParams<{ url: string; title: string }>();
   const router = useRouter();
 
-  const pdfUrl = decodeURIComponent(url || "");
+  let pdfUrl = "";
+  try { pdfUrl = decodeURIComponent(url || ""); } catch { pdfUrl = url || ""; }
 
-  if (!pdfUrl) {
+  if (!pdfUrl || !isAllowedPdfUrl(pdfUrl)) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>No PDF URL provided.</Text>
+        <Text style={styles.errorText}>{!pdfUrl ? "No PDF URL provided." : "Invalid PDF URL domain."}</Text>
       </View>
     );
   }
