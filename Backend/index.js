@@ -31,7 +31,9 @@ const allowedOrigins = [
   "http://localhost:8081",
   "http://localhost:5000",
   "http://localhost:5173",
+  "https://async-0.vercel.app",
   process.env.MOBILE_APP_URL,
+  process.env.FRONTEND_URL,
   process.env.LANDING_PAGE_URL,
   process.env.CHROME_EXTENSION_ORIGIN, // chrome-extension://<extension-id>
 ].filter(Boolean); // Remove undefined values
