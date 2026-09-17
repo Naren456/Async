@@ -62,11 +62,12 @@ export default function SignIn() {
     scheme: "async",
     useProxy: Platform.OS !== "web",
   });
+  const webClientIdReal = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const [webRequest, webResponse, webPromptAsync] = Google.useIdTokenAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    clientId: webClientIdReal || "dummy.apps.googleusercontent.com",
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID || undefined,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID || undefined,
+    webClientId: webClientIdReal || "dummy.apps.googleusercontent.com",
     redirectUri,
   });
 
@@ -145,6 +146,10 @@ export default function SignIn() {
   // --- Google Sign-In Handler ---
   const onGoogleButtonPress = async () => {
     if (Platform.OS === 'web') {
+      if (!webClientIdReal) {
+        showToast("Google Sign-In not configured on web", "info");
+        return;
+      }
       if (!webRequest) {
         showToast("Google auth not ready, please try again", "info");
         return;

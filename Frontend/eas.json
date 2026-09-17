@@ -1,8 +1,7 @@
 {
   "cli": {
     "version": ">= 13.5.0",
-    "appVersionSource": "remote",
-    "promptToUpgradeExpoUpdaters": false
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {

@@ -12,6 +12,10 @@ const getBaseUrl = () => {
   if (typeof window !== "undefined" && window.location.hostname === "localhost" && API_BASE_URL?.includes("vercel.app")) {
     return "http://localhost:8000";
   }
+  // Fallback for production Vercel when env not injected (common after `vercel --prod` without dashboard env)
+  if (!API_BASE_URL && typeof window !== "undefined" && window.location.hostname.includes("vercel.app")) {
+    return "https://async-server.vercel.app";
+  }
   return API_BASE_URL || "http://localhost:8000";
 };
 

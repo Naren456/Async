@@ -37,11 +37,12 @@ export default function Welcome() {
     // Web: http://localhost:8081, Production web: https://your-vercel-domain.vercel.app
     // Native proxy: https://auth.expo.io/@narendra78/async
   });
+  const webClientIdReal = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const [webRequest, webResponse, webPromptAsync] = Google.useIdTokenAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    clientId: webClientIdReal || "dummy.apps.googleusercontent.com",
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID || undefined,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID || undefined,
+    webClientId: webClientIdReal || "dummy.apps.googleusercontent.com",
     redirectUri,
   });
 
@@ -79,6 +80,10 @@ export default function Welcome() {
 
   const onGoogleButtonPress = async () => {
     if (Platform.OS === 'web') {
+      if (!webClientIdReal) {
+        Alert.alert("Not configured", "Google Sign-In not configured on web (EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID missing). Use email login or contact admin.");
+        return;
+      }
       if (!webRequest) {
         Alert.alert("Loading", "Google auth not ready, please try again");
         return;
